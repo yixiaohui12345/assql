@@ -1,0 +1,30 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>MySqlErrorEvent.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql.events
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.events.Event;
+    <span class="asReserved">import</span> flash.events.ErrorEvent;
+
+    <span class="asReserved">public</span> <span class="asClass">class</span> MySqlErrorEvent <span class="asReserved">extends</span> ErrorEvent
+    <span class="asBracket">{</span>
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> SQL_ERROR<span class="asOperator">:</span>String <span class="asOperator">=</span> <span class="asString">&quot;sqlError&quot;</span>;
+        
+        <span class="asReserved">public</span> <span class="asVar">var</span> msg<span class="asOperator">:</span>String;
+        <span class="asReserved">public</span> <span class="asVar">var</span> id<span class="asOperator">:</span>int;
+        <span class="asReserved">public</span> <span class="asFunction">function</span> MySqlErrorEvent<span class="asBracket">(</span>msg<span class="asOperator">:</span>String, id<span class="asOperator">:</span>int<span class="asOperator">=</span>0<span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">super</span><span class="asBracket">(</span>SQL_ERROR<span class="asBracket">)</span>;
+            <span class="asReserved">this</span>.msg <span class="asOperator">=</span> msg;
+            <span class="asReserved">this</span>.id <span class="asOperator">=</span> id;
+            <span class="asReserved">this</span>.text <span class="asOperator">=</span> <span class="asString">&quot;SQL Error #&quot;</span> <span class="asOperator">+</span> id <span class="asOperator">+</span> <span class="asString">&quot;: &quot;</span> <span class="asOperator">+</span> msg;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

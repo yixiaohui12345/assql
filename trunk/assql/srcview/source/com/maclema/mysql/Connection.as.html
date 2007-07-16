@@ -1,0 +1,247 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Connection.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.events.EventDispatcher;
+    <span class="asReserved">import</span> flash.net.Socket;
+    <span class="asReserved">import</span> flash.events.ErrorEvent;
+    <span class="asReserved">import</span> flash.events.Event;
+    <span class="asReserved">import</span> flash.events.IOErrorEvent;
+    <span class="asReserved">import</span> flash.events.SecurityErrorEvent;
+    <span class="asReserved">import</span> flash.events.ProgressEvent;
+    <span class="asReserved">import</span> com.maclema.mysql.events.MySqlErrorEvent;
+    
+    <span class="asReserved">public</span> <span class="asClass">class</span> Connection <span class="asReserved">extends</span> EventDispatcher
+    <span class="asBracket">{</span>
+        <span class="asComment">//the actual socket
+</span>        <span class="asReserved">private</span> <span class="asVar">var</span> sock<span class="asOperator">:</span>Socket;
+        
+        <span class="asComment">//connection information
+</span>        <span class="asReserved">private</span> <span class="asVar">var</span> host<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> port<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> username<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> password<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> database<span class="asOperator">:</span>String;
+        
+        <span class="asComment">//the current data reader
+</span>        <span class="asReserved">private</span> <span class="asVar">var</span> dataHandler<span class="asOperator">:</span>DataHandler;
+        
+        <span class="asComment">//the server information
+</span>        <span class="asReserved">public</span> <span class="asVar">var</span> server<span class="asOperator">:</span>ServerInformation;
+        
+        <span class="asComment">//the client capabilities
+</span>        <span class="asReserved">public</span> <span class="asVar">var</span> clientParam<span class="asOperator">:</span>int <span class="asOperator">=</span> 0;
+        
+        <span class="asReserved">private</span> <span class="asVar">var</span> expectingClose<span class="asOperator">:</span>Boolean <span class="asOperator">=</span> <span class="asReserved">false</span>;
+        
+        <span class="asReserved">public</span> <span class="asVar">var</span> hasLongColumnInfo<span class="asOperator">:</span>Boolean <span class="asOperator">=</span> <span class="asReserved">false</span>;
+        
+        <span class="asReserved">private</span> <span class="asVar">var</span> buffer<span class="asOperator">:</span>Buffer;
+        
+        <span class="asDoc">/**
+         * Creates a new connection to a MySql server.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> Connection<span class="asBracket">(</span> host<span class="asOperator">:</span>String, port<span class="asOperator">:</span>int, username<span class="asOperator">:</span>String, password<span class="asOperator">:</span>String <span class="asOperator">=</span> <span class="asReserved">null</span>, database<span class="asOperator">:</span>String <span class="asOperator">=</span> <span class="asReserved">null</span> <span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">super</span><span class="asBracket">()</span>;
+            
+            buffer <span class="asOperator">=</span> <span class="asReserved">new</span> Buffer<span class="asBracket">()</span>;
+            
+            <span class="asComment">//set the connection information    
+</span>            <span class="asReserved">this</span>.host <span class="asOperator">=</span> host;
+            <span class="asReserved">this</span>.port <span class="asOperator">=</span> port;
+            <span class="asReserved">this</span>.username <span class="asOperator">=</span> username;
+            <span class="asReserved">this</span>.password <span class="asOperator">=</span> password;
+            <span class="asReserved">this</span>.database <span class="asOperator">=</span> database;
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> <span class="asReserved">this</span>.database <span class="asOperator">==</span> <span class="asString">&quot;&quot;</span> <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asReserved">this</span>.database <span class="asOperator">=</span> <span class="asReserved">null</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> <span class="asReserved">this</span>.password <span class="asOperator">==</span> <span class="asString">&quot;&quot;</span> <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asReserved">this</span>.password <span class="asOperator">=</span> <span class="asReserved">null</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asComment">//create the connection to the server
+</span>            sock <span class="asOperator">=</span> <span class="asReserved">new</span> Socket<span class="asBracket">()</span>;
+            sock.addEventListener<span class="asBracket">(</span>IOErrorEvent.IO_ERROR, onSocketError<span class="asBracket">)</span>;
+            sock.addEventListener<span class="asBracket">(</span>SecurityErrorEvent.SECURITY_ERROR, onSocketError<span class="asBracket">)</span>;
+            sock.addEventListener<span class="asBracket">(</span>Event.CONNECT, onSocketConnect<span class="asBracket">)</span>;
+            sock.addEventListener<span class="asBracket">(</span>Event.CLOSE, onSocketClose<span class="asBracket">)</span>;
+            sock.addEventListener<span class="asBracket">(</span>ProgressEvent.SOCKET_DATA, onSocketData<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> onSocketError<span class="asBracket">(</span>e<span class="asOperator">:</span>ErrorEvent<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            dispatchEvent<span class="asBracket">(</span><span class="asReserved">new</span> MySqlErrorEvent<span class="asBracket">(</span>e.text<span class="asBracket">))</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> onSocketConnect<span class="asBracket">(</span>e<span class="asOperator">:</span>Event<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> onSocketClose<span class="asBracket">(</span>e<span class="asOperator">:</span>Event<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> <span class="asOperator">!</span>expectingClose <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asTrace">trace</span><span class="asBracket">(</span><span class="asString">&quot;Connection Terminated Unexpectedly!&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> onSocketData<span class="asBracket">(</span>e<span class="asOperator">:</span>ProgressEvent<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            sock.readBytes<span class="asBracket">(</span> buffer, buffer.length, sock.bytesAvailable <span class="asBracket">)</span>;
+            checkForPackets<span class="asBracket">()</span>;        
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> checkForPackets<span class="asBracket">()</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            buffer.position <span class="asOperator">=</span> 0;
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> buffer.bytesAvailable <span class="asOperator">&gt;=</span> 4 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asComment">//get packet information
+</span>                <span class="asVar">var</span> len<span class="asOperator">:</span>Number <span class="asOperator">=</span> buffer.readThreeByteInt<span class="asBracket">()</span>;
+                <span class="asVar">var</span> num<span class="asOperator">:</span>int <span class="asOperator">=</span> buffer.readByte<span class="asBracket">()</span>;
+ 
+                <span class="asComment">//is there a whole packet downloaded?
+</span>                <span class="asReserved">if</span> <span class="asBracket">(</span> buffer.bytesAvailable <span class="asOperator">&gt;=</span> len <span class="asBracket">)</span>
+                <span class="asBracket">{</span>    
+                    <span class="asComment">//read the packet
+</span>                    buffer.position <span class="asOperator">=</span> 0;
+                    
+                    <span class="asVar">var</span> pack<span class="asOperator">:</span>Packet <span class="asOperator">=</span> <span class="asReserved">new</span> Packet<span class="asBracket">(</span>buffer<span class="asBracket">)</span>;
+                    
+                    <span class="asComment">//remove the read packet from the inBuffer
+</span>                    <span class="asVar">var</span> tmp<span class="asOperator">:</span>Buffer <span class="asOperator">=</span> buffer;
+                    buffer <span class="asOperator">=</span> <span class="asReserved">new</span> Buffer<span class="asBracket">()</span>;
+                    tmp.readBytes<span class="asBracket">(</span>buffer<span class="asBracket">)</span>;
+                    tmp <span class="asOperator">=</span> <span class="asReserved">null</span>;
+                    
+                       <span class="asReserved">if</span> <span class="asBracket">(</span> dataHandler <span class="asOperator">!=</span> <span class="asReserved">null</span> <span class="asBracket">)</span>
+                       <span class="asBracket">{</span>
+                           dataHandler.pushPacket<span class="asBracket">(</span> pack <span class="asBracket">)</span>;
+                       <span class="asBracket">}</span>
+                    
+                    checkForPackets<span class="asBracket">()</span>;
+                <span class="asBracket">}</span>
+            <span class="asBracket">}</span>
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> setDataHandler<span class="asBracket">(</span>handler<span class="asOperator">:</span>DataHandler<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> dataHandler <span class="asOperator">!=</span> <span class="asReserved">null</span> <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                dataHandler.removeEventListener<span class="asBracket">(</span> <span class="asString">&quot;unregister&quot;</span>, unregisterDataHandler <span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            dataHandler <span class="asOperator">=</span> <span class="asReserved">null</span>;
+            
+            dataHandler <span class="asOperator">=</span> handler;
+            dataHandler.addEventListener<span class="asBracket">(</span> <span class="asString">&quot;unregister&quot;</span>, unregisterDataHandler <span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> unregisterDataHandler<span class="asBracket">(</span>e<span class="asOperator">:</span>Event<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            dataHandler.removeEventListener<span class="asBracket">(</span> <span class="asString">&quot;unregister&quot;</span>, unregisterDataHandler <span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Opens the socket connection to the server
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> connect<span class="asBracket">()</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asComment">//set the dataHandler
+</span>            setDataHandler<span class="asBracket">(</span> <span class="asReserved">new</span> HandshakeHandler<span class="asBracket">(</span><span class="asReserved">this</span>, username, password, database<span class="asBracket">)</span> <span class="asBracket">)</span>;
+            
+            sock.connect<span class="asBracket">(</span> host, port <span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Disconnects the socket from the server.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> disconnect<span class="asBracket">()</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            expectingClose <span class="asOperator">=</span> <span class="asReserved">true</span>;
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> sock.connected <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                sock.close<span class="asBracket">()</span>;
+            <span class="asBracket">}</span>
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Creates a new statement object
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> createStatement<span class="asBracket">()</span><span class="asOperator">:</span>Statement
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> <span class="asReserved">new</span> Statement<span class="asBracket">(</span><span class="asReserved">this</span><span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Used by Statement to execute a query or update sql statement. Should
+         * never be called directly.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> executeQuery<span class="asBracket">(</span>statement<span class="asOperator">:</span>Statement, sql<span class="asOperator">:</span>String<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            setDataHandler<span class="asBracket">(</span><span class="asReserved">new</span> QueryHandler<span class="asBracket">(</span><span class="asReserved">this</span>, statement<span class="asBracket">))</span>;
+            sendCommand<span class="asBracket">(</span>Mysql.COM_QUERY, sql<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+        * Executes a binary query object as a sql statement. Should never be
+        * called directly.
+        **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> executeBinaryQuery<span class="asBracket">(</span>statement<span class="asOperator">:</span>Statement, query<span class="asOperator">:</span>BinaryQuery<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            setDataHandler<span class="asBracket">(</span><span class="asReserved">new</span> QueryHandler<span class="asBracket">(</span><span class="asReserved">this</span>, statement<span class="asBracket">))</span>;
+            sendBinaryCommand<span class="asBracket">(</span>Mysql.COM_QUERY, query<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> sendBinaryCommand<span class="asBracket">(</span>command<span class="asOperator">:</span>int, data<span class="asOperator">:</span>BinaryQuery<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asVar">var</span> packet<span class="asOperator">:</span>Packet <span class="asOperator">=</span> <span class="asReserved">new</span> Packet<span class="asBracket">()</span>;
+            packet.writeByte<span class="asBracket">(</span>command<span class="asBracket">)</span>;
+            data.readBytes<span class="asBracket">(</span> packet, packet.position, data.bytesAvailable <span class="asBracket">)</span>;
+            packet.send<span class="asBracket">(</span>sock<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> sendCommand<span class="asBracket">(</span>command<span class="asOperator">:</span>int, data<span class="asOperator">:</span>String<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asVar">var</span> packet<span class="asOperator">:</span>Packet <span class="asOperator">=</span> <span class="asReserved">new</span> Packet<span class="asBracket">()</span>;
+            packet.writeByte<span class="asBracket">(</span>command<span class="asBracket">)</span>;
+            packet.writeUTFBytes<span class="asBracket">(</span>data<span class="asBracket">)</span>;
+            packet.send<span class="asBracket">(</span>sock<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+        * Changes the database
+        **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> changeDatabaseTo<span class="asBracket">(</span>whatDb<span class="asOperator">:</span>String<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>    
+            <span class="asReserved">if</span> <span class="asBracket">(</span> whatDb <span class="asOperator">==</span> <span class="asReserved">null</span> <span class="asOperator">||</span> whatDb.length <span class="asOperator">==</span> 0 <span class="asBracket">)</span>
+                <span class="asReserved">return</span>;
+                
+            sendCommand<span class="asBracket">(</span>Mysql.COM_INIT_DB, whatDb<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+        * Returns the actual socket.
+        **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getSocket<span class="asBracket">()</span><span class="asOperator">:</span>Socket
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> sock;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

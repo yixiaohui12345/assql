@@ -1,0 +1,157 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Field.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asDoc">/**
+     * This class represents a MySql column
+     **/</span>
+    <span class="asReserved">public</span> <span class="asClass">class</span> Field
+    <span class="asBracket">{</span>
+        <span class="asComment">/*
+         VERSION 4.1
+         Bytes                      Name
+         -----                      ----
+         n (Length Coded String)    catalog
+         n (Length Coded String)    db
+         n (Length Coded String)    table
+         n (Length Coded String)    org_table
+         n (Length Coded String)    name
+         n (Length Coded String)    org_name
+         1                          (filler)
+         2                          charsetnr
+         4                          length
+         1                          type
+         2                          flags
+         1                          decimals
+         2                          (filler), always 0x00
+         n (Length Coded Binary)    default
+        */</span>
+        <span class="asReserved">private</span> <span class="asVar">var</span> _catalog<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _db<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _table<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _orgTable<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _name<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _orgName<span class="asOperator">:</span>String;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _charsetnr<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _length<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _type<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _flags<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _decimals<span class="asOperator">:</span>int;
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> Field<span class="asBracket">(</span>packet<span class="asOperator">:</span>Packet<span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            _catalog <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            _db <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            _table <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            _orgTable <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            _name <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            _orgName <span class="asOperator">=</span> packet.readLengthCodedString<span class="asBracket">()</span>;
+            packet.readByte<span class="asBracket">()</span>; <span class="asComment">//filler
+</span>            _charsetnr <span class="asOperator">=</span> packet.readShort<span class="asBracket">()</span>;
+            _length <span class="asOperator">=</span> packet.readInt<span class="asBracket">()</span>;
+            _type <span class="asOperator">=</span> packet.readByte<span class="asBracket">()</span>;
+            _flags <span class="asOperator">=</span> packet.readShort<span class="asBracket">()</span>;
+            _decimals <span class="asOperator">=</span> packet.readByte<span class="asBracket">()</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Catalog. For 4.1, 5.0 and 5.1 the value is &quot;def&quot;.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getCatalog<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _catalog;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Database identifier
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getDatabase<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _db;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * The table identifier after the AS clause
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getTable<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _table;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Original table identifier
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getRealTable<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _orgTable;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Column identifier after AS clase
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getName<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _name;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Original column identifier
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getRealName<span class="asBracket">()</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _orgName;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Character set number
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getCharacterSet<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _charsetnr;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Length of column, according to the definition.
+         * Also known as &quot;display length&quot;. The value given
+         * here may be larger than the actual length, for
+         * example an instance of a VARCHAR(2) column may
+         * have only 1 character in it.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getLength<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _length;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * The code for the column&apos;s data type
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getType<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _type;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Possible flag values
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getFlags<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _flags;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * The number of positions after the decimal point
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getDecimals<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _decimals;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

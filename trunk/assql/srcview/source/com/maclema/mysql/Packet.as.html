@@ -1,0 +1,138 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Packet.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.net.Socket;
+    <span class="asReserved">import</span> flash.utils.ByteArray;
+    
+    <span class="asDoc">/**
+     * @private
+     **/</span>
+    <span class="asReserved">public</span> <span class="asClass">class</span> Packet <span class="asReserved">extends</span> Buffer
+    <span class="asBracket">{</span>
+        <span class="asReserved">private</span> <span class="asReserved">static</span> <span class="asReserved">const</span> maxAllowedPacket<span class="asOperator">:</span>int <span class="asOperator">=</span> 1024 <span class="asOperator">*</span> 1024;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> maxThreeBytes<span class="asOperator">:</span>int <span class="asOperator">=</span> <span class="asBracket">(</span>256 <span class="asOperator">*</span> 256 <span class="asOperator">*</span> 256<span class="asBracket">)</span> <span class="asOperator">-</span> 1;
+        
+        <span class="asReserved">private</span> <span class="asVar">var</span> packetHeader<span class="asOperator">:</span>Buffer;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _packetLength<span class="asOperator">:</span>int <span class="asOperator">=</span> <span class="asOperator">-</span>1;
+        <span class="asReserved">private</span> <span class="asVar">var</span> _packetNumber<span class="asOperator">:</span>int <span class="asOperator">=</span> 0;
+        
+        <span class="asReserved">public</span> <span class="asVar">var</span> waiting<span class="asOperator">:</span>Boolean <span class="asOperator">=</span> <span class="asReserved">false</span>;
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> Packet<span class="asBracket">(</span>buf<span class="asOperator">:</span>Buffer<span class="asOperator">=</span><span class="asReserved">null</span><span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">super</span><span class="asBracket">()</span>;
+            
+            packetHeader <span class="asOperator">=</span> <span class="asReserved">new</span> Buffer<span class="asBracket">()</span>;
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> buf <span class="asOperator">!=</span> <span class="asReserved">null</span> <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asComment">//read the packet header...
+</span>                buf.readBytes<span class="asBracket">(</span>packetHeader, 0, 4<span class="asBracket">)</span>;
+                packetHeader.position <span class="asOperator">=</span> 0;
+                _packetLength <span class="asOperator">=</span> packetHeader.readThreeByteInt<span class="asBracket">()</span>;
+                _packetNumber <span class="asOperator">=</span> packetHeader.readByte<span class="asBracket">()</span>;
+                
+                <span class="asComment">//read the packet data
+</span>                buf.readBytes<span class="asBracket">(</span><span class="asReserved">this</span>, 0, _packetLength<span class="asBracket">)</span>;
+                
+                <span class="asComment">//move the positions to 0
+</span>                <span class="asReserved">this</span>.position <span class="asOperator">=</span> 0;
+                packetHeader.position <span class="asOperator">=</span> 0;
+            <span class="asBracket">}</span>
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> <span class="asReserved">get</span> packetLength<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> _packetLength <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+                <span class="asReserved">return</span> _packetLength;
+            <span class="asReserved">else</span>
+                <span class="asReserved">return</span> <span class="asReserved">this</span>.length;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> <span class="asReserved">get</span> packetNumber<span class="asBracket">()</span><span class="asOperator">:</span>int
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> _packetNumber;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> <span class="asReserved">get</span> header<span class="asBracket">()</span><span class="asOperator">:</span>Buffer
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> packetHeader;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> send<span class="asBracket">(</span>sock<span class="asOperator">:</span>Socket, seq<span class="asOperator">:</span>int<span class="asOperator">=</span>0<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> packetLength <span class="asOperator">&gt;</span> maxAllowedPacket <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asTrace">trace</span><span class="asBracket">(</span><span class="asString">&quot;PACKET TO BIG&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> packetLength <span class="asOperator">&gt;</span> maxThreeBytes <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                sendSplitPackets<span class="asBracket">(</span>sock<span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            <span class="asReserved">else</span>
+            <span class="asBracket">{</span>
+                sendFullPacket<span class="asBracket">(</span>sock, seq<span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> getPacketToSend<span class="asBracket">()</span><span class="asOperator">:</span>Buffer
+        <span class="asBracket">{</span>
+            <span class="asVar">var</span> packetToSend<span class="asOperator">:</span>Buffer <span class="asOperator">=</span> <span class="asReserved">new</span> Buffer<span class="asBracket">()</span>;
+            
+            packetHeader.position <span class="asOperator">=</span> 0;
+            packetHeader.readBytes<span class="asBracket">(</span>packetToSend, 0, 4<span class="asBracket">)</span>;
+            
+            <span class="asReserved">this</span>.position <span class="asOperator">=</span> 0;
+            <span class="asReserved">this</span>.readBytes<span class="asBracket">(</span>packetToSend, 4, <span class="asReserved">this</span>.packetLength<span class="asBracket">)</span>;
+            
+            packetToSend.position <span class="asOperator">=</span> 0;
+            
+            <span class="asReserved">return</span> packetToSend;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> sendFullPacket<span class="asBracket">(</span>sock<span class="asOperator">:</span>Socket, seq<span class="asOperator">:</span>int<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            packetHeader.position <span class="asOperator">=</span> 0;
+            packetHeader.writeThreeByteInt<span class="asBracket">(</span> <span class="asReserved">this</span>.packetLength <span class="asBracket">)</span>;
+            packetHeader.writeByte<span class="asBracket">(</span> seq <span class="asBracket">)</span>;
+            
+            sock.writeBytes<span class="asBracket">(</span> getPacketToSend<span class="asBracket">()</span> <span class="asBracket">)</span>;
+            sock.flush<span class="asBracket">()</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">private</span> <span class="asFunction">function</span> sendSplitPackets<span class="asBracket">(</span>sock<span class="asOperator">:</span>Socket<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            <span class="asVar">var</span> len<span class="asOperator">:</span>int <span class="asOperator">=</span> packetLength;
+            <span class="asVar">var</span> pos<span class="asOperator">:</span>int <span class="asOperator">=</span> 0;
+            <span class="asVar">var</span> seq<span class="asOperator">:</span>int <span class="asOperator">=</span> 0;
+            <span class="asVar">var</span> pack<span class="asOperator">:</span>Packet;
+            
+            <span class="asReserved">while</span> <span class="asBracket">(</span> len <span class="asOperator">&gt;</span> maxThreeBytes <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                seq<span class="asOperator">++</span>;
+                
+                pack <span class="asOperator">=</span> <span class="asReserved">new</span> Packet<span class="asBracket">()</span>;
+                readBytes<span class="asBracket">(</span>pack, pos, maxThreeBytes<span class="asBracket">)</span>;
+                pos <span class="asOperator">+=</span> maxThreeBytes;
+                
+                pack.send<span class="asBracket">(</span>sock, seq<span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asComment">//send last packet
+</span>            seq<span class="asOperator">++</span>;
+            pack <span class="asOperator">=</span> <span class="asReserved">new</span> Packet<span class="asBracket">()</span>;
+            readBytes<span class="asBracket">(</span>pack, pos, <span class="asBracket">(</span>len<span class="asOperator">-</span>pos<span class="asBracket">))</span>;
+            pack.send<span class="asBracket">(</span>sock, seq<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

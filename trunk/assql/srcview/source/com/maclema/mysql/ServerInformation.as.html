@@ -1,0 +1,118 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>ServerInformation.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.utils.ByteArray;
+    
+    <span class="asDoc">/**
+     * @private
+     **/</span>
+    <span class="asReserved">public</span> <span class="asClass">class</span> ServerInformation
+    <span class="asBracket">{</span>
+        <span class="asReserved">public</span> <span class="asVar">var</span> protocolVersion<span class="asOperator">:</span>int;
+        <span class="asReserved">public</span> <span class="asVar">var</span> serverVersion<span class="asOperator">:</span>String;
+        <span class="asReserved">public</span> <span class="asVar">var</span> threadID<span class="asOperator">:</span>int;
+        <span class="asReserved">public</span> <span class="asVar">var</span> seed<span class="asOperator">:</span>String;
+        <span class="asReserved">public</span> <span class="asVar">var</span> serverCapabilities<span class="asOperator">:</span>int;
+        <span class="asReserved">public</span> <span class="asVar">var</span> serverLanguage<span class="asOperator">:</span>int;
+        <span class="asReserved">public</span> <span class="asVar">var</span> serverStatus<span class="asOperator">:</span>int;
+        
+        <span class="asReserved">public</span> <span class="asVar">var</span> useLongPassword<span class="asOperator">:</span>Boolean;
+        
+        <span class="asReserved">private</span> <span class="asVar">var</span> major<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> minor<span class="asOperator">:</span>int;
+        <span class="asReserved">private</span> <span class="asVar">var</span> revision<span class="asOperator">:</span>int;
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> ServerInformation<span class="asBracket">(</span>packet<span class="asOperator">:</span>Buffer<span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            protocolVersion <span class="asOperator">=</span> packet.readByte<span class="asBracket">()</span>;
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> protocolVersion <span class="asOperator">&lt;</span> 10 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asReserved">throw</span> <span class="asReserved">new</span> Error<span class="asBracket">(</span><span class="asString">&quot;Unsupported Protocol Version&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            serverVersion <span class="asOperator">=</span> packet.readString<span class="asBracket">()</span>;
+            
+            <span class="asVar">var</span> point<span class="asOperator">:</span>int <span class="asOperator">=</span> serverVersion.indexOf<span class="asBracket">(</span><span class="asString">&quot;.&quot;</span><span class="asBracket">)</span>;
+            <span class="asReserved">if</span> <span class="asBracket">(</span> point <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                major <span class="asOperator">=</span> int<span class="asBracket">(</span>serverVersion.substr<span class="asBracket">(</span>0, point<span class="asBracket">))</span>;
+                
+                <span class="asVar">var</span> remaining<span class="asOperator">:</span>String <span class="asOperator">=</span> serverVersion.substr<span class="asBracket">(</span>point<span class="asOperator">+</span>1<span class="asBracket">)</span>;
+                point <span class="asOperator">=</span> remaining.indexOf<span class="asBracket">(</span><span class="asString">&quot;.&quot;</span><span class="asBracket">)</span>;
+                
+                <span class="asReserved">if</span> <span class="asBracket">(</span> point <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+                <span class="asBracket">{</span>
+                    minor <span class="asOperator">=</span> int<span class="asBracket">(</span>remaining.substr<span class="asBracket">(</span>0, point<span class="asBracket">))</span>;
+                    
+                    remaining <span class="asOperator">=</span> remaining.substr<span class="asBracket">(</span>point<span class="asOperator">+</span>1<span class="asBracket">)</span>;
+                    
+                    <span class="asVar">var</span> pos<span class="asOperator">:</span>int <span class="asOperator">=</span> 0;
+                    
+                    <span class="asReserved">while</span> <span class="asBracket">(</span> pos <span class="asOperator">&lt;</span> remaining.length <span class="asBracket">)</span>
+                    <span class="asBracket">{</span>
+                        <span class="asReserved">if</span> <span class="asBracket">(</span> String<span class="asBracket">(</span><span class="asString">&quot;0123456789&quot;</span><span class="asBracket">)</span>.indexOf<span class="asBracket">(</span>remaining.charAt<span class="asBracket">(</span>pos<span class="asBracket">))</span> <span class="asOperator">==</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+                        <span class="asBracket">{</span>
+                            <span class="asReserved">break</span>;
+                        <span class="asBracket">}</span>
+                        
+                        pos<span class="asOperator">++</span>;
+                    <span class="asBracket">}</span>
+                    
+                    revision <span class="asOperator">=</span> int<span class="asBracket">(</span>remaining.substr<span class="asBracket">(</span>0, pos<span class="asBracket">))</span>;
+                <span class="asBracket">}</span>
+            <span class="asBracket">}</span>
+            
+            threadID <span class="asOperator">=</span> packet.readInt<span class="asBracket">()</span>;
+            
+            seed <span class="asOperator">=</span> packet.readString<span class="asBracket">()</span>;
+            
+            serverCapabilities <span class="asOperator">=</span> packet.readShort<span class="asBracket">()</span>;
+            serverLanguage <span class="asOperator">=</span> packet.readByte<span class="asBracket">()</span> <span class="asOperator">&amp;</span> 0xff;
+            serverStatus <span class="asOperator">=</span> packet.readShort<span class="asBracket">()</span>;
+            
+            packet.position <span class="asOperator">=</span> packet.position<span class="asOperator">+</span>13;
+            
+            seed <span class="asOperator">+=</span> packet.readString<span class="asBracket">()</span>;
+            
+            useLongPassword <span class="asOperator">=</span> <span class="asBracket">(</span>protocolVersion <span class="asOperator">&gt;</span> 9<span class="asBracket">)</span> <span class="asOperator">?</span> <span class="asReserved">true</span> <span class="asOperator">:</span> <span class="asReserved">false</span>;
+            
+            <span class="asTrace">trace</span><span class="asBracket">(</span><span class="asString">&quot;[ServerInformation] Version: &quot;</span> <span class="asOperator">+</span> serverVersion<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> meetsVersion<span class="asBracket">(</span>mjr<span class="asOperator">:</span>int, mnr<span class="asOperator">:</span>int, rvn<span class="asOperator">:</span>int<span class="asBracket">)</span><span class="asOperator">:</span>Boolean
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> major <span class="asOperator">&gt;=</span> mjr <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                <span class="asReserved">if</span> <span class="asBracket">(</span> major <span class="asOperator">==</span> mjr <span class="asBracket">)</span>
+                <span class="asBracket">{</span>
+                    <span class="asReserved">if</span> <span class="asBracket">(</span> minor <span class="asOperator">&gt;=</span> mnr <span class="asBracket">)</span>
+                    <span class="asBracket">{</span>
+                        <span class="asReserved">if</span> <span class="asBracket">(</span> minor <span class="asOperator">==</span> mnr <span class="asBracket">)</span>
+                        <span class="asBracket">{</span>
+                            <span class="asReserved">return</span> <span class="asBracket">(</span>revision <span class="asOperator">&gt;=</span> rvn <span class="asBracket">)</span>;
+                        <span class="asBracket">}</span>
+                        <span class="asReserved">return</span> <span class="asReserved">true</span>;
+                    <span class="asBracket">}</span>
+                    <span class="asReserved">return</span> <span class="asReserved">true</span>;
+                <span class="asBracket">}</span>
+                <span class="asReserved">return</span> <span class="asReserved">true</span>;
+            <span class="asBracket">}</span>
+            <span class="asReserved">return</span> <span class="asReserved">false</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> isCapableOf<span class="asBracket">(</span>param<span class="asOperator">:</span>int<span class="asBracket">)</span><span class="asOperator">:</span>Boolean
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> <span class="asBracket">(</span> <span class="asBracket">(</span>serverCapabilities <span class="asOperator">&amp;</span> param<span class="asBracket">)</span> <span class="asOperator">!=</span> 0 <span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

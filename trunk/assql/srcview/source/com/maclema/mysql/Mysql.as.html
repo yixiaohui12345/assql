@@ -1,0 +1,131 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Mysql.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asDoc">/**
+     * Static Fields
+     **/</span>
+    <span class="asReserved">public</span> <span class="asClass">class</span> Mysql
+    <span class="asBracket">{</span>
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_LONG_PASSWORD<span class="asOperator">:</span>int <span class="asOperator">=</span> 1;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_FOUND_ROWS<span class="asOperator">:</span>int <span class="asOperator">=</span> 2;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_LONG_FLAG<span class="asOperator">:</span>int <span class="asOperator">=</span> 4;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_CONNECT_WITH_DB<span class="asOperator">:</span>int <span class="asOperator">=</span> 8;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_NO_SCHEMA<span class="asOperator">:</span>int <span class="asOperator">=</span> 16;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_COMPRESS<span class="asOperator">:</span>int <span class="asOperator">=</span> 32;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_ODBC<span class="asOperator">:</span>int <span class="asOperator">=</span> 64;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_LOCAL_FILES<span class="asOperator">:</span>int <span class="asOperator">=</span> 128;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_IGNORE_SPACE<span class="asOperator">:</span>int <span class="asOperator">=</span> 256;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_PROTOCOL_41<span class="asOperator">:</span>int <span class="asOperator">=</span> 512;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_INTERACTIVE<span class="asOperator">:</span>int <span class="asOperator">=</span> 1024;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_SSL<span class="asOperator">:</span>int <span class="asOperator">=</span> 2048;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_IGNORE_SIGPIPE<span class="asOperator">:</span>int <span class="asOperator">=</span> 4096;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_TRANSACTIONS<span class="asOperator">:</span>int <span class="asOperator">=</span> 8192;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_RESERVED<span class="asOperator">:</span>int <span class="asOperator">=</span> 16384;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_SECURE_CONNECTION<span class="asOperator">:</span>int <span class="asOperator">=</span> 32768;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_MULTI_STATEMENTS<span class="asOperator">:</span>int <span class="asOperator">=</span> 65536;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> CLIENT_MULTI_RESULTS<span class="asOperator">:</span>int <span class="asOperator">=</span> 131072;
+        
+        <span class="asComment">/* Commands */</span>
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_SLEEP<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x00;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_QUIT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x01;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_INIT_DB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x02;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_QUERY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x03;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_FIELD_LIST<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x04;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_CREATE_DB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x05;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_DROP_DB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x06;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_REFRESH<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x07;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_SHUTDOWN<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x08;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STATISTICS<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x09;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_PROCESS_INFO<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0a;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_CONNECT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0b;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_PROCESS_KILL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0c;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_DEBUG<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0d;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_PING<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0e;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_TIME<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0f;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_DELAYED_INSERT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x10;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_CHANGE_USER<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x11;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_BINLOG_DUMP<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x12;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_TABLE_DUMP<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x13;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_CONNECT_OUT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x14;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_REGISTER_SLAVE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x15;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_PREPARE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x16;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_EXECUTE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x17;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_SEND_LONG_DATA<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x18;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_CLOSE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x19;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_RESET<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x1a;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_SET_OPTION<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x1b;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> COM_STMT_FETCH<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x1c;
+        
+        <span class="asComment">/* field types */</span>
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_DECIMAL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x00;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_TINY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x01;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_SHORT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x02;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_LONG<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x03;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_FLOAT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x04;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_DOUBLE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x05;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_NULL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x06;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_TIMESTAMP<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x07;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_LONGLONG<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x08;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_INT24<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x09;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_DATE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0a;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_TIME<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0b;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_DATETIME<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0c;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_YEAR<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0d;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_NEWDATE<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0e;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_VARCHAR<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x0f;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_BIT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0x10;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_NEWDECIMAL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xf6;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_ENUM<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xf7;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_SET<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xf8;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_TINY_BLOB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xf9;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_MEDIUM_BLOB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xfa;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_LONG_BLOB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xfb;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_BLOB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xfc;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_VAR_STRING<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xfd;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_STRING<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xfe;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FIELD_TYPE_GEOMETRY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0xff;
+        
+        <span class="asComment">/* column flags */</span>
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_NOT_NULL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0001;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_PRIMARY_KEY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0002;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_UNIQUE_KEY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0004;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_MULTIPLE_KEY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0008;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_BLOB<span class="asOperator">:</span>int <span class="asOperator">=</span> 0010;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_UNSIGNED_FLAG<span class="asOperator">:</span>int <span class="asOperator">=</span> 0020;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_ZEROFILL<span class="asOperator">:</span>int <span class="asOperator">=</span> 0040;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_BINARY<span class="asOperator">:</span>int <span class="asOperator">=</span> 0080;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_ENUM<span class="asOperator">:</span>int <span class="asOperator">=</span> 0100;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_AUTO_INCREMENT<span class="asOperator">:</span>int <span class="asOperator">=</span> 0200;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_TIMESTAMP<span class="asOperator">:</span>int <span class="asOperator">=</span> 0400;
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asReserved">const</span> FLAG_SET<span class="asOperator">:</span>int <span class="asOperator">=</span> 0800;
+        
+        <span class="asReserved">public</span> <span class="asReserved">static</span> <span class="asFunction">function</span> escapeString<span class="asBracket">(</span>str<span class="asOperator">:</span>String<span class="asBracket">)</span><span class="asOperator">:</span>String
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> str.indexOf<span class="asBracket">(</span><span class="asString">&quot;\\&quot;</span><span class="asBracket">)</span> <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                str.replace<span class="asBracket">(</span><span class="asString">&quot;\\&quot;</span>, <span class="asString">&quot;\\&quot;</span><span class="asOperator">+</span><span class="asString">&quot;\\&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> str.indexOf<span class="asBracket">(</span><span class="asString">&quot;\&apos;&quot;</span><span class="asBracket">)</span> <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                str <span class="asOperator">=</span> str.replace<span class="asBracket">(</span><span class="asString">&quot;\&apos;&quot;</span>, <span class="asString">&quot;\\&quot;</span><span class="asOperator">+</span><span class="asString">&quot;\&apos;&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asReserved">if</span> <span class="asBracket">(</span> str.indexOf<span class="asBracket">(</span><span class="asString">&quot;\&quot;&quot;</span><span class="asBracket">)</span> <span class="asOperator">!=</span> <span class="asOperator">-</span>1 <span class="asBracket">)</span>
+            <span class="asBracket">{</span>
+                str <span class="asOperator">=</span> str.replace<span class="asBracket">(</span><span class="asString">&quot;\&apos;&quot;</span>, <span class="asString">&quot;\\&quot;</span><span class="asOperator">+</span><span class="asString">&quot;\&quot;&quot;</span><span class="asBracket">)</span>;
+            <span class="asBracket">}</span>
+            
+            <span class="asReserved">return</span> str;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>
