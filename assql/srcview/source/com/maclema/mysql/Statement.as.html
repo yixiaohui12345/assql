@@ -1,0 +1,49 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Statement.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.events.EventDispatcher;
+    
+    <span class="asReserved">public</span> <span class="asClass">class</span> Statement <span class="asReserved">extends</span> EventDispatcher
+    <span class="asBracket">{</span>
+        <span class="asReserved">private</span> <span class="asVar">var</span> con<span class="asOperator">:</span>Connection;
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> Statement<span class="asBracket">(</span>con<span class="asOperator">:</span>Connection<span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">this</span>.con <span class="asOperator">=</span> con;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Executes the specified sql statement
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> executeQuery<span class="asBracket">(</span>sql<span class="asOperator">:</span>String<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            con.executeQuery<span class="asBracket">(</span><span class="asReserved">this</span>, sql<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+        * Executes a binary query object
+        **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> executeBinaryQuery<span class="asBracket">(</span>query<span class="asOperator">:</span>BinaryQuery<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            query.position <span class="asOperator">=</span> 0;
+            con.executeBinaryQuery<span class="asBracket">(</span><span class="asReserved">this</span>, query<span class="asBracket">)</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Returns the Connection that created this statement
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> getConnection<span class="asBracket">()</span><span class="asOperator">:</span>Connection
+        <span class="asBracket">{</span>
+            <span class="asReserved">return</span> con;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>

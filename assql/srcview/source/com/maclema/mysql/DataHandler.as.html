@@ -1,0 +1,69 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>DataHandler.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="asPackage">package</span> com.maclema.mysql
+<span class="asBracket">{</span>
+    <span class="asReserved">import</span> flash.events.EventDispatcher;
+    <span class="asReserved">import</span> flash.utils.ByteArray;
+    <span class="asReserved">import</span> flash.net.Socket;
+    <span class="asReserved">import</span> flash.events.ProgressEvent;
+    <span class="asReserved">import</span> com.maclema.mysql.Buffer;
+    <span class="asReserved">import</span> flash.events.Event;
+    
+    <span class="asDoc">/**
+     * This class is the base class for any class that is used as a data
+     * handler for data that the server sends and recieves.
+     **/</span>
+    <span class="asReserved">public</span> <span class="asClass">class</span> DataHandler <span class="asReserved">extends</span> EventDispatcher
+    <span class="asBracket">{</span>
+        <span class="asReserved">protected</span> <span class="asVar">var</span> con<span class="asOperator">:</span>Connection;
+        <span class="asReserved">private</span> <span class="asVar">var</span> packets<span class="asOperator">:</span>Array;
+        
+        <span class="asReserved">public</span> <span class="asFunction">function</span> DataHandler<span class="asBracket">(</span>con<span class="asOperator">:</span>Connection<span class="asBracket">)</span>
+        <span class="asBracket">{</span>
+            <span class="asReserved">super</span><span class="asBracket">()</span>;
+            
+            <span class="asReserved">this</span>.con <span class="asOperator">=</span> con;
+            
+            packets <span class="asOperator">=</span> <span class="asReserved">new</span> Array<span class="asBracket">()</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asDoc">/**
+         * Called by the Connection and adds a new/recieved packet to
+         * the array of packets that need be handled.
+         **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> pushPacket<span class="asBracket">(</span>packet<span class="asOperator">:</span>Packet<span class="asBracket">)</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            packets.push<span class="asBracket">(</span>packet<span class="asBracket">)</span>;
+            newPacket<span class="asBracket">()</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asComment">//overridden by handlers
+</span>        <span class="asReserved">protected</span> <span class="asFunction">function</span> newPacket<span class="asBracket">()</span><span class="asOperator">:</span><span class="asReserved">void</span> <span class="asBracket">{}</span>
+        
+        <span class="asDoc">/**
+        * Returns the next packet that needs to be handled
+        **/</span>
+        <span class="asReserved">public</span> <span class="asFunction">function</span> nextPacket<span class="asBracket">()</span><span class="asOperator">:</span>Packet
+        <span class="asBracket">{</span>
+            <span class="asReserved">if</span> <span class="asBracket">(</span> packets <span class="asOperator">!=</span> <span class="asReserved">null</span> <span class="asOperator">&amp;&amp;</span> packets.length <span class="asOperator">&gt;</span> 0 <span class="asBracket">)</span>
+                <span class="asReserved">return</span> Packet<span class="asBracket">(</span>packets.shift<span class="asBracket">())</span>;
+            <span class="asReserved">else</span>
+                <span class="asReserved">return</span> <span class="asReserved">null</span>;
+        <span class="asBracket">}</span>
+        
+        <span class="asReserved">protected</span> <span class="asFunction">function</span> unregister<span class="asBracket">()</span><span class="asOperator">:</span><span class="asReserved">void</span>
+        <span class="asBracket">{</span>
+            packets <span class="asOperator">=</span> <span class="asReserved">null</span>;
+            
+            dispatchEvent<span class="asBracket">(</span><span class="asReserved">new</span> Event<span class="asBracket">(</span><span class="asString">&quot;unregister&quot;</span><span class="asBracket">))</span>;
+        <span class="asBracket">}</span>
+    <span class="asBracket">}</span>
+<span class="asBracket">}</span></pre></body>
+</html>
