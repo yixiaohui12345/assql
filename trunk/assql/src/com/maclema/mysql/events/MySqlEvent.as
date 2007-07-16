@@ -2,7 +2,6 @@ package com.maclema.mysql.events
 {
 	import flash.events.Event;
 	import com.maclema.mysql.ResultSet;
-	import com.maclema.mysql.Statement;
 	
 	public class MySqlEvent extends Event
 	{	

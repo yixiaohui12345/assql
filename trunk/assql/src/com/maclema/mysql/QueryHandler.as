@@ -4,6 +4,7 @@ package com.maclema.mysql
 	import flash.events.Event;
 	import flash.utils.ByteArray;
 	import com.maclema.mysql.events.MySqlEvent;
+	import com.maclema.mysql.events.MySqlErrorEvent;
 	
 	/**
 	 * Handles recieving and parsing the data sent by the MySql server
@@ -41,13 +42,14 @@ package com.maclema.mysql
 				
 				if ( packet != null )
 				{
+					var evt:MySqlEvent;
 					var field_count:int = packet.readByte() & 0xFF;
 				
 					if ( field_count == 0x00 )
 					{
 						var rows:int = packet.readLengthCodedBinary();
 						var insertid:int = packet.readLengthCodedBinary();
-						var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
+						evt = new MySqlEvent(MySqlEvent.RESPONSE);
 						evt.affectedRows = rows;
 						evt.insertID = insertid;
 						
@@ -75,7 +77,7 @@ package com.maclema.mysql
 						{
 							ResultSet.initialize(rs);
 							
-							var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
+							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
 	
 							unregister();
