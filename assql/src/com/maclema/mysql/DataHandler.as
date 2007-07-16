@@ -4,7 +4,6 @@ package com.maclema.mysql
 	import flash.utils.ByteArray;
 	import flash.net.Socket;
 	import flash.events.ProgressEvent;
-	import com.maclema.mysql.Buffer;
 	import flash.events.Event;
 	
 	/**

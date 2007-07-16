@@ -31,6 +31,9 @@ package com.maclema.mysql
 		{
 			inPacketCount++;
 			
+			var packet:Packet;
+			var field_count:int;
+			
 			if ( inPacketCount == 1 )
 			{
 				con.server = new ServerInformation( nextPacket() );
@@ -38,8 +41,8 @@ package com.maclema.mysql
 			}
 			else if ( inPacketCount == 2 )
 			{
-				var packet:Packet = nextPacket();
-				var field_count:int = packet.readByte() & 0xFF;
+				packet= nextPacket();
+				field_count = packet.readByte() & 0xFF;
 				
 				if ( field_count == 0x00 )
 				{
@@ -65,8 +68,8 @@ package com.maclema.mysql
 			}
 			else if ( connectWithDb && inPacketCount == 3 )
 			{
-				var packet:Packet = nextPacket();
-				var field_count:int = packet.readByte() & 0xFF;
+				packet = nextPacket();
+				field_count = packet.readByte() & 0xFF;
 				
 				if ( field_count == 0x00 )
 				{
