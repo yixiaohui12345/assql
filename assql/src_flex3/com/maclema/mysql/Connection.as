@@ -11,6 +11,7 @@ package com.maclema.mysql
 	import flash.net.Socket;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.MySqlErrorEvent")]
+	[Event(name="sql_response", type="com.maclema.mysql.MySqlEvent")]
 	public class Connection extends EventDispatcher
 	{
 		//the actual socket
@@ -246,8 +247,12 @@ package com.maclema.mysql
         /**
         * Changes the database
         **/
-        public function changeDatabaseTo(whatDb:String):void
+        public function changeDatabaseTo(whatDb:String, doNotChangeHandler:Boolean=false):void
         {	
+        	if ( doNotChangeHandler == false ) {
+        		setDataHandler(new CommandHandler(this));
+        	}
+        	
             if ( whatDb == null || whatDb.length == 0 )
                 return;
                 

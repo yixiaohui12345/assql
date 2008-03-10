@@ -60,7 +60,7 @@ package com.maclema.mysql
 					if ( connectWithDb )
 					{
 						//send command
-						con.changeDatabaseTo(database);
+						con.changeDatabaseTo(database, true);
 					}
 					else
 					{
