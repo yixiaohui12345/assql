@@ -134,6 +134,9 @@ package com.maclema.mysql
                 }
                 else
                 {
+                	//since we are doing the check for 4.1.22, we should
+                	//never get here. Fix: Adjust checks to allow previous
+                	//versions
                 	doAuthentication();
                 }
 			}

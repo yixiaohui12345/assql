@@ -74,13 +74,15 @@ package com.maclema.mysql
                     				 ((packet.readByte() & 0xff) << 8);
             }
             
-            var pos:int = packet.position;
-            serverLanguage = packet.readByte() & 0xff;
-            serverStatus = (packet.readByte() & 0xff) | ((packet.readByte() & 0xff) << 8);
-            packet.position = pos+16;
-            
-            seed += packet.readString();
-             
+            //Re: Issue 5 (Thanks Michael! http://code.google.com/p/asdox/)
+            if ( meetsVersion(4, 1, 1) ) {
+	            var pos:int = packet.position;
+	            serverLanguage = packet.readByte() & 0xff;
+	            serverStatus = (packet.readByte() & 0xff) | ((packet.readByte() & 0xff) << 8);
+	            packet.position = pos+16;
+	            
+	            seed += packet.readString();
+            }
             useLongPassword = true; //we only support min protocol version 10.
             
             trace("[ServerInformation] Version: " + serverVersion);
@@ -100,7 +102,7 @@ package com.maclema.mysql
                         }
                         return true;
                     }
-                    return true;
+                    return false; //fixed: Re: Issue #4
                 }
                 return true;
             }
