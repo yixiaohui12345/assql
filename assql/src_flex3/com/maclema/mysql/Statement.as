@@ -19,7 +19,6 @@ package com.maclema.mysql
          **/
         public function executeQuery(sql:String):void
         {
-        	trace("[Statement] Executing: "+ sql);
             con.executeQuery(this, sql);
         }
         
