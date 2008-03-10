@@ -39,7 +39,6 @@ package com.maclema.mysql
 			if ( inPacketCount == 1 )
 			{
 				con.server = new ServerInformation( nextPacket() );
-				trace("[HandshakeHandler] doHandshake()");
 				doHandshake();
 			}
 			else if ( inPacketCount == 2 )
@@ -53,7 +52,6 @@ package com.maclema.mysql
 					//By sending this very specific reply server asks us to send scrambled
                   	//password in old format. The reply contains scramble_323.
                   	inPacketCount--;
-                  	trace("[HandshakeHandler] sendScramble323()");
                   	sendScramble323();
 				}
 				else if ( field_count == 0x00 )
@@ -62,13 +60,11 @@ package com.maclema.mysql
 					if ( connectWithDb )
 					{
 						//send command
-						trace("[HandshakeHandler] Changing database");
 						con.changeDatabaseTo(database);
 					}
 					else
 					{
 						//woop! were authenticated
-						trace("[HandshakeHandler] Authenticated!");
 						unregister();
 						con.dispatchEvent(new Event(Event.CONNECT));
 					}
@@ -87,7 +83,6 @@ package com.maclema.mysql
 				if ( field_count == 0x00 )
 				{
 					//woop! were authenticated
-					trace("[HandshakeHandler] Authenticated!");
 					unregister();
 					con.dispatchEvent(new Event(Event.CONNECT));
 				}

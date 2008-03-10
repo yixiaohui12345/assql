@@ -10,6 +10,7 @@ package com.maclema.mysql
 	import flash.events.SecurityErrorEvent;
 	import flash.net.Socket;
 	
+	[Event(name="sqlError", type="com.maclema.mysql.MySqlErrorEvent")]
 	public class Connection extends EventDispatcher
 	{
 		//the actual socket
@@ -102,7 +103,7 @@ package com.maclema.mysql
 		
 		private function onSocketConnect(e:Event):void
 		{
-			trace("[Connection] Connected");
+			
 		}
 		
 		private function onSocketClose(e:Event):void
@@ -194,7 +195,6 @@ package com.maclema.mysql
 			{
 				sock.close();
 				
-				trace("[Connection] Disconnected");
 				dispatchEvent(new Event(Event.CLOSE));
 			}
 		}
