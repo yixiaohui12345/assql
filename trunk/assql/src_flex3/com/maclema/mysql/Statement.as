@@ -1,6 +1,7 @@
 package com.maclema.mysql
 {
     import flash.events.EventDispatcher;
+    import flash.utils.ByteArray;
     
     [Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
     [Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
@@ -8,18 +9,103 @@ package com.maclema.mysql
     public class Statement extends EventDispatcher
     {
         private var con:Connection;
+        private var _sql:String = null;
+        private var params:Array;
         
         public function Statement(con:Connection)
         {
             this.con = con;
+            this.params = new Array();
+        }
+        
+        /**
+        * Set the sql string to execute
+        **/
+        public function set sql(value:String):void {
+        	this._sql = value;
+        }
+        
+        /**
+        * Get the sql string to execute
+        **/
+        public function get sql():String {
+        	return this._sql;
+        }
+        
+        /**
+        * Set a String parameter
+        **/
+        public function setString(index:int, value:String):void {
+        	params[index] = value;
+        }
+        
+        /**
+        * Set a Number parameter
+        **/
+        public function setNumber(index:int, value:Number):void {
+        	params[index] = value;
+        }
+        
+        /**
+        * Set a Date parameter
+        **/
+        public function setDate(index:int, value:Date):void {
+        	params[index] = value;
+        }
+        
+        /**
+        * Set's a Binary parameter
+        **/
+        public function setBinary(index:int, value:ByteArray):void {
+        	params[index] = value;
         }
         
         /**
          * Executes the specified sql statement
          **/
-        public function executeQuery(sql:String):void
+        public function executeQuery(sqlString:String=null):void
         {
-            con.executeQuery(this, sql);
+        	if ( sqlString != null ) {
+        		this.sql = sqlString;
+        	}
+        	
+        	//parameters
+        	if ( this.sql.indexOf("?") != -1 ) {
+        		var binq:BinaryQuery = addParametersToSql();
+        		con.executeBinaryQuery(this, binq);
+        	}
+        	else {
+          		con.executeQuery(this, sql);
+         	}
+        }
+        
+        private function addParametersToSql():BinaryQuery {
+        	var parts:Array = this.sql.split("?");
+    		var binq:BinaryQuery = new BinaryQuery();
+    		for ( var i:int = 0; i<parts.length; i++ ) {
+    			binq.append(parts[i]);
+    			
+    			if ( params[i+1] ) {
+    				var value:* = params[i+1];
+    				
+    				if ( value is String ) {
+    					binq.append(value, true);
+    				}
+    				else if ( value is int || value is Number ) {
+    					binq.append(String(value));
+    				}
+    				else if ( value is Date ) {
+    					binq.append(String((value as Date).getTime()));
+    				}
+    				else if ( value is ByteArray ) {
+    					binq.appendBinary(ByteArray(value));
+    				}
+    				else {
+    					throw new Error("Unknown Parameter Object For Parameter Index " + i);
+    				}
+    			}
+    		}
+    		return binq;
         }
         
         /**
