@@ -11,8 +11,10 @@ package com.maclema.mysql
 	import flash.net.Socket;
 	import flash.utils.getTimer;
 	
-	[Event(name="sqlError", type="com.maclema.mysql.MySqlErrorEvent")]
-	[Event(name="sql_response", type="com.maclema.mysql.MySqlEvent")]
+	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
+	[Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
+	[Event(name="connect", type="flash.events.Event")]
+	[Event(name="close", type="flash.events.Event")]
 	public class Connection extends EventDispatcher
 	{
 		//the actual socket
