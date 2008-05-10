@@ -1,5 +1,7 @@
 Here are some sample queries to give an idea of the performance. All queries were ran connecting to a local mysql server.
 
+I ran all these queries on a MacBook Pro, 2.4GHz Core 2, 4GB Ram.
+
 Mysql Result
   Rows:       5
   Query Size: 0.15 KB
@@ -13,19 +15,19 @@ Mysql Result
 Mysql Result
   Rows:       472
   Query Size: 144.14 KB
-  Query Time: 82 ms
+  Query Time: 68 ms
 
 Mysql Result
   Rows:       10
   Query Size: 1.70 KB
-  Query Time: 11 ms
+  Query Time: 9 ms
 
 Mysql Result
   Rows:       13888
   Query Size: 4,284.33 KB
-  Query Time: 3754 ms
+  Query Time: 3726 ms
 
 Mysql Result
   Rows:       13885
   Query Size: 1,870.48 KB
-  Query Time: 3870 ms
+  Query Time: 4093 ms
