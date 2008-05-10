@@ -239,12 +239,17 @@ package com.maclema.mysql
         **/
         public function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
         {
+        	_tx = 0;
+        	_queryStart = getTimer();
         	setDataHandler(new QueryHandler(this, statement));
         	sendBinaryCommand(Mysql.COM_QUERY, query);
         }
         
         private function sendBinaryCommand(command:int, data:BinaryQuery):void
         {
+        	//check that the data is at position 0
+        	data.position = 0;
+        	
             var packet:Packet = new Packet();
             packet.writeByte(command);
             data.readBytes( packet, packet.position, data.bytesAvailable );
