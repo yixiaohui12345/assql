@@ -1,0 +1,31 @@
+Here are some sample queries to give an idea of the performance. All queries were ran connecting to a local mysql server.
+
+MySql Result
+  Rows:       5
+  Query Size: 0.15 KB
+  Query Time: 15 ms
+
+MySql Result
+  Rows:       864
+  Query Size: 28.77 KB
+  Query Time: 110 ms
+
+MySql Result
+  Rows:       472
+  Query Size: 144.14 KB
+  Query Time: 82 ms
+
+MySql Result
+  Rows:       10
+  Query Size: 1.70 KB
+  Query Time: 11 ms
+
+MySql Result
+  Rows:       13888
+  Query Size: 4,284.33 KB
+  Query Time: 3754 ms
+
+MySql Result
+  Rows:       13885
+  Query Size: 1,870.48 KB
+  Query Time: 3870 ms
