@@ -2,9 +2,9 @@ package com.maclema.mysql
 {
     import flash.events.EventDispatcher;
     
-    [Event(name="sqlError", type="com.maclema.mysql.MySqlErrorEvent")]
-    [Event(name="sql_response", type="com.maclema.mysql.MySqlEvent")]
-    [Event(name="sql_result", type="com.maclema.mysql.MySqlEvent")]
+    [Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
+    [Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
+    [Event(name="sql_result", type="com.maclema.mysql.events.MySqlEvent")]
     public class Statement extends EventDispatcher
     {
         private var con:Connection;
