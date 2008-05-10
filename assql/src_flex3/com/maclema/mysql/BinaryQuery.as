@@ -1,7 +1,6 @@
 package com.maclema.mysql
 {
 	import flash.utils.ByteArray;
-	import flash.utils.IDataInput;
 	
 	/**
 	 * This class is used to build SQL quries that include binary data such as
@@ -33,11 +32,10 @@ package com.maclema.mysql
 		/**
 		 * Appends a chunk of binary data to the query to be executed
 		 **/
-		public function appendBinary(data:IDataInput):void
+		public function appendBinary(data:ByteArray):void
 		{
-			while ( data.bytesAvailable > 0 )
-			{
-				var byte:int = data.readByte() & 0xFF;
+			for(var i:int = 0; i < data.length; i++) {
+				var byte:int = data[i];
 				
 				if ( byte == 0x27 )
 				{
