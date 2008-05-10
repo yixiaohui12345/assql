@@ -1,10 +1,10 @@
 package com.maclema.mysql
 {
-	import flash.net.Socket;
-	import flash.events.Event;
-	import flash.utils.ByteArray;
 	import com.maclema.mysql.events.MySqlEvent;
-	import com.maclema.mysql.events.MySqlErrorEvent;
+	import com.maclema.util.ByteFormatter;
+	
+	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
 	
 	/**
 	 * Handles recieving and parsing the data sent by the MySql server
@@ -79,7 +79,14 @@ package com.maclema.mysql
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
-	
+							
+							trace("Mysql Result");
+							trace("  Rows:       " + rs.size());
+							trace("  Query Size: " + ByteFormatter.format(con.tx, ByteFormatter.KBYTES, 2));
+							trace("  Total TX:   " + ByteFormatter.format(con.totalTX, ByteFormatter.KBYTES, 2));
+							trace("  Query Time: " + (getTimer()-con.lastQueryStart) + " ms");
+							trace();
+							
 							unregister();
 							st.dispatchEvent(evt);
 						}

@@ -9,6 +9,7 @@ package com.maclema.mysql
 	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.Socket;
+	import flash.utils.getTimer;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.MySqlErrorEvent")]
 	[Event(name="sql_response", type="com.maclema.mysql.MySqlEvent")]
@@ -40,6 +41,10 @@ package com.maclema.mysql
 		private var buffer:Buffer;
 		
 		private var _connected:Boolean = false;
+		
+		private var _totalTX:Number;
+		private var _tx:Number;
+		private var _queryStart:Number;
 		
 		/**
 		 * Creates a new connection to a MySql server.
@@ -118,6 +123,9 @@ package com.maclema.mysql
 		
 		private function onSocketData(e:ProgressEvent):void
 		{
+			_tx += sock.bytesAvailable;
+			_totalTX += sock.bytesAvailable;
+			
 			sock.readBytes( buffer, buffer.length, sock.bytesAvailable );
 			checkForPackets();		
 		}
@@ -179,6 +187,9 @@ package com.maclema.mysql
 		 **/
 		public function connect():void
 		{
+			_tx = 0;
+			_totalTX = 0;
+			
 			//set the dataHandler
 			setDataHandler( new HandshakeHandler(this, username, password, database) );
 			
@@ -214,6 +225,8 @@ package com.maclema.mysql
          **/
         public function executeQuery(statement:Statement, sql:String):void
         {
+        	_tx = 0;
+        	_queryStart = getTimer();
             setDataHandler(new QueryHandler(this, statement));
             sendCommand(Mysql.COM_QUERY, sql);
         }
@@ -257,6 +270,27 @@ package com.maclema.mysql
                 return;
                 
             sendCommand(Mysql.COM_INIT_DB, whatDb);
+        }
+        
+        /**
+        * Returns the number of bytes recieved since the last query
+        **/
+        public function get tx():Number {
+        	return _tx;
+        }
+        
+        /**
+        * Returns the number of bytes recieved since the connection was opened
+        **/
+        public function get totalTX():Number {
+        	return _totalTX;
+        }
+        
+        /**
+        * Returns the time the last query was executed
+        **/
+        public function get lastQueryStart():Number {
+        	return _queryStart;
         }
         
         /**

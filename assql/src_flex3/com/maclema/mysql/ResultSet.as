@@ -108,6 +108,9 @@ package com.maclema.mysql
         public function getString(column:*):String
         {
         	var data:ByteArray = getBinary(column);
+        	if ( data == null ) {
+        		return null;
+        	}
         	data.position = 0;
         	return data.readUTFBytes(data.bytesAvailable);
         }
@@ -134,6 +137,10 @@ package com.maclema.mysql
         public function getDate(column:*):Date
         {
             var dateString:String = getString(column);
+            
+            if ( dateString == null ) {
+            	return null;
+            }
             
             var pat:RegExp = /-/g;
             dateString = dateString.replace(pat, "/");
@@ -174,8 +181,11 @@ package com.maclema.mysql
         	var ac:ArrayCollection = new ArrayCollection();
         	while ( this.next() ) {
         		var obj:Object = new Object();
+        		var index:int = 0;
         		for ( var prop:String in this.nameMap ) {
+        			index++;
         			obj[prop] = getString(prop);
+        			obj[index] = getString(prop);
         		}
      			ac.addItem(obj);
         	}
@@ -190,6 +200,13 @@ package com.maclema.mysql
         public function getColumns():Array
         {
             return columns;
+        }
+        
+        /**
+        * Returns the number of rows in the ResultSet
+        **/
+        public function size():int {
+        	return rows.length;
         }
     }
 }
