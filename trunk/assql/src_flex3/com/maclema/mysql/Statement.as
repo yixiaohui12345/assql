@@ -86,7 +86,8 @@ package com.maclema.mysql
         }
         
         /**
-         * Executes the specified sql statement
+         * Executes the specified sql statement. The statement can be provided using either the sql property
+         * or as the first parameter. You may also specify a MySqlResponder object as the second parameter.
          **/
         public function executeQuery(sqlString:String=null, responder:MySqlResponser=null):void
         {

@@ -17,7 +17,5 @@ package com.maclema.util
 	        nf.precision = decimals;
 	        return nf.format( value / divider ) + " " + _formats[format-1];
 	    }
-
-
 	}
 }
