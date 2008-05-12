@@ -1,5 +1,8 @@
 package com.maclema.mysql
 {
+    import com.maclema.mysql.events.MySqlErrorEvent;
+    import com.maclema.mysql.events.MySqlEvent;
+    
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     
@@ -12,10 +15,32 @@ package com.maclema.mysql
         private var _sql:String = null;
         private var params:Array;
         
+        private var responder:MySqlResponser;
+        
         public function Statement(con:Connection)
         {
             this.con = con;
             this.params = new Array();
+            
+            this.addEventListener(MySqlEvent.RESPONSE, handleResponse);
+            this.addEventListener(MySqlEvent.RESULT, handleResponse);
+            this.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError);
+        }
+        
+        private function handleResponse(e:MySqlEvent):void {
+        	if ( this.responder != null ) {
+        		if ( this.responder.responseHandler != null ) {
+        			this.responder.responseHandler(e);
+        		}
+        	}
+        }
+        
+        private function handleError(e:MySqlErrorEvent):void {
+        	if ( this.responder != null ) {
+        		if ( this.responder.errorHandler != null ) {
+        			this.responder.errorHandler(e);
+        		}
+        	}
         }
         
         /**
@@ -63,8 +88,10 @@ package com.maclema.mysql
         /**
          * Executes the specified sql statement
          **/
-        public function executeQuery(sqlString:String=null):void
+        public function executeQuery(sqlString:String=null, responder:MySqlResponser=null):void
         {
+        	this.responder = responder;
+        	
         	if ( sqlString != null ) {
         		this.sql = sqlString;
         	}
@@ -111,8 +138,10 @@ package com.maclema.mysql
         /**
         * Executes a binary query object
         **/
-        public function executeBinaryQuery(query:BinaryQuery):void
+        public function executeBinaryQuery(query:BinaryQuery, responder:MySqlResponser=null):void
         {
+        	this.responder = responder;
+        	
         	query.position = 0;
         	con.executeBinaryQuery(this, query);
         }
