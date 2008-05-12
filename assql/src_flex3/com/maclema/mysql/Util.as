@@ -101,7 +101,7 @@ package com.maclema.mysql
         	
         	var xored:ByteArray = new ByteArray();
         	
-        	for ( var i:int=0; i<toBeXored.length; i++ ) {
+        	for ( var n:int=0; n<toBeXored.length; n++ ) {
         		var b1:int = toBeXored.readByte();
         		var b2:int = phs1.readByte();
         		xored.writeByte( b1 ^ b2 );	

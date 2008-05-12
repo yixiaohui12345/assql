@@ -76,10 +76,10 @@ package com.maclema.mysql
             
             //Re: Issue 5 (Thanks Michael! http://code.google.com/p/asdox/)
             if ( meetsVersion(4, 1, 1) ) {
-	            var pos:int = packet.position;
+	            var oldpos:int = packet.position;
 	            serverLanguage = packet.readByte() & 0xff;
 	            serverStatus = (packet.readByte() & 0xff) | ((packet.readByte() & 0xff) << 8);
-	            packet.position = pos+16;
+	            packet.position = oldpos+16;
 	            
 	            seed += packet.readString();
             }
