@@ -7,6 +7,10 @@ package com.maclema.util
 	
 	public class ResultsUtil
 	{
+		/**
+		 * Takes a ResultSet and returns an array valid for being used as a 
+		 * DataGrid's columns property.
+		 **/
 		public static function getDataGridColumns(rs:ResultSet):Array {
 			var cols:Array = rs.getColumns();
 			var newcols:Array = new Array();
