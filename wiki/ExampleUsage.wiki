@@ -1,5 +1,5 @@
 #labels Featured
-===Example Usage===
+Sample usage of the asSQL MySql driver.
 {{{
 //The database connection object
 private var con:Connection;
