@@ -107,16 +107,16 @@ function createDocuments()
 	
 	# Check to see if the document directory already exists. If it does we 
 	# remove it.	
-	if [ -d "$output" ]
-		then
-			echo -e "Deleting old document directory"
-			rm -Rf "$output"
-	fi
+	#if [ -d "$output" ]
+	#	then
+	#		echo -e "Deleting old document directory"
+	#		rm -Rf "$output"
+	#fi
 	
 	# Regardless of wheter there was a directory for the documentation to remove 
 	# (see above). We still need to create one.
-	echo "Creating new document directory"
-	mkdir "$output"
+	#echo "Creating new document directory"
+	#mkdir "$output"
 	
 	# These two lines are basically identical to the asdoc shell script on Mac OSX 
 	# I have placed them here to avoid having to make the end user do any 
