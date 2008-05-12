@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <flexLibProperties version="1">
 <includeClasses>
+<classEntry path="com.maclema.util.ByteFormatter"/>
 <classEntry path="com.maclema.mysql.CommandHandler"/>
 <classEntry path="com.maclema.mysql.Statement"/>
 <classEntry path="com.maclema.mysql.DataHandler"/>
 <classEntry path="com.maclema.mysql.ResultSet"/>
+<classEntry path="com.maclema.util.ResultsUtil"/>
+<classEntry path="com.maclema.mysql.MySqlResponser"/>
 <classEntry path="com.maclema.mysql.Field"/>
 <classEntry path="com.maclema.mysql.Buffer"/>
 <classEntry path="com.adobe.utils.IntUtil"/>
@@ -12,9 +15,9 @@
 <classEntry path="com.maclema.mysql.Mysql"/>
 <classEntry path="com.maclema.mysql.BinaryQuery"/>
 <classEntry path="com.maclema.mysql.HandshakeHandler"/>
-<classEntry path="com.adobe.crypto.SHA1"/>
 <classEntry path="com.maclema.mysql.QueryHandler"/>
 <classEntry path="com.maclema.mysql.Packet"/>
+<classEntry path="com.adobe.crypto.SHA1"/>
 <classEntry path="com.maclema.mysql.Connection"/>
 <classEntry path="com.maclema.mysql.events.MySqlEvent"/>
 <classEntry path="com.maclema.mysql.Util"/>
