@@ -47,6 +47,7 @@ package com.maclema.mysql
 		private var _totalTX:Number;
 		private var _tx:Number;
 		private var _queryStart:Number;
+		private var _busy:Boolean = false;
 		
 		/**
 		 * Creates a new connection to a MySql server.
@@ -182,6 +183,8 @@ package com.maclema.mysql
 		private function unregisterDataHandler(e:Event):void
 		{
 			dataHandler.removeEventListener( "unregister", unregisterDataHandler );
+			_busy = false;
+			dispatchEvent(new Event("busyChanged"));
 		}
 		
 		/**
@@ -227,6 +230,8 @@ package com.maclema.mysql
          **/
         internal function executeQuery(statement:Statement, sql:String):void
         {
+        	_busy = true;
+        	dispatchEvent(new Event("busyChanged"));
         	_tx = 0;
         	_queryStart = getTimer();
             setDataHandler(new QueryHandler(this, statement));
@@ -239,6 +244,8 @@ package com.maclema.mysql
         **/
         internal function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
         {
+        	_busy = true;
+        	dispatchEvent(new Event("busyChanged"));
         	_tx = 0;
         	_queryStart = getTimer();
         	setDataHandler(new QueryHandler(this, statement));
@@ -298,6 +305,14 @@ package com.maclema.mysql
         **/
         public function get lastQueryStart():Number {
         	return _queryStart;
+        }
+        
+        /**
+        * Returns true if the connection is currently executing a query
+        **/
+        [Bindable("busyChanged")]
+        public function get busy():Boolean {
+        	return _busy;
         }
         
         /**
