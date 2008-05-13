@@ -82,9 +82,9 @@ email: fgdevelopment@flashgen.com
 		ASDoc.
 		##############################################################################################	
 	-->	
-	<property name="WindowTitle" value="FlashGen.Com Common Class Library" />
-	<property name="PageTitle" value="FlashGen.Com Class Library"/>	
-	<property name="Footer" value="Copyright 2007 FlashGen.Com" />	
+	<property name="WindowTitle" value="asSQL Documentation" />
+	<property name="PageTitle" value="asSQL Documentation"/>	
+	<property name="Footer" value="http://assql.googlecode.com" />	
 	
 	<!-- 
 		##############################################################################################		
