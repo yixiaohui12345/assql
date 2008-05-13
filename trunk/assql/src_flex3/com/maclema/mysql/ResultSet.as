@@ -7,8 +7,8 @@ package com.maclema.mysql
     public class ResultSet
     {
         /**
-         * Used by Connection when building the ResultSet, should never
-         * be called directly
+         * Used by Connection when building the ResultSet.
+         * @private
          **/
         internal static function addColumn(rs:ResultSet, column:Field):void
         {
@@ -16,8 +16,8 @@ package com.maclema.mysql
         }
         
         /**
-         * Used by Connection when building the ResultSet, should never
-         * be called directly
+         * Used by Connection when building the ResultSet.
+         * @private
          **/
         internal static function addRow(rs:ResultSet, row:Array):void
         {
@@ -25,8 +25,8 @@ package com.maclema.mysql
         }
         
         /**
-         * Used by Connection when building the ResultSet, should never
-         * be called directly
+         * Used by Connection when building the ResultSet.
+         * @private
          **/
         internal static function initialize(rs:ResultSet):void
         {
