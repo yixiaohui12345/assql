@@ -225,7 +225,7 @@ package com.maclema.mysql
          * Used by Statement to execute a query or update sql statement. Should
          * never be called directly.
          **/
-        public function executeQuery(statement:Statement, sql:String):void
+        internal function executeQuery(statement:Statement, sql:String):void
         {
         	_tx = 0;
         	_queryStart = getTimer();
@@ -237,7 +237,7 @@ package com.maclema.mysql
         * Executes a binary query object as a sql statement. Should never be
         * called directly.
         **/
-        public function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
+        internal function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
         {
         	_tx = 0;
         	_queryStart = getTimer();
@@ -303,7 +303,7 @@ package com.maclema.mysql
         /**
         * Returns the actual socket.
         **/
-        public function getSocket():Socket
+        internal function getSocket():Socket
         {
         	return sock;
         }
