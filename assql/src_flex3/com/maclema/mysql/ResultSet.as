@@ -10,7 +10,7 @@ package com.maclema.mysql
          * Used by Connection when building the ResultSet, should never
          * be called directly
          **/
-        public static function addColumn(rs:ResultSet, column:Field):void
+        internal static function addColumn(rs:ResultSet, column:Field):void
         {
             rs.columns.push(column);
         }
@@ -19,7 +19,7 @@ package com.maclema.mysql
          * Used by Connection when building the ResultSet, should never
          * be called directly
          **/
-        public static function addRow(rs:ResultSet, row:Array):void
+        internal static function addRow(rs:ResultSet, row:Array):void
         {
             rs.rows.push(row);
         }
@@ -28,7 +28,7 @@ package com.maclema.mysql
          * Used by Connection when building the ResultSet, should never
          * be called directly
          **/
-        public static function initialize(rs:ResultSet):void
+        internal static function initialize(rs:ResultSet):void
         {
             rs.nameMap = new Object();
             for ( var i:int=0; i<rs.columns.length; i++ )
