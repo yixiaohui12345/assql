@@ -7,7 +7,7 @@ package com.maclema.mysql
      **/
     public class Packet extends Buffer
     {	
-        private static const maxAllowedPacket:int = 1024 * 1024;
+        private static const maxAllowedPacket:int = 1024 * 1024 * 1024; //1GB
         public static const maxThreeBytes:int = (256 * 256 * 256) - 1;
         
         private var packetHeader:Buffer;
@@ -64,7 +64,7 @@ package com.maclema.mysql
         {
             if ( packetLength > maxAllowedPacket )
             {
-            	trace("PACKET TO BIG");
+            	trace("PACKET TO BIG, MAX_ALLOWED: " + maxAllowedPacket + " GOT: " + packetLength);
             }
             
             if ( seqOverride != 0 ) {

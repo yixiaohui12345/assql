@@ -116,6 +116,7 @@ package com.maclema.mysql
     			if ( params[i+1] ) {
     				var value:* = params[i+1];
     				
+    				binq.append("'");
     				if ( value is String ) {
     					binq.append(value, true);
     				}
@@ -131,6 +132,7 @@ package com.maclema.mysql
     				else {
     					throw new Error("Unknown Parameter Object For Parameter Index " + i);
     				}
+    				binq.append("'");
     			}
     		}
     		return binq;
