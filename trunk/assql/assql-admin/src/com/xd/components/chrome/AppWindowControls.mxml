@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalGap="0" verticalAlign="middle"
+	paddingRight="8"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+
+	<mx:Button height="14" width="14" styleName="appMinimizeButton" click="stage.nativeWindow.minimize()" tabEnabled="false" toolTip="Minimize" buttonMode="true" mouseEnabled="true" useHandCursor="true" />
+	
+	<!-- If you would like to enable the maximize window functionality, look at the commented code below: -->
+	<mx:Button height="14" width="14" styleName="appMaximizeButton" click="stage.nativeWindow.maximize()" tabEnabled="false" toolTip="Maximize" buttonMode="true" mouseEnabled="true" useHandCursor="true" />
+	<!-- <mx:Button height="14" width="14" styleName="appMaximizeButton" tabEnabled="false" toolTip="Maximize" buttonMode="true" mouseEnabled="true" useHandCursor="true" /> -->
+			 
+	<mx:Button height="14" width="14" styleName="appCloseButton" click="NativeApplication.nativeApplication.exit()" tabEnabled="false" toolTip="Close" buttonMode="true" mouseEnabled="true" useHandCursor="true" />
+	
+</mx:HBox>

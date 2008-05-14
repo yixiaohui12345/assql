@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="239" height="170" 
+	verticalScrollPolicy="off" horizontalScrollPolicy="off" >
+
+	<mx:VBox height="100%" width="100%" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="5" verticalGap="5" >
+		<mx:Label text="Synchronization Settings" styleName="header1" />
+		<mx:CheckBox label="Enable automatic synchronization" styleName="sync" selected="true" />
+		<mx:CheckBox label="Synchronize on Shutdown" styleName="sync" selected="true" />
+		<mx:CheckBox label="Ask First" styleName="sync" paddingLeft="10"/>
+	</mx:VBox>
+	
+	<mx:HRule width="100%" strokeWidth="2" strokeColor="#202020" shadowColor="#404040" />
+	
+	<mx:VBox height="100%" width="100%" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" verticalGap="0" >
+		<mx:Button height="30" width="100%" label="Synchronize Now" labelPlacement="right" styleName="synchroNow" />
+	</mx:VBox>
+	
+</mx:VBox>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="354" height="282" title="Connection Properties" creationComplete="onCreationComplete()">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.PopUpManager;
+			import mx.controls.Alert;
+			import com.maclema.mysql.events.MySqlErrorEvent;
+			import com.maclema.mysql.Connection;
+			
+			[Bindable]
+			public var theConnection:DBConn = null;
+			
+			private var isNew:Boolean = false;
+			
+			private function onCreationComplete():void {
+				if ( theConnection == null ) {
+					isNew = true;
+					theConnection = new DBConn();
+				}	
+			}
+			
+			private function save():void {
+				theConnection.connectionName = conname.text;
+				theConnection.hostname = hostname.text;
+				theConnection.port = int(port.text);
+				theConnection.username = username.text;
+				theConnection.password = password.text;
+				theConnection.database = database.text;
+				
+				if ( isNew ) {
+					MyConnections.getInstance().connections.addItem(theConnection);
+				}	
+				
+				MyConnections.getInstance().save();
+				
+				cancel();
+			}
+			
+			private function cancel():void {
+				PopUpManager.removePopUp(this);
+			}
+			
+			private var con:Connection;
+			private function test():void {
+				AlertUtil.showAlert("Testing Connection... Please Wait...", "Testing...");
+				con = new Connection(hostname.text, int(port.text), username.text, password.text, database.text);
+				con.addEventListener(Event.CONNECT, handleConnect);
+				con.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError);
+				con.connect();
+			}
+			
+			private function handleConnect(e:Event):void {
+				AlertUtil.hideAlert(false);
+				con.disconnect();
+				Alert.show("Connection Successful!", "Success!");
+			}
+			
+			private function handleError(e:MySqlErrorEvent):void {
+				AlertUtil.hideAlert(false);
+				Alert.show("Connection Failed, Reason: " + e.text, "Failed!");
+			}
+		]]>
+	</mx:Script>
+	<mx:Label x="10" y="10" text="Connection Name:" color="#CCCCCC"/>
+	<mx:TextInput x="10" y="27" width="162" text="{theConnection.connectionName}" id="conname"/>
+	<mx:Label x="10" y="114" text="Username:" color="#CCCCCC"/>
+	<mx:Label x="180" y="114" text="Password:" color="#CCCCCC"/>
+	<mx:TextInput x="10" y="131" width="162" text="{theConnection.username}" id="username"/>
+	<mx:Label x="10" y="161" text="Database:" color="#CCCCCC"/>
+	<mx:TextInput x="10" y="178" width="162" text="{theConnection.database}" id="database"/>
+	<mx:TextInput x="180" y="131" width="162" text="{theConnection.password}" id="password"/>
+	<mx:Label x="10" y="67" text="Hostname:" color="#CCCCCC"/>
+	<mx:Label x="284" y="67" text="Port:" color="#CCCCCC"/>
+	<mx:TextInput x="10" y="84" width="266" text="{theConnection.hostname}" id="hostname"/>
+	<mx:TextInput x="284" y="84" width="58" text="{theConnection.port}" id="port"/>
+	<mx:Text x="180" y="153" text="WARNING: Password are saved locally as plain text." width="162" height="39" fontWeight="normal" color="#CCCCCC" fontSize="10"/>
+	<mx:Button label="Cancel" width="99" click="cancel();" right="117" bottom="10"/>
+	<mx:Button label="Test" width="63" click="test();" bottom="10" left="10"/>
+	<mx:Button label="Save" width="99" click="save();" right="10" bottom="10"/>
+</mx:Panel>

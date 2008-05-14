@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="608" height="380" xmlns:ns1="flexlib.containers.*">
+	<mx:Script>
+		<![CDATA[
+			import com.maclema.util.ByteFormatter;
+			import com.maclema.mysql.events.MySqlErrorEvent;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import com.maclema.util.ResultsUtil;
+			import mx.controls.Alert;
+			import com.maclema.mysql.events.MySqlEvent;
+			import com.maclema.mysql.MySqlResponser;
+			import com.maclema.mysql.Statement;
+			import com.maclema.mysql.Connection;
+			
+			[Bindable]
+			public var con:Connection;
+			
+			private var tableData:TableData;
+			
+			public function refresh():void {
+				var st:Statement = con.createStatement();
+				st.executeQuery("show table status", new MySqlResponser(
+					function (e:MySqlEvent):void {
+						grid.columns = [
+							new DataGridColumn("Name"),
+							new DataGridColumn("Rows"),
+							new DataGridColumn("Engine"),
+							new DataGridColumn("Auto_increment"),
+							new DataGridColumn("Collation")
+						];
+						
+						DataGridColumn(grid.columns[3]).headerText = "Auto Increment";
+						
+						grid.dataProvider = e.resultSet.getRows();
+					},
+					function (e:MySqlErrorEvent):void {
+						Alert.show("Error Refreshing Table List\n\n"+e.text);
+					}
+				));
+			}
+			
+			private function showTable():void {
+				dispatchEvent(new Event("showTable"));
+			}
+			
+			public function get tableName():String {
+				if ( grid.selectedItem == null ) {
+					return null;
+				}
+				return String(grid.selectedItem.Name);
+			}
+			
+			public function clear():void {
+				grid.dataProvider = null;
+				grid.columns = [];
+			}
+		]]>
+	</mx:Script>
+	<mx:VDividedBox id="vbox" x="0" y="0" left="0" right="0" top="0" bottom="0">
+		<mx:DataGrid id="grid" width="100%" doubleClickEnabled="true" doubleClick="showTable();">
+			
+		</mx:DataGrid>
+	</mx:VDividedBox>
+</mx:Canvas>

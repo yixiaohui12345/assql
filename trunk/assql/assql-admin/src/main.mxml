@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute"
+		showFlexChrome="false" showStatusBar="false" showGripper="true" showTitleBar="false"
+		frameRate="45" modalTransparency="0" horizontalScrollPolicy="off" verticalScrollPolicy="off"
+		xmlns:chrome="com.xd.components.chrome.*" xmlns:sync="com.xd.components.sync.*"
+		xmlns:controlbar="com.xd.components.controlbars.*"  viewSourceURL="srcview/index.html"
+		creationComplete="onCreationComplete()" xmlns:ns1="com.maclema.*" xmlns:flib1="flexlib.containers.*">
+		
+	<mx:Style source="assets/dark_default.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			/* ***********************************************************
+			 * 
+			 *  CREDITS
+			 * 
+			 *  Custom Chrome: http://www.graviti.tv/blog/?p=46
+			 * 
+			 * **********************************************************/
+			import com.maclema.QueryData;
+			import com.maclema.mysql.events.MySqlEvent;
+			import com.maclema.mysql.MySqlResponser;
+			import com.maclema.mysql.Statement;
+			import com.maclema.DBConn;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			import com.maclema.ConnectionPropertiesDialog;
+			import com.maclema.MyConnections;
+			import mx.events.ChildExistenceChangedEvent;
+			import com.maclema.TableData;
+			import mx.controls.Alert;
+			import com.maclema.mysql.events.MySqlErrorEvent;
+			import com.maclema.mysql.Mysql;
+			import com.maclema.mysql.Connection;
+			
+			[Bindable]
+			private var myConnections:MyConnections;
+			
+			[Bindable]
+			private var con:Connection;
+			
+			[Bindable]
+			private var connectedDatabaseName:String = "";
+			
+			private function onCreationComplete():void {
+				this.nativeWindow.width = 990;
+				this.nativeWindow.height = 710;
+				this.nativeWindow.x = ((Screen.mainScreen.bounds.width - this.nativeWindow.width)/2);
+				this.nativeWindow.y = ((Screen.mainScreen.bounds.height - this.nativeWindow.height)/2);
+				
+				myConnections = MyConnections.getInstance();
+				
+				tablesview.addEventListener("showTable", handleShowTable);
+			}
+			
+			private function handleConnected(e:Event):void {
+				tablesview.refresh();
+			}
+			
+			private function handleConnectionError(e:MySqlErrorEvent):void {
+				Alert.show("Connection Error: " + e.text);
+			}
+			
+			private function handleShowTable(e:Event):void {
+				var td:TableData = new TableData();
+				td.con = con;
+				td.tableName = tablesview.tableName;
+				td.label = tablesview.tableName;
+				td.percentWidth = 100;
+				td.percentHeight = 100;
+				tabsnav.addChild(td);
+				tabsnav.selectedChild = td;
+			}
+			
+			private function newConnection():void {
+				var pop:ConnectionPropertiesDialog = new ConnectionPropertiesDialog();
+				PopUpManager.addPopUp(pop, this, true);
+				PopUpManager.centerPopUp(pop);
+			}
+			
+			private function editConnection():void {
+				var pop:ConnectionPropertiesDialog = new ConnectionPropertiesDialog();
+				pop.theConnection = DBConn(conslist.selectedItem);
+				PopUpManager.addPopUp(pop, this, true);
+				PopUpManager.centerPopUp(pop);
+			}
+			
+			private function deleteConnection():void {
+				var index:int = myConnections.connections.getItemIndex(DBConn(conslist.selectedItem));
+				myConnections.connections.removeItemAt(index);
+				myConnections.save();
+			}
+			
+			private function openConnection():void {
+				if ( con && con.connected ) {
+					disconnect();
+				}
+				
+				if ( conslist.selectedItem != null ) {
+					var dbc:DBConn = DBConn(conslist.selectedItem);
+					
+					connectedDatabaseName = dbc.database;
+					
+					con = new Connection(dbc.hostname, dbc.port, dbc.username, dbc.password, dbc.database);
+					con.addEventListener(Event.CONNECT, handleConnected);
+					con.addEventListener(MySqlErrorEvent.SQL_ERROR, handleConnectionError);
+					con.connect();
+				}
+			}
+			
+			private function executeQuery():void {
+				var st:Statement = con.createStatement();
+				st.executeQuery(query.text, new MySqlResponser(
+					function (e:MySqlEvent):void {
+						if ( e.type == MySqlEvent.RESULT ) {
+							var td:QueryData = new QueryData();
+							td.handleResult(e);
+							td.label = "Query";
+							tabsnav.addChild(td);
+							tabsnav.selectedChild = td;
+						}
+						else {
+							Alert.show( "Affected Rows: " + e.affectedRows );
+						}
+					},
+					function (e:MySqlErrorEvent):void {
+						Alert.show("Error: " + e.text);	
+					}
+				));
+			}
+			
+			private function disconnect():void {
+				con.disconnect();
+				connectedDatabaseName = "";
+				if ( tablesview ) {
+					tablesview.clear();
+				}
+				
+				if ( query ) {
+					query.text = "";
+				}
+				
+				tabsnav.removeAllChildren();
+				
+				con = null;
+			}
+		]]>
+	</mx:Script>
+		
+	<!-- Application Custom Chrome -->
+	<chrome:CustomChrome top="10" bottom="10" left="10" right="10" />
+	
+	<!-- ContentBackgroundArea -->
+	<mx:VBox top="11" bottom="11" left="11" right="11" styleName="contentBackground" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+		
+	</mx:VBox>
+	
+	<!-- ContentArea -->
+	<mx:Canvas top="66" bottom="34" left="11" right="11" styleName="contentArea" horizontalScrollPolicy="off" verticalScrollPolicy="auto" >
+		<!--<chrome:BorderHighlight top="0" bottom="0" left="0" right="0" >
+			
+		</chrome:BorderHighlight>-->
+		<mx:Panel width="153" layout="absolute" title="My Connections" left="10" top="10" bottom="10">
+			<mx:List id="conslist" left="2" right="2" top="41" bottom="2" dataProvider="{myConnections.connections}" labelField="connectionName" doubleClickEnabled="true" doubleClick="openConnection()"></mx:List>
+			<mx:Button x="7.5" y="10" label="+" width="40" click="newConnection();" toolTip="New Connection"/>
+			<mx:Button x="55.5" y="10" label="-" width="40" click="deleteConnection();" enabled="{conslist.selectedItem!=null}" toolTip="Delete Connection"/>
+			<mx:Button x="103.5" y="10" label="..." width="40" click="editConnection();" enabled="{conslist.selectedItem!=null}" toolTip="Edit Connection"/>
+			</mx:Panel>
+		<mx:TitleWindow layout="absolute" title="{connectedDatabaseName}" left="171" top="10" bottom="10" right="10" showCloseButton="true" close="disconnect()" enabled="{con != null}" disabledOverlayAlpha="0" alpha="{con != null ? 1 : 0.3}">
+			<mx:VDividedBox id="vbox" left="10" right="10" top="10" bottom="10">
+				<mx:TabNavigator width="100%" height="50%">
+					<mx:Canvas label="Tables" width="100%">
+						<ns1:TablesView id="tablesview" con="{con}" left="0" right="0" top="0" bottom="0">
+						</ns1:TablesView>
+					</mx:Canvas>
+					<mx:Canvas label="Query" width="100%" height="100%">
+						<mx:TextArea left="10" right="10" top="10" bottom="41" id="query"/>
+						<mx:Button label="Execute Query" right="10" bottom="10" width="128" click="executeQuery();"/>
+					</mx:Canvas>
+				</mx:TabNavigator>
+				<flib1:SuperTabNavigator width="100%" height="50%" id="tabsnav">
+					
+				</flib1:SuperTabNavigator>
+			</mx:VDividedBox>
+		</mx:TitleWindow>
+	</mx:Canvas>
+	
+	<!-- Application ControlBar -->
+	<controlbar:TopControlBar top="11" left="11" right="11" mouseDown="nativeWindow.startMove()" />
+	
+	<!-- Application StatusBar -->
+	<chrome:StatusBar bottom="11" left="11" right="11" selectedIndex="{con.connected ? con.busy ? 2 : 0 : 1}" />
+</mx:WindowedApplication>
