@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ControlBar xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="968" height="54" horizontalAlign="left"
+	xmlns:flash.filters="flash.filters.*"
+	xmlns:chrome="com.xd.components.chrome.*"
+	xmlns:search="com.xd.components.search.*" >
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.ViewStack;
+			
+			[Bindable]
+			public var dataProvider: ViewStack;
+			
+		]]>
+	</mx:Script>
+	
+	<!-- Branding Area -->
+	<mx:HBox styleName="branding" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+		<mx:Text text="asSQL Admin" styleName="appTitle" selectable="false" >
+			<mx:filters>
+				<flash.filters:DropShadowFilter quality="4" distance="1" angle="90" blurX="2" blurY="2" color="0x000000" alpha="0.75" />
+			</mx:filters>
+		</mx:Text>
+	</mx:HBox>
+	
+	<mx:HBox height="38" verticalAlign="middle" horizontalGap="0" paddingLeft="5" >
+		<mx:VRule height="36" strokeWidth="1" strokeColor="#FFFFFF" alpha=".07" />
+		<mx:VRule height="38" strokeWidth="1" strokeColor="#000000" alpha=".4" />
+		<mx:VRule height="36" strokeWidth="1" strokeColor="#FFFFFF" alpha=".07" />
+	</mx:HBox>
+	
+	
+	<!-- Application Navigation -->
+	<mx:HBox height="50" styleName="navigationControls" verticalAlign="middle" horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+	
+		<!-- HomeMade LinkBar -->
+	</mx:HBox>
+	
+	<mx:Spacer width="100%" />
+	
+	<mx:Spacer width="15" />
+		
+	<!-- Windowing Buttons -->
+	<chrome:AppWindowControls />
+	
+</mx:ControlBar>
