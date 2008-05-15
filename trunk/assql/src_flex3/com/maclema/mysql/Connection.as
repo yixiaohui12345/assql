@@ -225,8 +225,8 @@ package com.maclema.mysql
 			Logger.info(this, "disconnect()");
 			
 			if ( dataHandler != null ) {
-				Logger.error(this, "It seems there is still a pending qeury operation. Disconnection should be called after all queries are completed");
-				throw new Error("It seems there is still a pending qeury operation. Disconnection should be called after all queries are completed");
+				Logger.error(this, "It seems there is still a pending qeury operation. Disconnect should be called after all queries are completed");
+				throw new Error("It seems there is still a pending qeury operation. Disconnect should be called after all queries are completed");
 			}
 			
 			expectingClose = true;
