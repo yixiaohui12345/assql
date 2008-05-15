@@ -180,12 +180,7 @@ package com.maclema.mysql
 		
 		private function setDataHandler(handler:DataHandler):void
 		{
-			if ( dataHandler != null )
-			{
-				dataHandler.removeEventListener( "unregister", unregisterDataHandler );
-			}
-			
-			dataHandler = null;
+			unregisterDataHandler(null);
 			
 			Logger.info(this, "Set Data Handler To: " + getQualifiedClassName(handler));
 			
@@ -193,13 +188,17 @@ package com.maclema.mysql
 			dataHandler.addEventListener( "unregister", unregisterDataHandler );
 		}
 		
-		private function unregisterDataHandler(e:Event):void
+		private function unregisterDataHandler(e:Event=null):void
 		{
-			Logger.info(this, "Unregistered Data Handler");
+			if ( dataHandler != null ) {
+				Logger.info(this, "Unregistered Data Handler");
 			
-			dataHandler.removeEventListener( "unregister", unregisterDataHandler );
-			_busy = false;
-			dispatchEvent(new Event("busyChanged"));
+				dataHandler.removeEventListener( "unregister", unregisterDataHandler );
+				dataHandler = null;
+				
+				_busy = false;
+				dispatchEvent(new Event("busyChanged"));
+			}
 		}
 		
 		/**
@@ -224,6 +223,11 @@ package com.maclema.mysql
 		public function disconnect():void
 		{
 			Logger.info(this, "disconnect()");
+			
+			if ( dataHandler != null ) {
+				Logger.error(this, "It seems there is still a pending qeury operation. Disconnection should be called after all queries are completed");
+				throw new Error("It seems there is still a pending qeury operation. Disconnection should be called after all queries are completed");
+			}
 			
 			expectingClose = true;
 			
