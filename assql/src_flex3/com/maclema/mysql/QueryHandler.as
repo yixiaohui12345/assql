@@ -30,8 +30,6 @@ package com.maclema.mysql
 		
 		override protected function newPacket():void
 		{
-			Logger.info(this, "New Packet");
-			
 			handleNextPacket();
 		}
 		
@@ -50,8 +48,6 @@ package com.maclema.mysql
 				
 					if ( field_count == 0x00 )
 					{
-						Logger.info(this, "Query Response Packet");
-						
 						var rows:int = packet.readLengthCodedBinary();
 						var insertid:int = packet.readLengthCodedBinary();
 						evt = new MySqlEvent(MySqlEvent.RESPONSE);
@@ -63,8 +59,6 @@ package com.maclema.mysql
 					}
 					else if ( field_count == 0xFF || field_count == -1 )
 					{
-						Logger.info(this, "Query Error Packet");
-						
 						unregister();
 						new ErrorHandler(packet, st);	
 					}
@@ -75,8 +69,6 @@ package com.maclema.mysql
 						//eof packet
 						if ( !readFields )
 						{
-							Logger.info(this, "Query EOF (Column Data) Packet");
-							
 							readFields = true;
 						
 							working = false;
@@ -84,8 +76,6 @@ package com.maclema.mysql
 						}
 						else
 						{
-							Logger.info(this, "Query EOF Packet");
-							
 							ResultSet.initialize(rs);
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
@@ -107,8 +97,6 @@ package com.maclema.mysql
 						
 						if ( !readHeader )
 						{
-							Logger.info(this, "Query Init Packet");
-							
 							rs = new ResultSet();
 							readHeader = true;
 							
@@ -117,8 +105,6 @@ package com.maclema.mysql
 						}
 						else if ( !readFields )
 						{
-							Logger.info(this, "Query Column Info Packet");
-							
 							var field:Field = new Field(packet);
 							ResultSet.addColumn(rs, field);
 						
@@ -127,8 +113,6 @@ package com.maclema.mysql
 						}
 						else
 						{
-							Logger.info(this, "Query Row Packet");
-							
 							var row:Array = new Array();
 							while ( packet.bytesAvailable > 0 )
 							{

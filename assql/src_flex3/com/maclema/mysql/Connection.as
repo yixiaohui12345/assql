@@ -51,6 +51,8 @@ package com.maclema.mysql
 		private var _queryStart:Number;
 		private var _busy:Boolean = false;
 		
+		private var queryPool:Array;
+		
 		/**
 		 * Creates a new connection to a MySql server.
 		 **/
@@ -66,6 +68,8 @@ package com.maclema.mysql
 			this.username = username;
 			this.password = password;
 			this.database = database;
+			
+			this.queryPool = new Array();
 			
 			if ( this.database == "" )
 			{
@@ -134,9 +138,7 @@ package com.maclema.mysql
 		}
 		
 		private function onSocketData(e:ProgressEvent):void
-		{
-			Logger.info(this, "Socket Data (" + sock.bytesAvailable + " bytes)");
-			
+		{	
 			_tx += sock.bytesAvailable;
 			_totalTX += sock.bytesAvailable;
 			
@@ -198,6 +200,8 @@ package com.maclema.mysql
 				
 				_busy = false;
 				dispatchEvent(new Event("busyChanged"));
+				
+				checkPool();
 			}
 		}
 		
@@ -255,12 +259,17 @@ package com.maclema.mysql
         {
         	Logger.info(this, "Execute Query (" + sql + ")");
         	
-        	_busy = true;
-        	dispatchEvent(new Event("busyChanged"));
-        	_tx = 0;
-        	_queryStart = getTimer();
-            setDataHandler(new QueryHandler(this, statement));
-            sendCommand(Mysql.COM_QUERY, sql);
+        	if ( dataHandler != null ) {
+        		poolQuery(statement, sql);
+        	}
+        	else {
+	        	_busy = true;
+	        	dispatchEvent(new Event("busyChanged"));
+	        	_tx = 0;
+	        	_queryStart = getTimer();
+	            setDataHandler(new QueryHandler(this, statement));
+	            sendCommand(Mysql.COM_QUERY, sql);
+	    	}
         }
         
         /**
@@ -271,12 +280,43 @@ package com.maclema.mysql
         {
         	Logger.info(this, "Execute Binary Query");
         	
-        	_busy = true;
-        	dispatchEvent(new Event("busyChanged"));
-        	_tx = 0;
-        	_queryStart = getTimer();
-        	setDataHandler(new QueryHandler(this, statement));
-        	sendBinaryCommand(Mysql.COM_QUERY, query);
+        	if ( dataHandler != null ) {
+        		poolQuery(statement, query);
+        	}
+        	else {
+	        	_busy = true;
+	        	dispatchEvent(new Event("busyChanged"));
+	        	_tx = 0;
+	        	_queryStart = getTimer();
+	        	setDataHandler(new QueryHandler(this, statement));
+	        	sendBinaryCommand(Mysql.COM_QUERY, query);
+        	}
+        }
+        
+        private function poolQuery(statement:Statement, query:*):void {
+        	Logger.info(this, "Pooling Query");
+        	queryPool.push({statement: statement, query: query});
+        }
+        
+        private function checkPool():void {
+        	if ( queryPool.length > 0 ) {
+        		Logger.info(this, "Executing Pooled Query");
+        		
+        		var obj:Object = queryPool.shift();
+        		var st:Statement = obj.statement;
+        		var query:* = obj.query;
+        		
+        		if ( query is String ) {
+        			executeQuery(st, String(query));
+        		}
+        		else if ( query is BinaryQuery ) {
+        			executeBinaryQuery(st, BinaryQuery(query));
+        		}
+        		else {
+        			Logger.error(this, "Unknown query type in pool");
+        			throw new Error("Unknown query type in pool");
+        		}
+        	}
         }
         
         private function sendBinaryCommand(command:int, data:BinaryQuery):void
