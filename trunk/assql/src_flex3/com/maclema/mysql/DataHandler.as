@@ -29,7 +29,6 @@ package com.maclema.mysql
 		 **/
 		public function pushPacket(packet:Packet):void
 		{
-			Logger.info(this, "Push Packet (Total Packets: " + packets.length + ")");
 			packets.push(packet);
 			newPacket();
 		}
@@ -44,9 +43,7 @@ package com.maclema.mysql
         * Returns the next packet that needs to be handled
         **/
         public function nextPacket():Packet
-        {
-        	Logger.info(this, "Next Packet");
-        	
+        {	
         	if ( packets != null && packets.length > 0 )
 	        	return Packet(packets.shift());
 	        else
