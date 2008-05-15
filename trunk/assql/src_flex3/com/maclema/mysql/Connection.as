@@ -1,5 +1,6 @@
 package com.maclema.mysql
 {
+	import com.maclema.logging.Logger;
 	import com.maclema.mysql.events.MySqlErrorEvent;
 	
 	import flash.events.ErrorEvent;
@@ -9,6 +10,7 @@ package com.maclema.mysql
 	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.Socket;
+	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
@@ -89,12 +91,16 @@ package com.maclema.mysql
 		
 		private function onConnected(e:Event):void
 		{
+			Logger.info(this, "Connected");
+			
 			this._connected = true;
 			dispatchEvent(new Event("connectionStateChanged"));
 		}
 		
 		private function onDisconnect(e:Event):void
 		{
+			Logger.info(this, "Disconnected");
+			
 			this._connected = false;
 			dispatchEvent(new Event("connectionStateChanged"));
 		}
@@ -107,16 +113,19 @@ package com.maclema.mysql
 		
 		private function onSocketError(e:ErrorEvent):void
 		{
+			Logger.error(this, "Socket Error: " + e.toString());
 			dispatchEvent(new MySqlErrorEvent(e.text));
 		}
 		
 		private function onSocketConnect(e:Event):void
 		{
-			
+			Logger.info(this, "Socket Connected");
 		}
 		
 		private function onSocketClose(e:Event):void
 		{
+			Logger.info(this, "Socket Closed (Expected: " + expectingClose +")");
+			
 			if ( !expectingClose )
 			{
 				trace("Connection Terminated Unexpectedly!");
@@ -126,6 +135,8 @@ package com.maclema.mysql
 		
 		private function onSocketData(e:ProgressEvent):void
 		{
+			Logger.info(this, "Socket Data (" + sock.bytesAvailable + " bytes)");
+			
 			_tx += sock.bytesAvailable;
 			_totalTX += sock.bytesAvailable;
 			
@@ -176,12 +187,16 @@ package com.maclema.mysql
 			
 			dataHandler = null;
 			
+			Logger.info(this, "Set Data Handler To: " + getQualifiedClassName(handler));
+			
 			dataHandler = handler;
 			dataHandler.addEventListener( "unregister", unregisterDataHandler );
 		}
 		
 		private function unregisterDataHandler(e:Event):void
 		{
+			Logger.info(this, "Unregistered Data Handler");
+			
 			dataHandler.removeEventListener( "unregister", unregisterDataHandler );
 			_busy = false;
 			dispatchEvent(new Event("busyChanged"));
@@ -230,6 +245,8 @@ package com.maclema.mysql
          **/
         internal function executeQuery(statement:Statement, sql:String):void
         {
+        	Logger.info(this, "Execute Query (" + sql + ")");
+        	
         	_busy = true;
         	dispatchEvent(new Event("busyChanged"));
         	_tx = 0;
@@ -244,6 +261,8 @@ package com.maclema.mysql
         **/
         internal function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
         {
+        	Logger.info(this, "Execute Binary Query");
+        	
         	_busy = true;
         	dispatchEvent(new Event("busyChanged"));
         	_tx = 0;
@@ -254,6 +273,7 @@ package com.maclema.mysql
         
         private function sendBinaryCommand(command:int, data:BinaryQuery):void
         {
+        	Logger.info(this, "Send Binar Command");
         	//check that the data is at position 0
         	data.position = 0;
         	
@@ -276,6 +296,8 @@ package com.maclema.mysql
         **/
         public function changeDatabaseTo(whatDb:String, doNotChangeHandler:Boolean=false):void
         {	
+        	Logger.info(this, "Change Database (" + whatDb + ")");
+        	
         	if ( doNotChangeHandler == false ) {
         		setDataHandler(new CommandHandler(this));
         	}

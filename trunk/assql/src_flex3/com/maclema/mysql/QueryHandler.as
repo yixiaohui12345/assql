@@ -1,5 +1,6 @@
 package com.maclema.mysql
 {
+	import com.maclema.logging.Logger;
 	import com.maclema.mysql.events.MySqlEvent;
 	import com.maclema.util.ByteFormatter;
 	
@@ -29,6 +30,8 @@ package com.maclema.mysql
 		
 		override protected function newPacket():void
 		{
+			Logger.info(this, "New Packet");
+			
 			handleNextPacket();
 		}
 		
@@ -47,6 +50,8 @@ package com.maclema.mysql
 				
 					if ( field_count == 0x00 )
 					{
+						Logger.info(this, "Query Response Packet");
+						
 						var rows:int = packet.readLengthCodedBinary();
 						var insertid:int = packet.readLengthCodedBinary();
 						evt = new MySqlEvent(MySqlEvent.RESPONSE);
@@ -58,16 +63,20 @@ package com.maclema.mysql
 					}
 					else if ( field_count == 0xFF || field_count == -1 )
 					{
+						Logger.info(this, "Query Error Packet");
+						
 						unregister();
 						new ErrorHandler(packet, st);	
 					}
 					else if ( field_count == 0xFE || field_count == -2 )
-					{
+					{	
 						packet.position = 0;
 						
 						//eof packet
 						if ( !readFields )
 						{
+							Logger.info(this, "Query EOF (Column Data) Packet");
+							
 							readFields = true;
 						
 							working = false;
@@ -75,17 +84,18 @@ package com.maclema.mysql
 						}
 						else
 						{
+							Logger.info(this, "Query EOF Packet");
+							
 							ResultSet.initialize(rs);
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
 							
-							trace("Mysql Result");
-							trace("  Rows:       " + rs.size());
-							trace("  Query Size: " + ByteFormatter.format(con.tx, ByteFormatter.KBYTES, 2));
-							trace("  Total TX:   " + ByteFormatter.format(con.totalTX, ByteFormatter.KBYTES, 2));
-							trace("  Query Time: " + (getTimer()-con.lastQueryStart) + " ms");
-							trace();
+							Logger.debug(this, "Mysql Result");
+							Logger.debug(this, "  Rows:       " + rs.size());
+							Logger.debug(this, "  Query Size: " + ByteFormatter.format(con.tx, ByteFormatter.KBYTES, 2));
+							Logger.debug(this, "  Total TX:   " + ByteFormatter.format(con.totalTX, ByteFormatter.KBYTES, 2));
+							Logger.debug(this, "  Query Time: " + (getTimer()-con.lastQueryStart) + " ms");
 							
 							unregister();
 							st.dispatchEvent(evt);
@@ -97,6 +107,8 @@ package com.maclema.mysql
 						
 						if ( !readHeader )
 						{
+							Logger.info(this, "Query Init Packet");
+							
 							rs = new ResultSet();
 							readHeader = true;
 							
@@ -105,6 +117,8 @@ package com.maclema.mysql
 						}
 						else if ( !readFields )
 						{
+							Logger.info(this, "Query Column Info Packet");
+							
 							var field:Field = new Field(packet);
 							ResultSet.addColumn(rs, field);
 						
@@ -113,6 +127,8 @@ package com.maclema.mysql
 						}
 						else
 						{
+							Logger.info(this, "Query Row Packet");
+							
 							var row:Array = new Array();
 							while ( packet.bytesAvailable > 0 )
 							{

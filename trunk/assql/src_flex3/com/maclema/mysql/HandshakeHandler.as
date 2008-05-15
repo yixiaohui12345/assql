@@ -1,5 +1,7 @@
 package com.maclema.mysql
 {
+	import com.maclema.logging.Logger;
+	
 	import flash.events.Event;
 	import flash.utils.ByteArray;
 	
@@ -31,13 +33,14 @@ package com.maclema.mysql
 		}
 		
 		override protected function newPacket():void
-		{
+		{	
 			inPacketCount++;
 			var packet:Packet;
 			var field_count:int;
 			
 			if ( inPacketCount == 1 )
 			{
+				Logger.info(this, "Server Information Packet");
 				con.server = new ServerInformation( nextPacket() );
 				doHandshake();
 			}
@@ -49,6 +52,7 @@ package com.maclema.mysql
 				
 				if ( field_count == 0xFE && packet.length < 9 )
 				{
+					Logger.info(this, "323 Scramble Request Packet");
 					//By sending this very specific reply server asks us to send scrambled
                   	//password in old format. The reply contains scramble_323.
                   	inPacketCount--;
@@ -56,6 +60,7 @@ package com.maclema.mysql
 				}
 				else if ( field_count == 0x00 )
 				{
+					Logger.info(this, "Success Packet");
 					//ok packet
 					if ( connectWithDb )
 					{
@@ -71,6 +76,7 @@ package com.maclema.mysql
 				}
 				else if ( field_count == 0xFF )
 				{
+					Logger.info(this, "Error Packet");
 					unregister();
 					new ErrorHandler( packet, con );
 				}
@@ -82,12 +88,16 @@ package com.maclema.mysql
 				
 				if ( field_count == 0x00 )
 				{
+					Logger.info(this, "Connect With DB Success Packet");
+					
 					//woop! were authenticated
 					unregister();
 					con.dispatchEvent(new Event(Event.CONNECT));
 				}
 				else if ( field_count == 0xFF || field_count == -1 )
 				{
+					Logger.info(this, "Connect With DB Error Packet");
+					
 					unregister();
 					new ErrorHandler( packet, con );
 				}
@@ -96,6 +106,7 @@ package com.maclema.mysql
 		
 		private function doHandshake():void
 		{
+			Logger.info(this, "doHandshake");
 			if ( con.server.meetsVersion( 4, 1, 22 ) )
 			{
 				con.clientParam = 0;
@@ -149,6 +160,8 @@ package com.maclema.mysql
 		/* completes the authentication */
 		private function doAuthentication():void
 		{
+			Logger.info(this, "doAuthentication");
+			
 			//the packet to send
 			var packet:Packet = new Packet();
 			
@@ -198,6 +211,8 @@ package com.maclema.mysql
 		/* completes the authentication */
 		private function doSecureAuthentication411():void
 		{
+			Logger.info(this, "doSecureAuthentication");
+			
 			//the packet to send
 			var packet:Packet = new Packet();
 			
