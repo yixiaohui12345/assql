@@ -1,10 +1,9 @@
 package com.maclema.mysql
 {
-	import flash.events.EventDispatcher;
-	import flash.utils.ByteArray;
-	import flash.net.Socket;
-	import flash.events.ProgressEvent;
+	import com.maclema.logging.Logger;
+	
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	
 	/**
 	 * This class is the base class for any class that is used as a data
@@ -30,18 +29,24 @@ package com.maclema.mysql
 		 **/
 		public function pushPacket(packet:Packet):void
 		{
+			Logger.info(this, "Push Packet (Total Packets: " + packets.length + ")");
 			packets.push(packet);
 			newPacket();
 		}
         
         //overridden by handlers
-        protected function newPacket():void {}
+        protected function newPacket():void {
+        	Logger.fatal(this, "NEW PACKET WAS NOT OVERRIDDEN");
+        	throw new Error("newPacket() WAS NOT OVERRIDDEN");
+        }
         
         /**
         * Returns the next packet that needs to be handled
         **/
         public function nextPacket():Packet
         {
+        	Logger.info(this, "Next Packet");
+        	
         	if ( packets != null && packets.length > 0 )
 	        	return Packet(packets.shift());
 	        else

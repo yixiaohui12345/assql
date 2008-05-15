@@ -1,5 +1,6 @@
 package com.maclema.mysql
 {
+    import com.maclema.logging.Logger;
     import com.maclema.mysql.events.MySqlErrorEvent;
     import com.maclema.mysql.events.MySqlEvent;
     
@@ -30,6 +31,7 @@ package com.maclema.mysql
         private function handleResponse(e:MySqlEvent):void {
         	if ( this.responder != null ) {
         		if ( this.responder.responseHandler != null ) {
+        			Logger.info(this, "Dispatching Result/Response Responder");
         			this.responder.responseHandler(e);
         		}
         	}
@@ -38,6 +40,7 @@ package com.maclema.mysql
         private function handleError(e:MySqlErrorEvent):void {
         	if ( this.responder != null ) {
         		if ( this.responder.errorHandler != null ) {
+        			Logger.info(this, "Dispatching Error Responder");
         			this.responder.errorHandler(e);
         		}
         	}
@@ -61,6 +64,7 @@ package com.maclema.mysql
         * Set a String parameter
         **/
         public function setString(index:int, value:String):void {
+        	Logger.info(this, "setString (" + value + ")");
         	params[index] = value;
         }
         
@@ -68,6 +72,7 @@ package com.maclema.mysql
         * Set a Number parameter
         **/
         public function setNumber(index:int, value:Number):void {
+        	Logger.info(this, "setNumber (" + value +")");
         	params[index] = value;
         }
         
@@ -75,6 +80,7 @@ package com.maclema.mysql
         * Set a Date parameter
         **/
         public function setDate(index:int, value:Date):void {
+        	Logger.info(this, "setDate ("+ value.toDateString() +")");
         	params[index] = value;
         }
         
@@ -82,6 +88,7 @@ package com.maclema.mysql
         * Set's a Binary parameter
         **/
         public function setBinary(index:int, value:ByteArray):void {
+        	Logger.info(this, "setBinary (" + value.length + " bytes)");
         	params[index] = value;
         }
         
@@ -90,7 +97,9 @@ package com.maclema.mysql
          * or as the first parameter. You may also specify a MySqlResponder object as the second parameter.
          **/
         public function executeQuery(sqlString:String=null, responder:MySqlResponser=null):void
-        {
+        {	
+        	Logger.info(this, "executeQuery");
+        	
         	this.responder = responder;
         	
         	if ( sqlString != null ) {
@@ -99,10 +108,12 @@ package com.maclema.mysql
         	
         	//parameters
         	if ( this.sql.indexOf("?") != -1 ) {
+        		Logger.info(this, "executing a statement with parameters");
         		var binq:BinaryQuery = addParametersToSql();
         		con.executeBinaryQuery(this, binq);
         	}
         	else {
+        		Logger.info(this, "executing a regular statement");
           		con.executeQuery(this, sql);
          	}
         }
@@ -130,6 +141,7 @@ package com.maclema.mysql
     					binq.appendBinary(ByteArray(value));
     				}
     				else {
+    					Logger.fatal(this, "Unknown parameter objject for parameter index " + i);
     					throw new Error("Unknown Parameter Object For Parameter Index " + i);
     				}
     				binq.append("'");
@@ -143,6 +155,8 @@ package com.maclema.mysql
         **/
         public function executeBinaryQuery(query:BinaryQuery, responder:MySqlResponser=null):void
         {
+        	Logger.info(this, "executeBinaryQuery");
+        	
         	this.responder = responder;
         	
         	query.position = 0;

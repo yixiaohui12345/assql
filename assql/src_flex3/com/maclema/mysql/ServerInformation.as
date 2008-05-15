@@ -1,6 +1,6 @@
 package com.maclema.mysql
 {
-    import flash.utils.ByteArray;
+    import com.maclema.logging.Logger;
     
     /**
      * @private
@@ -85,7 +85,7 @@ package com.maclema.mysql
             }
             useLongPassword = true; //we only support min protocol version 10.
             
-            trace("[ServerInformation] Version: " + serverVersion);
+            Logger.debug(this, "Version: " + serverVersion);
         }
         
         public function meetsVersion(mjr:int, mnr:int, rvn:int):Boolean
