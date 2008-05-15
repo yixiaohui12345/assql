@@ -207,6 +207,8 @@ package com.maclema.mysql
 		 **/
 		public function connect():void
 		{
+			Logger.info(this, "connect()");
+			
 			_tx = 0;
 			_totalTX = 0;
 			
@@ -221,6 +223,8 @@ package com.maclema.mysql
 		 **/
 		public function disconnect():void
 		{
+			Logger.info(this, "disconnect()");
+			
 			expectingClose = true;
 			
 			if ( sock.connected )
@@ -273,7 +277,7 @@ package com.maclema.mysql
         
         private function sendBinaryCommand(command:int, data:BinaryQuery):void
         {
-        	Logger.info(this, "Send Binar Command");
+        	Logger.info(this, "Send Binary Command");
         	//check that the data is at position 0
         	data.position = 0;
         	
@@ -285,6 +289,8 @@ package com.maclema.mysql
 		
 		private function sendCommand(command:int, data:String):void
         {
+        	Logger.info(this, "Send Command (Command: " + command + " Data: " + data + ")");
+        	
             var packet:Packet = new Packet();
             packet.writeByte(command);
             packet.writeUTFBytes(data);
