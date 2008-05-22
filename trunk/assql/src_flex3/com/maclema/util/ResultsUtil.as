@@ -27,12 +27,12 @@ package com.maclema.util
 		
 		/**
 		 * Takes a value and and a Field, and returns a String ready for use in 
-		 * an SQL statement. You can optionally specify not to escape the values.
+		 * an SQL statement. You can optionally specify not to add quotes to the values.
 		 * 
 		 * Example: prepareForSqlString([some date in milliseconds], field) would return
 		 * '2008-01-01 00:00:00' ready for an insert statement
 		 **/
-		public static function prepareForSqlString(value:Object, field:Field, escapeValues:Boolean=true):String
+		public static function prepareForSqlString(value:Object, field:Field, addQuotes:Boolean=true):String
 		{
 			if ( value == null ) {
 				return "NULL";
@@ -41,44 +41,76 @@ package com.maclema.util
 			if (value is Object)
 			{							
 				var ds:DateFormatter = new DateFormatter();
+				var outValue:String;
 				
 				switch (field.getType())
 				{
 					case Mysql.FIELD_TYPE_DECIMAL:
 					case Mysql.FIELD_TYPE_TINY:
-        			case Mysql.FIELD_TYPE_SHORT:
-        			case Mysql.FIELD_TYPE_LONG:
-        			case Mysql.FIELD_TYPE_FLOAT:
-        			case Mysql.FIELD_TYPE_DOUBLE:
-        			case Mysql.FIELD_TYPE_LONGLONG:
-        			case Mysql.FIELD_TYPE_INT24:
-        			case Mysql.FIELD_TYPE_YEAR:
-        			case Mysql.FIELD_TYPE_NEWDECIMAL:
-        			case Mysql.FIELD_TYPE_BIT:
+					case Mysql.FIELD_TYPE_SHORT:
+					case Mysql.FIELD_TYPE_LONG:
+					case Mysql.FIELD_TYPE_FLOAT:
+					case Mysql.FIELD_TYPE_DOUBLE:
+					case Mysql.FIELD_TYPE_LONGLONG:
+					case Mysql.FIELD_TYPE_INT24:
+					case Mysql.FIELD_TYPE_YEAR:
+					case Mysql.FIELD_TYPE_NEWDECIMAL:
+					case Mysql.FIELD_TYPE_BIT:
 						return value.toString();
 						
 					case Mysql.FIELD_TYPE_DATE:
 						// MySQL date port
 						ds.formatString = "YYYY-MM-DD";
-						return "'" + ds.format(new Date(value)) + "'";
+						
+						outValue = ds.format(new Date(value));
+						
+						if ( addQuotes ) {
+							return "'" + outValue + "'";
+						}
+						else {
+							return outValue;
+						}
 					
 					case Mysql.FIELD_TYPE_TIMESTAMP:
 					case Mysql.FIELD_TYPE_DATETIME:
 					case Mysql.FIELD_TYPE_NEWDATE:
 						// MySQL datetime port
 						ds.formatString = "YYYY-MM-DD JJ:NN:SS";
-						return "'" + ds.format(new Date(value)) + "'";
+						
+						outValue = ds.format(new Date(value));
+						
+						if ( addQuotes ) {
+							return "'" + outValue + "'";
+						}
+						else {
+							return outValue;
+						}
 						
 					case Mysql.FIELD_TYPE_TIME:
 						// MySQL time port
 						ds.formatString = "JJ:NN:SS";
-						return "'" + ds.format(new Date(value)) + "'";
+						
+						outValue = ds.format(new Date(value));
+						
+						if ( addQuotes ) {
+							return "'" + outValue + "'";
+						}
+						else {
+							return outValue;
+						}
 					
 					case Mysql.FIELD_TYPE_ENUM:
 					case Mysql.FIELD_TYPE_VARCHAR:
 					case Mysql.FIELD_TYPE_VAR_STRING:
 					case Mysql.FIELD_TYPE_STRING:
-						return "'" + Mysql.escapeString(value.toString()) + "'";
+						outValue = Mysql.escapeString(value.toString());
+						
+						if ( addQuotes ) {
+							return "'" + outValue + "'";
+						}
+						else {
+							return outValue;
+						}
 				}
 			}
 			
