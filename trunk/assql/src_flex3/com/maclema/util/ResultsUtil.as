@@ -1,7 +1,6 @@
 package com.maclema.util
 {
 	import com.maclema.mysql.Field;
-	import com.maclema.mysql.Mysql;
 	import com.maclema.mysql.ResultSet;
 	
 	import mx.controls.dataGridClasses.DataGridColumn;

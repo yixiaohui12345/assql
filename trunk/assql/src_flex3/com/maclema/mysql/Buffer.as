@@ -1,7 +1,5 @@
 package com.maclema.mysql
-{
-    import com.maclema.util.ByteFormatter;
-    
+{   
     import flash.utils.ByteArray;
     
     /**
