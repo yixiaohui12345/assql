@@ -1,5 +1,7 @@
 package com.maclema.mysql
 {
+    import com.maclema.util.ByteFormatter;
+    
     import flash.utils.ByteArray;
     
     /**
@@ -75,6 +77,7 @@ package com.maclema.mysql
         {
             var firstByte:int = (readByte() & 0xFF);
             
+            trace("FirstByte: " + firstByte);
             if ( firstByte <= 250 )
             {
                 return firstByte;
@@ -95,8 +98,7 @@ package com.maclema.mysql
             {
                 return  ((readByte() & 0xff)) |
                         ((readByte() & 0xff) << 8) |
-                        ((readByte() & 0xff) << 16) |
-                        ((readByte() & 0xff) << 24);
+                        ((readByte() & 0xff) << 16);
             }
             
             if ( firstByte == 254 )
@@ -136,6 +138,11 @@ package com.maclema.mysql
             if ( len == 0 )
             {
                 return null;
+            }
+            
+            if ( len > this.bytesAvailable ) {
+            	trace(ByteFormatter.format(len, ByteFormatter.KBYTES, 2));
+            	trace(ByteFormatter.format(bytesAvailable, ByteFormatter.KBYTES, 2));
             }
             
             var out:ByteArray = new ByteArray();

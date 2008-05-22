@@ -1,5 +1,7 @@
 package com.maclema.mysql
 {
+    import com.maclema.logging.Logger;
+    
     import flash.net.Socket;
     
     /**
@@ -64,7 +66,7 @@ package com.maclema.mysql
         {
             if ( packetLength > maxAllowedPacket )
             {
-            	trace("PACKET TO BIG, MAX_ALLOWED: " + maxAllowedPacket + " GOT: " + packetLength);
+            	Logger.error(this, "Packet Larger Than maxAllowedPacket of " + maxAllowedPacket + " bytes");
             }
             
             if ( seqOverride != 0 ) {
