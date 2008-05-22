@@ -31,7 +31,7 @@ package com.maclema.logging
 		
 		private static function log(msgLevel:int, context:Object, message:String):void {
 			if ( level <= msgLevel ) {
-				trace(pad("[" + levelString() + "] " + getQualifiedClassName(context)) + " : " + message);
+				trace(pad("[" + levelString(msgLevel) + "] " + getQualifiedClassName(context)) + " : " + message);
 			}
 		}
 		
@@ -42,8 +42,8 @@ package com.maclema.logging
 			return str;
 		}
 		
-		private static function levelString():String {
-			switch (level) {
+		private static function levelString(whichLevel:int):String {
+			switch (whichLevel) {
 				case NONE: return "";
 				case FATAL: return "FATAL";
 				case ERROR: return "ERROR";
