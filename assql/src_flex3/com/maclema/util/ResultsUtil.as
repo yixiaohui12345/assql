@@ -1,9 +1,11 @@
 package com.maclema.util
 {
 	import com.maclema.mysql.Field;
+	import com.maclema.mysql.Mysql;
 	import com.maclema.mysql.ResultSet;
 	
 	import mx.controls.dataGridClasses.DataGridColumn;
+	import mx.formatters.DateFormatter;
 	
 	public class ResultsUtil
 	{
@@ -22,6 +24,65 @@ package com.maclema.util
 			}
 			return newcols;
 		}
-
+		
+		/**
+		 * Takes a value and and a Field, and returns a String ready for use in 
+		 * an SQL statement. You can optionally specify not to escape the values.
+		 * 
+		 * Example: prepareForSqlString([some date in milliseconds], field) would return
+		 * '2008-01-01 00:00:00' ready for an insert statement
+		 **/
+		public static function prepareForSqlString(value:Object, field:Field, escapeValues:Boolean=true):String
+		{
+			if ( value == null ) {
+				return "NULL";
+			}
+			
+			if (value is Object)
+			{							
+				var ds:DateFormatter = new DateFormatter();
+				
+				switch (field.getType())
+				{
+					case Mysql.FIELD_TYPE_DECIMAL:
+					case Mysql.FIELD_TYPE_TINY:
+        			case Mysql.FIELD_TYPE_SHORT:
+        			case Mysql.FIELD_TYPE_LONG:
+        			case Mysql.FIELD_TYPE_FLOAT:
+        			case Mysql.FIELD_TYPE_DOUBLE:
+        			case Mysql.FIELD_TYPE_LONGLONG:
+        			case Mysql.FIELD_TYPE_INT24:
+        			case Mysql.FIELD_TYPE_YEAR:
+        			case Mysql.FIELD_TYPE_NEWDECIMAL:
+        			case Mysql.FIELD_TYPE_BIT:
+						return value.toString();
+						
+					case Mysql.FIELD_TYPE_DATE:
+						// MySQL date port
+						ds.formatString = "YYYY-MM-DD";
+						return "'" + ds.format(new Date(value)) + "'";
+					
+					case Mysql.FIELD_TYPE_TIMESTAMP:
+					case Mysql.FIELD_TYPE_DATETIME:
+					case Mysql.FIELD_TYPE_NEWDATE:
+						// MySQL datetime port
+						ds.formatString = "YYYY-MM-DD JJ:NN:SS";
+						return "'" + ds.format(new Date(value)) + "'";
+						
+					case Mysql.FIELD_TYPE_TIME:
+						// MySQL time port
+						ds.formatString = "JJ:NN:SS";
+						return "'" + ds.format(new Date(value)) + "'";
+					
+					case Mysql.FIELD_TYPE_ENUM:
+					case Mysql.FIELD_TYPE_VARCHAR:
+					case Mysql.FIELD_TYPE_VAR_STRING:
+					case Mysql.FIELD_TYPE_STRING:
+						return "'" + Mysql.escapeString(value.toString()) + "'";
+				}
+			}
+			
+			return String(value);
+		}
 	}
 }
