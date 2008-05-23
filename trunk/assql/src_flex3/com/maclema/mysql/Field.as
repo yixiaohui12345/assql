@@ -47,9 +47,9 @@ package com.maclema.mysql
             packet.readByte(); //filler
             _charsetnr = packet.readTwoByteInt();
             _length = packet.readInt();
-            _type = packet.readByte();
+            _type = packet.readByte() & 0xFF;
             _flags = packet.readTwoByteInt();
-            _decimals = packet.readByte();
+            _decimals = packet.readByte() & 0xFF;
         }
         
         /**
