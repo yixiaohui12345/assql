@@ -69,16 +69,14 @@ package com.maclema.mysql
             this.serverCapabilities = 0;
             
             if ( packet.position < packet.length ) {
-            	//serverCapabilities = packet.readShort();
-            	serverCapabilities = (packet.readByte() & 0xff) |
-                    				 ((packet.readByte() & 0xff) << 8);
+            	serverCapabilities = packet.readTwoByteInt();
             }
             
             //Re: Issue 5 (Thanks Michael! http://code.google.com/p/asdox/)
             if ( meetsVersion(4, 1, 1) ) {
 	            var oldpos:int = packet.position;
 	            serverLanguage = packet.readByte() & 0xff;
-	            serverStatus = (packet.readByte() & 0xff) | ((packet.readByte() & 0xff) << 8);
+	            serverStatus = packet.readTwoByteInt();
 	            packet.position = oldpos+16;
 	            
 	            seed += packet.readString();

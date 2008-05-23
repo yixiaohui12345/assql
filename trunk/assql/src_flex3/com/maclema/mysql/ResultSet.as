@@ -1,5 +1,7 @@
 package com.maclema.mysql
 {
+    import com.maclema.util.ResultsUtil;
+    
     import flash.utils.ByteArray;
     
     import mx.collections.ArrayCollection;
@@ -181,11 +183,12 @@ package com.maclema.mysql
         	var ac:ArrayCollection = new ArrayCollection();
         	while ( this.next() ) {
         		var obj:Object = new Object();
-        		var index:int = 0;
-        		for ( var prop:String in this.nameMap ) {
-        			index++;
-        			obj[prop] = getString(prop);
-        			obj[index] = getString(prop);
+        		
+        		for ( var i:int=0; i<columns.length; i++ ) {
+        			var field:Field = Field(columns[i]);
+        			var value:* = getCastedValue(field);
+        			obj[field.getName()] = value;
+        			obj[i] = value;
         		}
      			ac.addItem(obj);
         	}
@@ -193,6 +196,46 @@ package com.maclema.mysql
         	
             return ac;
         }
+        
+        private function getCastedValue(field:Field):*
+		{
+			switch (field.getType())
+			{
+				case Mysql.FIELD_TYPE_DECIMAL:
+				case Mysql.FIELD_TYPE_TINY:
+				case Mysql.FIELD_TYPE_SHORT:
+				case Mysql.FIELD_TYPE_LONG:
+				case Mysql.FIELD_TYPE_FLOAT:
+				case Mysql.FIELD_TYPE_DOUBLE:
+				case Mysql.FIELD_TYPE_LONGLONG:
+				case Mysql.FIELD_TYPE_INT24:
+				case Mysql.FIELD_TYPE_YEAR:
+				case Mysql.FIELD_TYPE_NEWDECIMAL:
+				case Mysql.FIELD_TYPE_BIT:
+					return getNumber(field.getName());
+					
+				case Mysql.FIELD_TYPE_DATE:
+				case Mysql.FIELD_TYPE_TIMESTAMP:
+				case Mysql.FIELD_TYPE_DATETIME:
+				case Mysql.FIELD_TYPE_NEWDATE:
+				case Mysql.FIELD_TYPE_TIME:
+					return getDate(field.getName());
+				
+				case Mysql.FIELD_TYPE_ENUM:
+				case Mysql.FIELD_TYPE_VARCHAR:
+				case Mysql.FIELD_TYPE_VAR_STRING:
+				case Mysql.FIELD_TYPE_STRING:
+					return getString(field.getName());
+					
+				case Mysql.FIELD_TYPE_BLOB:
+				case Mysql.FIELD_TYPE_LONG_BLOB:
+				case Mysql.FIELD_TYPE_MEDIUM_BLOB:
+				case Mysql.FIELD_TYPE_TINY_BLOB:
+					return getBinary(field.getName());
+			}
+			
+			return getString(field.getName());
+		}
         
         /**
          * Returns an array for Field objects

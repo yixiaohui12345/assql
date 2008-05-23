@@ -48,6 +48,26 @@ package com.maclema.mysql
         }
         
         /**
+         * Writes a two byte integer
+         **/
+        public function writeTwoByteInt(value:int):void
+        {
+            writeByte( value & 0xff );
+            writeByte( value >>> 8 );
+        }
+        
+        /**
+         * Reads a two byte integer
+         **/
+        public function readTwoByteInt():int
+        {
+            var n:int = ((readByte() & 0xff)) |
+                        ((readByte() & 0xff) << 8);
+                        
+            return n;
+        }
+        
+        /**
          * Reads a null-terminated string
          **/
         public function readString():String
