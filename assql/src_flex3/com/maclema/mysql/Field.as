@@ -45,10 +45,10 @@ package com.maclema.mysql
             _name = packet.readLengthCodedString();
             _orgName = packet.readLengthCodedString();
             packet.readByte(); //filler
-            _charsetnr = packet.readShort();
+            _charsetnr = packet.readTwoByteInt();
             _length = packet.readInt();
             _type = packet.readByte();
-            _flags = packet.readShort();
+            _flags = packet.readTwoByteInt();
             _decimals = packet.readByte();
         }
         
