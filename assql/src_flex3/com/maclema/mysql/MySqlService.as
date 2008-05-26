@@ -8,6 +8,7 @@ package com.maclema.mysql
 	import mx.collections.ArrayCollection;
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
+	import mx.rpc.IResponder;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
 	[Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
@@ -45,6 +46,11 @@ package com.maclema.mysql
 		 * Auto connect when ready (Default: false)
 		 **/
 		public var autoConnect:Boolean = false;
+		
+		/**
+		 * The responder to use for the mysql service
+		 **/
+		public var responder:IResponder;
 		
 		private var con:Connection;
 		
@@ -167,7 +173,7 @@ package com.maclema.mysql
 			if ( e.type == MySqlEvent.RESULT ) {
 				_lastResultSet = e.resultSet;
 				_lastResult = _lastResultSet.getRows();
-				dispatchEvent(new Event("lastResultChanged"));	
+				dispatchEvent(new Event("lastResultChanged"));
 			}
 			else if ( e.type == MySqlEvent.RESPONSE ) {
 				_lastInsertID = e.insertID;
@@ -175,10 +181,18 @@ package com.maclema.mysql
 				dispatchEvent(new Event("lastResponseChanged"));	
 			}
 			
+			if ( responder != null ) {
+				responder.result(e);
+			}
+			
 			dispatchEvent(e);
 		}
 		
 		private function handleError(e:MySqlErrorEvent):void {
+			if ( responder != null ) {
+				responder.fault(e);
+			}
+			
 			dispatchEvent(e);
 		}
 	}

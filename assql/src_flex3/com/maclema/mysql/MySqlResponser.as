@@ -1,6 +1,11 @@
 package com.maclema.mysql
 {
-	public class MySqlResponser
+	import com.maclema.mysql.events.MySqlErrorEvent;
+	import com.maclema.mysql.events.MySqlEvent;
+	
+	import mx.rpc.IResponder;
+	
+	public class MySqlResponser implements IResponder
 	{
 		public var responseHandler:Function;
 		public var errorHandler:Function;
@@ -9,6 +14,18 @@ package com.maclema.mysql
 		{
 			this.responseHandler = responseHandler;
 			this.errorHandler = errorHandler;
+		}
+		
+		public function result(data:Object):void {
+			if ( responseHandler != null ) {
+				responseHandler(MySqlEvent(data));
+			}
+		}
+		
+		public function fault(data:Object):void {
+			if ( errorHandler != null ) {
+				errorHandler(MySqlErrorEvent(data));
+			}
 		}
 	}
 }

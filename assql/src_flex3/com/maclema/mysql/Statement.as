@@ -7,6 +7,8 @@ package com.maclema.mysql
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     
+    import mx.rpc.IResponder;
+    
     [Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
     [Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
     [Event(name="sql_result", type="com.maclema.mysql.events.MySqlEvent")]
@@ -16,7 +18,7 @@ package com.maclema.mysql
         private var _sql:String = null;
         private var params:Array;
         
-        private var responder:MySqlResponser;
+        private var responder:IResponder;
         
         public function Statement(con:Connection)
         {
@@ -30,19 +32,15 @@ package com.maclema.mysql
         
         private function handleResponse(e:MySqlEvent):void {
         	if ( this.responder != null ) {
-        		if ( this.responder.responseHandler != null ) {
-        			Logger.info(this, "Dispatching Result/Response Responder");
-        			this.responder.responseHandler(e);
-        		}
+        		Logger.info(this, "Dispatching Result/Response Responder");
+        		responder.result(e);
         	}
         }
         
         private function handleError(e:MySqlErrorEvent):void {
         	if ( this.responder != null ) {
-        		if ( this.responder.errorHandler != null ) {
-        			Logger.info(this, "Dispatching Error Responder");
-        			this.responder.errorHandler(e);
-        		}
+        		Logger.info(this, "Dispatching Error Responder");
+        		responder.fault(e);
         	}
         }
         
@@ -96,7 +94,7 @@ package com.maclema.mysql
          * Executes the specified sql statement. The statement can be provided using either the sql property
          * or as the first parameter. You may also specify a MySqlResponder object as the second parameter.
          **/
-        public function executeQuery(sqlString:String=null, responder:MySqlResponser=null):void
+        public function executeQuery(sqlString:String=null, responder:IResponder=null):void
         {	
         	Logger.info(this, "executeQuery");
         	
@@ -153,7 +151,7 @@ package com.maclema.mysql
         /**
         * Executes a binary query object
         **/
-        public function executeBinaryQuery(query:BinaryQuery, responder:MySqlResponser=null):void
+        public function executeBinaryQuery(query:BinaryQuery, responder:IResponder=null):void
         {
         	Logger.info(this, "executeBinaryQuery");
         	
