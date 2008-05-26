@@ -152,6 +152,11 @@ package com.maclema.mysql
 		}
 		
 		private function handleConnectError(e:MySqlErrorEvent):void {
+			
+			if ( responder != null ) {
+				responder.fault(e);
+			}
+			
 			dispatchEvent(e);
 		}
 		
