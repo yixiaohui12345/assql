@@ -4,18 +4,21 @@ package com.maclema.mysql
 	import com.maclema.mysql.events.MySqlEvent;
 	
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
-	import mx.core.UIComponent;
+	import mx.core.IMXMLObject;
 	import mx.events.FlexEvent;
 	import mx.rpc.IResponder;
+	import mx.rpc.http.mxml.HTTPService;
+	import mx.rpc.mxml.IMXMLSupport;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
 	[Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
 	[Event(name="sql_result", type="com.maclema.mysql.events.MySqlEvent")]
 	[Event(name="connect", type="flash.events.Event")]
 	[Event(name="close", type="flash.events.Event")]
-	public class MySqlService extends UIComponent
+	public class MySqlService extends EventDispatcher
 	{
 		/**
 		 * The hostname to connect to
@@ -43,11 +46,6 @@ package com.maclema.mysql
 		public var database:String = "";
 		
 		/**
-		 * Auto connect when ready (Default: false)
-		 **/
-		public var autoConnect:Boolean = false;
-		
-		/**
 		 * The responder to use for the mysql service
 		 **/
 		public var responder:IResponder;
@@ -63,13 +61,6 @@ package com.maclema.mysql
 		
 		public function MySqlService()
 		{
-			addEventListener(FlexEvent.CREATION_COMPLETE, handleCreationComplete);
-		}
-		
-		private function handleCreationComplete(e:FlexEvent):void {
-			if ( autoConnect ) {
-				connect();
-			}
 		}
 		
 		/**
