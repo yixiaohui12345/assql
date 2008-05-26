@@ -132,12 +132,22 @@ package com.maclema.mysql
 		private function handleConnected(e:Event):void {
 			_connected = true;
 			dispatchEvent(new Event("connectedChanged"));
+			
+			if ( responder != null ) {
+				responder.result(e);
+			}
+			
 			dispatchEvent(e);
 		}
 		
 		private function handleDisconnected(e:Event):void {
 			_connected = false;
 			dispatchEvent(new Event("connectedChanged"));
+			
+			if ( responder != null ) {
+				responder.result(e);
+			}
+			
 			dispatchEvent(e);
 		}
 		
