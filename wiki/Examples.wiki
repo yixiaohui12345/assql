@@ -1,4 +1,4 @@
-#Examples of using asSQL
+#Examples of using asSQL (Beta 2.5 and later)
 
 === MySqlService Example ===
 
@@ -24,4 +24,24 @@
 	columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" 
 	dataProvider="{service.lastResult}">
 </mx:DataGrid>
+}}}
+
+
+=== Token/Responder Example 1 ===
+
+{{{
+public function getAllEmployees():void {
+	var st:Statement = con.createStatement();
+	
+	var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+	token.addResponder(new AsyncResponder(
+		function result(data:Object, token:Object):void {
+			Alert.show("Found " + ResultSet(data).size() + " employees!");
+		},
+		
+		function fault(info:Object):void {
+			Alert.show("Error: " + info);
+		}
+	));
+}
 }}}
