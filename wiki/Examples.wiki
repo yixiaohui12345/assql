@@ -111,3 +111,21 @@ This is an example of using only event listeners to handle queries and responses
 {{{
 TODO: Put code here.
 }}}
+
+
+=== Statement Parameters Example ===
+
+This is an example of using parameters in a Statement.
+
+{{{
+TODO: Put code here.
+}}}
+
+
+=== Inserting Binary Data Example ===
+
+This is an example of inserting binary data using a Statement.
+
+{{{
+TODO: Put code here
+}}}
