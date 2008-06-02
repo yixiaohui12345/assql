@@ -62,7 +62,7 @@ public class DatabaseAccess extends AsyncResponder
 	public function DatabaseAccess()
 	{
 		//create the connection and connect
-		con = new Connection("localhost", 3306, "root", "", "assql-test");
+		con = new Connection("localhost", 3306, "root", "", "sampledb");
 		con.addEventListener(Event.CONNECT, handleConnected);
 		con.connect();
 	}
