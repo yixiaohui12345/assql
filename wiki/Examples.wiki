@@ -8,6 +8,15 @@
 
 [Examples#Token_Responder_Example_2 Token Responder Example 2]
 
+[Examples#Event_Listeners_Example Event Listeners Example]
+
+[Examples#Statement_Parameters_Example Statement Parameters Example]
+
+[Examples#Inserting_Binary_Data_Example Inserting Binary Data Example]
+
+[Examples#Selecting_Binary_Data_Example Selecting Binary Data Example]
+
+
 === MySqlService Example ===
 
 This example is using MySqlService and DataGrid. The data grid's columns property and dataProvider property are bound to the MySqlService lastResult (ArrayCollection of Rows) and lastResultSet (The actual ResultSet).
@@ -112,7 +121,7 @@ public class DatabaseAccess extends AsyncResponder
 }
 }}}
 
-=== Event Listener's Example ===
+=== Event Listeners Example ===
 
 This is an example of using only event listeners to handle queries and responses.
 
