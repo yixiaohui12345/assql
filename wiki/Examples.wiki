@@ -125,7 +125,17 @@ TODO: Put code here.
 
 === Inserting Binary Data Example ===
 
-This is an example of inserting binary data using a Statement.
+This is an example of inserting binary data.
+
+{{{
+TODO: Put code here
+}}}
+
+
+=== Selecting Binary Data Example ===
+
+This is an example of selecting binary data.
+
 
 {{{
 TODO: Put code here
