@@ -103,3 +103,11 @@ public class DatabaseAccess extends AsyncResponder
 	}
 }
 }}}
+
+=== Event Listener's Example ===
+
+This is an example of using only event listeners to handle queries and responses.
+
+{{{
+TODO: Put code here.
+}}}
