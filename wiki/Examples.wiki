@@ -4,9 +4,9 @@
 === On This Page ===
 [Examples#MySqlService_Example MySqlService Example]
 
-[Examples#Token_-_Responder_Example_1 Token - Responder Example 1]
+[Examples#Token_Responder_Example_1 Token Responder Example 1]
 
-[Examples#Token_-_Responder_Example_2 Token - Responder Example 2]
+[Examples#Token_Responder_Example_2 Token Responder Example 2]
 
 === MySqlService Example ===
 
@@ -37,7 +37,7 @@ This example is using MySqlService and DataGrid. The data grid's columns propert
 }}}
 
 
-=== Token - Responder Example 1 ===
+=== Token Responder Example 1 ===
 
 This is an example of using an AsyncResponder to handle a query.
 
@@ -58,7 +58,7 @@ public function getAllEmployees():void {
 }
 }}}
 
-=== Token - Responder Example 2 ===
+=== Token Responder Example 2 ===
 
 This is a more in depth example, using a class that extends AsyncResponder. With each statement, an info property is set on the MySqlToken. This way all queries and responses can be handled with the same result and fault handlers.
 
