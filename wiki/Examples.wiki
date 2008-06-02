@@ -2,6 +2,8 @@
 
 === MySqlService Example ===
 
+This example is using MySqlService and DataGrid. The data grid's columns property and dataProvider property are bound to the MySqlService lastResult (ArrayCollection of Rows) and lastResultSet (The actual ResultSet).
+
 {{{
 <mx:Script>
 	<![CDATA[
@@ -43,5 +45,57 @@ public function getAllEmployees():void {
 			Alert.show("Error: " + info);
 		}
 	));
+}
+}}}
+
+=== Token/Responder Example 2 ===
+
+{{{
+public class DatabaseAccess extends AsyncResponder
+{
+	private var con:Connection;
+	
+	public function DatabaseAccess()
+	{
+		//create the connection and connect
+		con = new Connection("localhost", 3306, "root", "", "assql-test");
+		con.addEventListener(Event.CONNECT, handleConnected);
+		con.connect();
+	}
+	
+	public function getAllEmployees():void {
+		var st:Statement = con.createStatement();
+		
+		var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+		token.info = "getAllEmployees";
+		token.addResponder(this);
+	}
+
+	override public function result(data:Object, token:Object):void {
+		var rs:ResultSet;
+		var affectedRows:int;
+		var insertID:int;
+		
+		if ( data is ResultSet ) {
+			//SELECT statement
+			rs = ResultSet(data);
+		}
+		else {
+			//INSERT/UPDATE/DELETE statement
+			affectedRows = data.affectedRows;
+			insertID = data.insertID;
+		}
+		
+		if ( token.info == "getAllEmployees" ) {
+			Alert.show("Found " + rs.size() + " employees!");
+		}
+		else if ( token.info = "insertEmployee" ) {
+			Alert.show("New Employee ID: " + insertID);
+		}
+	}
+	
+	override public function fault(info:Object):void {
+		Alert.show("Error: " + info);
+	}
 }
 }}}
