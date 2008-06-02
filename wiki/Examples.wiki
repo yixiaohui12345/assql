@@ -1,5 +1,27 @@
 #Examples of using asSQL
 
-= Introduction =
+=== MySqlService Example ===
 
-Add your content here.
+{{{
+<mx:Script>
+	<![CDATA[
+		import com.maclema.util.ResultsUtil;
+		
+		private function handleConnect(e:Event):void {
+			service.send("select * from employees");
+		}
+	]]>
+</mx:Script>
+<assql:MySqlService id="service"
+	hostname="localhost"
+	username="root"
+	password=""
+	database="sampledb"
+	autoConnect="true"
+	connect="handleConnect(event)" />
+	
+<mx:DataGrid left="10" right="10" top="10" bottom="10" 
+	columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" 
+	dataProvider="{service.lastResult}">
+</mx:DataGrid>
+}}}
