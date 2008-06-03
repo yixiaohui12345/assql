@@ -110,7 +110,7 @@ public class DatabaseAccess extends AsyncResponder
 		if ( token.info == "getAllEmployees" ) {
 			Alert.show("Found " + rs.size() + " employees!");
 		}
-		else if ( token.info = "insertEmployee" ) {
+		else if ( token.info == "insertEmployee" ) {
 			Alert.show("New Employee ID: " + insertID);
 		}
 	}
