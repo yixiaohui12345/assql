@@ -1,6 +1,7 @@
 package com.maclema.mysql.mxml
 {
 	import com.maclema.mysql.MySqlService;
+	import com.maclema.mysql.MySqlToken;
 	import com.maclema.mysql.events.MySqlErrorEvent;
 	import com.maclema.mysql.events.MySqlEvent;
 	
@@ -50,15 +51,17 @@ package com.maclema.mysql.mxml
 			_showBusyCursor = value;
 		}
 		
-		override public function send(queryObject:*):void {
-			super.send(queryObject);
+		override public function send(queryObject:*):MySqlToken {
+			var token:MySqlToken = super.send(queryObject);
 			
 			if ( showBusyCursor ) {
 				CursorManager.setBusyCursor();
 			}
+			
+			return token;
 		}
 		
-		private function removeBusyCursor(e:Event=null):void {
+		private function removeBusyCursor(e:MySqlEvent=null):void {
 			CursorManager.removeBusyCursor();
 		}
 	}

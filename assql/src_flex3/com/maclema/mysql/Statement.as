@@ -7,42 +7,24 @@ package com.maclema.mysql
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     
-    import mx.rpc.IResponder;
+    import mx.formatters.DateFormatter;
     
     [Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
-    [Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
-    [Event(name="sql_result", type="com.maclema.mysql.events.MySqlEvent")]
+    [Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
+    [Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
     public class Statement extends EventDispatcher
     {
         private var con:Connection;
         private var _sql:String = null;
         private var params:Array;
         
-        private var responder:IResponder;
-        
         public function Statement(con:Connection)
         {
             this.con = con;
             this.params = new Array();
-            
-            this.addEventListener(MySqlEvent.RESPONSE, handleResponse);
-            this.addEventListener(MySqlEvent.RESULT, handleResponse);
-            this.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError);
         }
         
-        private function handleResponse(e:MySqlEvent):void {
-        	if ( this.responder != null ) {
-        		Logger.info(this, "Dispatching Result/Response Responder");
-        		responder.result(e);
-        	}
-        }
         
-        private function handleError(e:MySqlErrorEvent):void {
-        	if ( this.responder != null ) {
-        		Logger.info(this, "Dispatching Error Responder");
-        		responder.fault(e);
-        	}
-        }
         
         /**
         * Set the sql string to execute
@@ -75,11 +57,33 @@ package com.maclema.mysql
         }
         
         /**
-        * Set a Date parameter
+        * Set a Date parameter (YYYY-MM-DD)
         **/
         public function setDate(index:int, value:Date):void {
         	Logger.info(this, "setDate ("+ value.toDateString() +")");
-        	params[index] = value;
+        	var df:DateFormatter = new DateFormatter();
+        	df.formatString = "YYYY-MM-DD";
+        	params[index] = df.format(value);
+        }
+        
+        /**
+        * Set a DateTime parameter (YYYY-MM-DD J:NN:SS)
+        **/
+        public function setDateTime(index:int, value:Date):void {
+        	Logger.info(this, "setDate ("+ value.toDateString() +")");
+        	var df:DateFormatter = new DateFormatter();
+        	df.formatString = "YYYY-MM-DD J:NN:SS";
+        	params[index] = df.format(value);
+        }
+        
+       /**
+        * Set a Time parameter (H:MM:SS)
+        **/
+        public function setTime(index:int, value:Date):void {
+        	Logger.info(this, "setDate ("+ value.toDateString() +")");
+        	var df:DateFormatter = new DateFormatter();
+        	df.formatString = "J:NN:SS";
+        	params[index] = df.format(value);
         }
         
         /**
@@ -92,13 +96,17 @@ package com.maclema.mysql
         
         /**
          * Executes the specified sql statement. The statement can be provided using either the sql property
-         * or as the first parameter. You may also specify a MySqlResponder object as the second parameter.
+         * or as the first parameter of this method. You may also specify a IResponder object as the second parameter.
+         * <br><br>
+         * When result(data:Object) is called on the IResponder the data object will be either a ResultSet, in the case
+         * of query statements, and in the case of data manipulation statements, will be an object with two properties, 
+         * affectedRows, and insertID. 
          **/
-        public function executeQuery(sqlString:String=null, responder:IResponder=null):void
-        {	
+        public function executeQuery(sqlString:String=null):MySqlToken
+        {
         	Logger.info(this, "executeQuery");
         	
-        	this.responder = responder;
+        	var token = new MySqlToken();
         	
         	if ( sqlString != null ) {
         		this.sql = sqlString;
@@ -108,12 +116,14 @@ package com.maclema.mysql
         	if ( this.sql.indexOf("?") != -1 ) {
         		Logger.info(this, "executing a statement with parameters");
         		var binq:BinaryQuery = addParametersToSql();
-        		con.executeBinaryQuery(this, binq);
+        		con.executeBinaryQuery(token, binq);
         	}
         	else {
         		Logger.info(this, "executing a regular statement");
-          		con.executeQuery(this, sql);
+          		con.executeQuery(token, sql);
          	}
+         	
+         	return token;
         }
         
         private function addParametersToSql():BinaryQuery {
@@ -151,14 +161,16 @@ package com.maclema.mysql
         /**
         * Executes a binary query object
         **/
-        public function executeBinaryQuery(query:BinaryQuery, responder:IResponder=null):void
+        public function executeBinaryQuery(query:BinaryQuery):MySqlToken
         {
         	Logger.info(this, "executeBinaryQuery");
         	
-        	this.responder = responder;
+        	var token:MySqlToken = new MySqlToken();
         	
         	query.position = 0;
-        	con.executeBinaryQuery(this, query);
+        	con.executeBinaryQuery(token, query);
+        	
+        	return token;
         }
         
         /**

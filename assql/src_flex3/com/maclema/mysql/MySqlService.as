@@ -7,15 +7,12 @@ package com.maclema.mysql
 	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
-	import mx.core.IMXMLObject;
-	import mx.events.FlexEvent;
+	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
-	import mx.rpc.http.mxml.HTTPService;
-	import mx.rpc.mxml.IMXMLSupport;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
-	[Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
-	[Event(name="sql_result", type="com.maclema.mysql.events.MySqlEvent")]
+	[Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
+	[Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
 	[Event(name="connect", type="flash.events.Event")]
 	[Event(name="close", type="flash.events.Event")]
 	public class MySqlService extends EventDispatcher
@@ -149,42 +146,62 @@ package com.maclema.mysql
 		 * Executes a query, you may pass in either an sql string,
 		 * or a BinaryQuery object.
 		 **/
-		public function send(queryObject:*):void {
+		public function send(queryObject:*):MySqlToken {
 			var st:Statement = con.createStatement();
+			var token:MySqlToken;
+			
+			st.addEventListener(MySqlEvent.RESULT, handleResultEvent);
+			st.addEventListener(MySqlEvent.RESPONSE, handleResponseEvent);
 			
 			if ( queryObject is String ) {
-				st.executeQuery(String(queryObject), new MySqlResponser( handleResult,handleError ));
+				token = st.executeQuery(String(queryObject));
+				token.addResponder(new AsyncResponder(handleResult, handleError, token));
 			}
 			else if ( queryObject is BinaryQuery ) {
-				st.executeBinaryQuery(BinaryQuery(queryObject), new MySqlResponser( handleResult,handleError ));	
+				token = st.executeBinaryQuery(BinaryQuery(queryObject));
+				token.addResponder(new AsyncResponder(handleResult, handleError, token));
 			}
+			
+			return token;
 		}
 		
-		private function handleResult(e:MySqlEvent):void {
-			if ( e.type == MySqlEvent.RESULT ) {
-				_lastResultSet = e.resultSet;
+		private function handleResultEvent(e:MySqlEvent):void {
+			var evt:MySqlEvent = new MySqlEvent(e.type);
+			evt.resultSet = e.resultSet;
+			evt.affectedRows = e.affectedRows;
+			evt.insertID = e.insertID;
+			dispatchEvent(evt);
+		}
+		
+		private function handleResponseEvent(e:MySqlEvent):void {
+			var evt:MySqlEvent = new MySqlEvent(e.type);
+			evt.resultSet = e.resultSet;
+			evt.affectedRows = e.affectedRows;
+			evt.insertID = e.insertID;
+			dispatchEvent(evt);
+		}
+		
+		private function handleResult(data:Object, token:Object=null):void {
+			if ( data is ResultSet ) {
+				_lastResultSet = ResultSet(data);
 				_lastResult = _lastResultSet.getRows();
 				dispatchEvent(new Event("lastResultChanged"));
 			}
-			else if ( e.type == MySqlEvent.RESPONSE ) {
-				_lastInsertID = e.insertID;
-				_lastAffectedRows = e.affectedRows;
-				dispatchEvent(new Event("lastResponseChanged"));	
+			else {
+				_lastAffectedRows = data.affectedRows;
+				_lastInsertID = data.insertID;
+				dispatchEvent(new Event("lastResponseChanged"));
 			}
 			
 			if ( responder != null ) {
-				responder.result(e);
+				responder.result(data);
 			}
-			
-			dispatchEvent(e);
 		}
 		
-		private function handleError(e:MySqlErrorEvent):void {
+		private function handleError(info:Object):void {
 			if ( responder != null ) {
-				responder.fault(e);
+				responder.fault(info);
 			}
-			
-			dispatchEvent(e);
 		}
 	}
 }

@@ -36,6 +36,8 @@ package com.maclema.mysql
         private var _flags:int;
         private var _decimals:int;
         
+        private var _asType:int;
+        
         public function Field(packet:Packet)
         {
             _catalog = packet.readLengthCodedString();
@@ -50,6 +52,42 @@ package com.maclema.mysql
             _type = packet.readByte() & 0xFF;
             _flags = packet.readTwoByteInt();
             _decimals = packet.readByte() & 0xFF;
+            _asType = determineAsType();
+        }
+        
+        private function determineAsType():int {
+        	switch (_type)
+			{
+				case Mysql.FIELD_TYPE_DECIMAL:
+				case Mysql.FIELD_TYPE_TINY:
+				case Mysql.FIELD_TYPE_SHORT:
+				case Mysql.FIELD_TYPE_LONG:
+				case Mysql.FIELD_TYPE_FLOAT:
+				case Mysql.FIELD_TYPE_DOUBLE:
+				case Mysql.FIELD_TYPE_LONGLONG:
+				case Mysql.FIELD_TYPE_INT24:
+				case Mysql.FIELD_TYPE_YEAR:
+				case Mysql.FIELD_TYPE_NEWDECIMAL:
+				case Mysql.FIELD_TYPE_BIT:
+					return Mysql.AS_TYPE_NUMBER;
+					
+				case Mysql.FIELD_TYPE_DATE:
+				case Mysql.FIELD_TYPE_TIMESTAMP:
+				case Mysql.FIELD_TYPE_DATETIME:
+				case Mysql.FIELD_TYPE_NEWDATE:
+					return Mysql.AS_TYPE_DATE;
+					
+				case Mysql.FIELD_TYPE_TIME:
+					return Mysql.AS_TYPE_TIME;
+					
+				case Mysql.FIELD_TYPE_BLOB:
+				case Mysql.FIELD_TYPE_LONG_BLOB:
+				case Mysql.FIELD_TYPE_MEDIUM_BLOB:
+				case Mysql.FIELD_TYPE_TINY_BLOB:
+					return Mysql.AS_TYPE_BYTEARRAY;
+			}
+			
+			return Mysql.AS_TYPE_STRING;
         }
         
         /**
@@ -106,6 +144,13 @@ package com.maclema.mysql
         public function getCharacterSet():int
         {
             return _charsetnr;
+        }
+        
+        /**
+         * Returns an actionscript type identifier which is defined in MySql.AS_TYPE_*
+         **/
+        public function getAsType():int {
+        	return _asType;
         }
         
         /**

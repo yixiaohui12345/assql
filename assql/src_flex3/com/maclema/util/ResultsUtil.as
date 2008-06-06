@@ -16,14 +16,44 @@ package com.maclema.util
 		public static function getDataGridColumns(rs:ResultSet):Array {
 			var cols:Array = rs.getColumns();
 			var newcols:Array = new Array();
-			for ( var i:int=0; i<cols.length; i++ ) {
-				var clmName:String = Field(cols[i]).getName();
-				var clm:DataGridColumn = new DataGridColumn( clmName );
-				clm.dataField = clmName;
+			
+			cols.forEach(function(c:Field, index:int, arr:Array):void {
+				var clm:DataGridColumn = new DataGridColumn( c.getName() );
+				clm.dataField = c.getName();
+				
+				if ( c.getAsType() == Mysql.AS_TYPE_DATE ) {
+					clm.labelFunction = columnDateFunction;
+				}
+				else if ( c.getAsType() == Mysql.AS_TYPE_TIME ) {
+					clm.labelFunction = columnTimeFunction;
+				}
+				
 				newcols.push(clm);
-			}
+			});
+			
 			return newcols;
 		}
+		
+		public static function columnDateFunction(item:Object, column:DataGridColumn):String {
+			if ( item[column.dataField] is String ) {
+				return item[column.dataField];
+			}
+			var dt:Date = item[column.dataField] as Date;
+			var df:DateFormatter = new DateFormatter();
+			df.formatString = "YYYY-MM-DD";
+			return df.format(dt);
+		};
+		
+		public static function columnTimeFunction(item:Object, column:DataGridColumn):String {
+			if ( item[column.dataField] is String ) {
+				return item[column.dataField];
+			}
+			
+			var dt:Date = item[column.dataField] as Date;
+			var df:DateFormatter = new DateFormatter();
+			df.formatString = "J:NN:SS";
+			return df.format(dt);
+		};
 		
 		/**
 		 * Takes a value and and a Field, and returns a String ready for use in 

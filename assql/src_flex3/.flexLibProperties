@@ -7,6 +7,7 @@
 <classEntry path="com.maclema.util.ResultsUtil"/>
 <classEntry path="com.maclema.logging.Logger"/>
 <classEntry path="com.maclema.mysql.Field"/>
+<classEntry path="com.maclema.mysql.MySqlToken"/>
 <classEntry path="com.adobe.utils.IntUtil"/>
 <classEntry path="com.maclema.mysql.Buffer"/>
 <classEntry path="com.maclema.mysql.ServerInformation"/>
@@ -20,7 +21,6 @@
 <classEntry path="com.maclema.mysql.CommandHandler"/>
 <classEntry path="com.maclema.mysql.DataHandler"/>
 <classEntry path="com.maclema.mysql.mxml.MySqlService"/>
-<classEntry path="com.maclema.mysql.MySqlResponser"/>
 <classEntry path="com.maclema.mysql.BinaryQuery"/>
 <classEntry path="com.maclema.mysql.Mysql"/>
 <classEntry path="com.maclema.mysql.Util"/>

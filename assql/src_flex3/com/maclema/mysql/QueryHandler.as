@@ -13,7 +13,7 @@ package com.maclema.mysql
 	 **/
 	public class QueryHandler extends DataHandler
 	{
-		private var st:Statement;
+		private var token:MySqlToken;
 		private var rs:ResultSet;
 		
 		private var readHeader:Boolean = false;
@@ -21,11 +21,11 @@ package com.maclema.mysql
 		
 		private var working:Boolean = false;
 		
-		public function QueryHandler(con:Connection, st:Statement)
+		public function QueryHandler(con:Connection, token:MySqlToken)
 		{
 			super(con);
 			
-			this.st = st;
+			this.token = token;
 		}
 		
 		override protected function newPacket():void
@@ -55,12 +55,12 @@ package com.maclema.mysql
 						evt.insertID = insertid;
 						
 						unregister();
-						st.dispatchEvent(evt);
+						token.dispatchEvent(evt);
 					}
 					else if ( field_count == 0xFF || field_count == -1 )
 					{
 						unregister();
-						new ErrorHandler(packet, st);	
+						new ErrorHandler(packet, token);	
 					}
 					else if ( field_count == 0xFE || field_count == -2 )
 					{	
@@ -88,7 +88,7 @@ package com.maclema.mysql
 							Logger.debug(this, "  Query Time: " + (getTimer()-con.lastQueryStart) + " ms");
 							
 							unregister();
-							st.dispatchEvent(evt);
+							token.dispatchEvent(evt);
 						}
 					}
 					else
