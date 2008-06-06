@@ -1,10 +1,12 @@
 package com.maclema.mysql
 {
-    import com.maclema.util.ResultsUtil;
+    import com.maclema.logging.Logger;
     
     import flash.utils.ByteArray;
+    import flash.utils.getTimer;
     
     import mx.collections.ArrayCollection;
+    import mx.formatters.DateFormatter;
     
     public class ResultSet
     {
@@ -32,23 +34,31 @@ package com.maclema.mysql
          **/
         internal static function initialize(rs:ResultSet):void
         {
-            rs.nameMap = new Object();
+            rs.map = new Object();
             for ( var i:int=0; i<rs.columns.length; i++ )
             {
                 var c:Field = Field(rs.columns[i]);
-                rs.nameMap[c.getName()] = (i+1);
+                rs.map[c.getName()] = i;
+                rs.map[String((i+1))] = i;
             }
         }
         
         private var index:int = -1;
         private var columns:Array;
         private var rows:Array;
-        private var nameMap:Object;
+        private var map:Object;
+        
+        private var todayDateString:String;
         
         public function ResultSet()
         {
             this.columns = new Array();
             this.rows = new Array();    
+            
+            //for getTime optimization
+            var df:DateFormatter = new DateFormatter();
+            df.formatString = "YYYY/MM/DD";
+            todayDateString = df.format(new Date());
         }
         
         /**
@@ -67,6 +77,20 @@ package com.maclema.mysql
             if ( index < rows.length-1 )
             {
                 index++;
+                return true;
+            }
+            
+            return false;
+        }
+        
+        /**
+         * Moves the pointer to the previous row
+         **/
+        public function previous():Boolean
+        {
+            if ( index > 0 )
+            {
+                index--;
                 return true;
             }
             
@@ -126,6 +150,28 @@ package com.maclema.mysql
         }
         
         /**
+        * Returns a boolean value for the specified column.
+        **/
+        public function getBoolean(column:*):Boolean 
+        {
+        	return Boolean(getString(column));
+        }
+        
+        /**
+        * Returns a Date object, where yyyy-mm-dd is always the current date, but
+        * the time values are HH:mm:ss from the column
+        **/
+        public function getTime(column:*):Date {
+        	var timeString:String = getString(column);
+            
+            if ( timeString == null ) {
+            	return null;
+            }
+			
+			return new Date(Date.parse(todayDateString + " " + timeString));
+        }
+        
+        /**
          * Returns a Number for the specifiec column
          **/
         public function getNumber(column:*):Number
@@ -143,11 +189,16 @@ package com.maclema.mysql
             if ( dateString == null ) {
             	return null;
             }
+        
+            var mainParts:Array = dateString.split(" ");
+            var dateParts:Array = mainParts[0].split("-");
             
-            var pat:RegExp = /-/g;
-            dateString = dateString.replace(pat, "/");
-
-            return new Date( Date.parse(dateString) );
+            //check for 0000-00-00 dates
+            if ( Number(dateParts[0])+Number(dateParts[1])+Number(dateParts[2]) == 0 ) {
+            	return null;
+            }
+            
+            return new Date(Date.parse(dateParts.join("/")+(mainParts[1]?" "+mainParts[1]:" ")));
         }
         
         /**
@@ -155,85 +206,56 @@ package com.maclema.mysql
          **/
         public function getBinary(column:*):ByteArray
         {
-            var colIndex:int;
-        	
-        	if ( column is Number || column is int || column is uint )
-        	{
-        		colIndex = int(column);
-        	}
-        	else if ( column is String )
-        	{
-        		colIndex = int(nameMap[String(column)]);
-        	}
-        	else
-        	{
-        		throw new Error("Can only select columns using their name or index");
-        	}
-        	
-        	colIndex -= 1; //columns are 1-based
-        	
-        	return ByteArray(rows[index][colIndex]);
+        	return ByteArray(rows[index][int(map[String(column)])]);
         }
         
         /**
-         * Returns all rows as a bindable ArrayCollection
+         * Returns all rows as a bindable ArrayCollection, you can optionally pass a single
+         * boolean value indicating if date's and time's should just be casted to plain strings.
+         * Casting to plain strings is a lot faster then parsing the dates.
          **/
-        public function getRows():ArrayCollection
+        public function getRows(dateTimesAsStrings:Boolean=false):ArrayCollection
         {
-        	var ac:ArrayCollection = new ArrayCollection();
+        	var st:Number = getTimer();
+        	
+        	var arr:Array = new Array();
         	while ( this.next() ) {
         		var obj:Object = new Object();
         		
-        		for ( var i:int=0; i<columns.length; i++ ) {
-        			var field:Field = Field(columns[i]);
-        			var value:* = getCastedValue(field);
-        			obj[field.getName()] = value;
-        			obj[i] = value;
-        		}
-     			ac.addItem(obj);
+        		columns.forEach(function(c:Field, index:int, arr:Array):void {
+        			obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
+        		});
+        		
+     			arr.push(obj);
         	}
-        	this.index = -1;
+        	first();
         	
-            return ac;
+        	var run:Number = getTimer()-st;
+        	Logger.debug(this, "getRows() in " + run + " ms");
+            return new ArrayCollection(arr);
         }
         
-        private function getCastedValue(field:Field):*
+        private function getCastedValue(field:Field, dateTimesAsStrings:Boolean):*
 		{
-			switch (field.getType())
+			switch (field.getAsType())
 			{
-				case Mysql.FIELD_TYPE_DECIMAL:
-				case Mysql.FIELD_TYPE_TINY:
-				case Mysql.FIELD_TYPE_SHORT:
-				case Mysql.FIELD_TYPE_LONG:
-				case Mysql.FIELD_TYPE_FLOAT:
-				case Mysql.FIELD_TYPE_DOUBLE:
-				case Mysql.FIELD_TYPE_LONGLONG:
-				case Mysql.FIELD_TYPE_INT24:
-				case Mysql.FIELD_TYPE_YEAR:
-				case Mysql.FIELD_TYPE_NEWDECIMAL:
-				case Mysql.FIELD_TYPE_BIT:
+				case Mysql.AS_TYPE_NUMBER:
 					return getNumber(field.getName());
 					
-				case Mysql.FIELD_TYPE_DATE:
-				case Mysql.FIELD_TYPE_TIMESTAMP:
-				case Mysql.FIELD_TYPE_DATETIME:
-				case Mysql.FIELD_TYPE_NEWDATE:
-				case Mysql.FIELD_TYPE_TIME:
+				case Mysql.AS_TYPE_DATE:
+					if ( dateTimesAsStrings ) { break; }
 					return getDate(field.getName());
+					
+				case Mysql.AS_TYPE_TIME:
+					if ( dateTimesAsStrings ) { break; }
+					return getTime(field.getName());
 				
-				case Mysql.FIELD_TYPE_ENUM:
-				case Mysql.FIELD_TYPE_VARCHAR:
-				case Mysql.FIELD_TYPE_VAR_STRING:
-				case Mysql.FIELD_TYPE_STRING:
+				case Mysql.AS_TYPE_STRING:
 					return getString(field.getName());
 					
-				case Mysql.FIELD_TYPE_BLOB:
-				case Mysql.FIELD_TYPE_LONG_BLOB:
-				case Mysql.FIELD_TYPE_MEDIUM_BLOB:
-				case Mysql.FIELD_TYPE_TINY_BLOB:
+				case Mysql.AS_TYPE_BYTEARRAY:
 					return getBinary(field.getName());
 			}
-			
 			return getString(field.getName());
 		}
         

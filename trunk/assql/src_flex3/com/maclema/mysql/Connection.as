@@ -14,7 +14,7 @@ package com.maclema.mysql
 	import flash.utils.getTimer;
 	
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
-	[Event(name="sql_response", type="com.maclema.mysql.events.MySqlEvent")]
+	[Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
 	[Event(name="connect", type="flash.events.Event")]
 	[Event(name="close", type="flash.events.Event")]
 	public class Connection extends EventDispatcher
@@ -147,25 +147,18 @@ package com.maclema.mysql
 		}
 		
 		private function checkForPackets():void
-        {
+        {	
         	buffer.position = 0;
-        	
-            if ( buffer.bytesAvailable >= 4 )
-            {
-            	//get packet information
-                var len:Number = buffer.readThreeByteInt();
-                var num:int = buffer.readByte();
- 
-                //is there a whole packet downloaded?
-                if ( buffer.bytesAvailable >= len )
-                {	
-                    //read the packet
-                    buffer.position = 0;
-                    
-                    var pack:Packet = new Packet(buffer);
-                    
-                    //remove the read packet from the inBuffer
-                    var tmp:Buffer = buffer;
+        	while ( buffer.bytesAvailable >= 4 ) {
+        		var len:int = buffer.readThreeByteInt();
+                buffer.readByte();
+                       	  
+           		if ( buffer.bytesAvailable >= len ) {
+           			buffer.position = 0;
+           			
+           			var pack:Packet = new Packet(buffer);
+           			
+           			var tmp:Buffer = buffer;
                     buffer = new Buffer();
                     tmp.readBytes(buffer);
                     tmp = null;
@@ -174,9 +167,7 @@ package com.maclema.mysql
                    	{
                    		dataHandler.pushPacket( pack );
                    	}
-                    
-                    checkForPackets();
-                }
+           		}
         	}
         }
 		
@@ -255,19 +246,19 @@ package com.maclema.mysql
          * Used by Statement to execute a query or update sql statement. 
          * @private
          **/
-        internal function executeQuery(statement:Statement, sql:String):void
+        internal function executeQuery(token:MySqlToken, sql:String):void
         {
         	Logger.info(this, "Execute Query (" + sql + ")");
         	
         	if ( dataHandler != null ) {
-        		poolQuery(statement, sql);
+        		poolQuery(token, sql);
         	}
         	else {
 	        	_busy = true;
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	            setDataHandler(new QueryHandler(this, statement));
+	            setDataHandler(new QueryHandler(this, token));
 	            sendCommand(Mysql.COM_QUERY, sql);
 	    	}
         }
@@ -276,26 +267,26 @@ package com.maclema.mysql
         * Executes a binary query object as a sql statement.
         * @private
         **/
-        internal function executeBinaryQuery(statement:Statement, query:BinaryQuery):void
+        internal function executeBinaryQuery(token:MySqlToken, query:BinaryQuery):void
         {
         	Logger.info(this, "Execute Binary Query");
         	
         	if ( dataHandler != null ) {
-        		poolQuery(statement, query);
+        		poolQuery(token, query);
         	}
         	else {
 	        	_busy = true;
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	        	setDataHandler(new QueryHandler(this, statement));
+	        	setDataHandler(new QueryHandler(this, token));
 	        	sendBinaryCommand(Mysql.COM_QUERY, query);
         	}
         }
         
-        private function poolQuery(statement:Statement, query:*):void {
+        private function poolQuery(token:MySqlToken, query:*):void {
         	Logger.info(this, "Pooling Query");
-        	queryPool.push({statement: statement, query: query});
+        	queryPool.push({token: token, query: query});
         }
         
         private function checkPool():void {
@@ -303,14 +294,14 @@ package com.maclema.mysql
         		Logger.info(this, "Executing Pooled Query");
         		
         		var obj:Object = queryPool.shift();
-        		var st:Statement = obj.statement;
+        		var token:MySqlToken = obj.token;
         		var query:* = obj.query;
         		
         		if ( query is String ) {
-        			executeQuery(st, String(query));
+        			executeQuery(token, String(query));
         		}
         		else if ( query is BinaryQuery ) {
-        			executeBinaryQuery(st, BinaryQuery(query));
+        			executeBinaryQuery(token, BinaryQuery(query));
         		}
         		else {
         			Logger.error(this, "Unknown query type in pool");

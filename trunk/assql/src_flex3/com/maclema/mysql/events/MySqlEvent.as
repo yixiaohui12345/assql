@@ -5,8 +5,8 @@ package com.maclema.mysql.events
 	
 	public class MySqlEvent extends Event
 	{	
-		public static const RESPONSE:String = "sql_response";
-		public static const RESULT:String = "sql_result";
+		public static const RESPONSE:String = "response";
+		public static const RESULT:String = "result";
 		
 		//related to RESPONSE
 		public var affectedRows:int;
