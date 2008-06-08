@@ -3,7 +3,7 @@ package com.maclema.mysql
 	import flash.events.IEventDispatcher;
 	import com.maclema.mysql.events.MySqlErrorEvent;
 	
-	public class ErrorHandler
+	internal class ErrorHandler
 	{
 		public function ErrorHandler( packet:Packet, dispatchOn:IEventDispatcher )
 		{

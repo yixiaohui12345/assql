@@ -7,7 +7,7 @@ package com.maclema.mysql
     /**
      * @private
      **/
-    public class Packet extends Buffer
+    internal class Packet extends Buffer
     {	
         private static const maxAllowedPacket:int = 1024 * 1024 * 1024; //1GB
         public static const maxThreeBytes:int = (256 * 256 * 256) - 1;

@@ -43,6 +43,8 @@ package com.maclema.mysql
             }
         }
         
+        private var _token:MySqlToken;
+        
         private var index:int = -1;
         private var columns:Array;
         private var rows:Array;
@@ -50,8 +52,9 @@ package com.maclema.mysql
         
         private var todayDateString:String;
         
-        public function ResultSet()
+        public function ResultSet(token:MySqlToken)
         {
+        	this._token = token;
             this.columns = new Array();
             this.rows = new Array();    
             
@@ -59,6 +62,13 @@ package com.maclema.mysql
             var df:DateFormatter = new DateFormatter();
             df.formatString = "YYYY/MM/DD";
             todayDateString = df.format(new Date());
+        }
+        
+        /**
+        * Returns the token object that created this result set.
+        **/
+        public function get token():MySqlToken {
+        	return _token;
         }
         
         /**
@@ -239,21 +249,21 @@ package com.maclema.mysql
 		{
 			switch (field.getAsType())
 			{
-				case Mysql.AS_TYPE_NUMBER:
+				case Mysql.AS3_TYPE_NUMBER:
 					return getNumber(field.getName());
 					
-				case Mysql.AS_TYPE_DATE:
+				case Mysql.AS3_TYPE_DATE:
 					if ( dateTimesAsStrings ) { break; }
 					return getDate(field.getName());
 					
-				case Mysql.AS_TYPE_TIME:
+				case Mysql.AS3_TYPE_TIME:
 					if ( dateTimesAsStrings ) { break; }
 					return getTime(field.getName());
 				
-				case Mysql.AS_TYPE_STRING:
+				case Mysql.AS3_TYPE_STRING:
 					return getString(field.getName());
 					
-				case Mysql.AS_TYPE_BYTEARRAY:
+				case Mysql.AS3_TYPE_BYTEARRAY:
 					return getBinary(field.getName());
 			}
 			return getString(field.getName());

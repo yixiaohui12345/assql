@@ -9,7 +9,7 @@ package com.maclema.mysql
 	 * This class handles completing the handshake between this driver
 	 * and the mysql server
 	 **/
-	public class HandshakeHandler extends DataHandler
+	internal class HandshakeHandler extends DataHandler
 	{
 		private static const AUTH_411_OVERHEAD:int = 33;
 		
@@ -65,7 +65,7 @@ package com.maclema.mysql
 					if ( connectWithDb )
 					{
 						//send command
-						con.changeDatabaseTo(database, true);
+						con.internalChangeDatabaseTo(database);
 					}
 					else
 					{

@@ -21,10 +21,10 @@ package com.maclema.util
 				var clm:DataGridColumn = new DataGridColumn( c.getName() );
 				clm.dataField = c.getName();
 				
-				if ( c.getAsType() == Mysql.AS_TYPE_DATE ) {
+				if ( c.getAsType() == Mysql.AS3_TYPE_DATE ) {
 					clm.labelFunction = columnDateFunction;
 				}
-				else if ( c.getAsType() == Mysql.AS_TYPE_TIME ) {
+				else if ( c.getAsType() == Mysql.AS3_TYPE_TIME ) {
 					clm.labelFunction = columnTimeFunction;
 				}
 				

@@ -11,7 +11,7 @@ package com.maclema.mysql
 	 * Handles recieving and parsing the data sent by the MySql server
 	 * in response to a query.
 	 **/
-	public class QueryHandler extends DataHandler
+	internal class QueryHandler extends DataHandler
 	{
 		private var token:MySqlToken;
 		private var rs:ResultSet;
@@ -97,7 +97,7 @@ package com.maclema.mysql
 						
 						if ( !readHeader )
 						{
-							rs = new ResultSet();
+							rs = new ResultSet(token);
 							readHeader = true;
 							
 							working = false;

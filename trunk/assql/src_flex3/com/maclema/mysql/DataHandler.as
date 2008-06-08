@@ -9,7 +9,7 @@ package com.maclema.mysql
 	 * This class is the base class for any class that is used as a data
 	 * handler for data that the server sends and recieves.
 	 **/
-	public class DataHandler extends EventDispatcher
+	internal class DataHandler extends EventDispatcher
 	{
 		protected var con:Connection;
 		private var packets:Array;

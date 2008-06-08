@@ -150,9 +150,6 @@ package com.maclema.mysql
 			var st:Statement = con.createStatement();
 			var token:MySqlToken;
 			
-			st.addEventListener(MySqlEvent.RESULT, handleResultEvent);
-			st.addEventListener(MySqlEvent.RESPONSE, handleResponseEvent);
-			
 			if ( queryObject is String ) {
 				token = st.executeQuery(String(queryObject));
 				token.addResponder(new AsyncResponder(handleResult, handleError, token));
@@ -163,22 +160,6 @@ package com.maclema.mysql
 			}
 			
 			return token;
-		}
-		
-		private function handleResultEvent(e:MySqlEvent):void {
-			var evt:MySqlEvent = new MySqlEvent(e.type);
-			evt.resultSet = e.resultSet;
-			evt.affectedRows = e.affectedRows;
-			evt.insertID = e.insertID;
-			dispatchEvent(evt);
-		}
-		
-		private function handleResponseEvent(e:MySqlEvent):void {
-			var evt:MySqlEvent = new MySqlEvent(e.type);
-			evt.resultSet = e.resultSet;
-			evt.affectedRows = e.affectedRows;
-			evt.insertID = e.insertID;
-			dispatchEvent(evt);
 		}
 		
 		private function handleResult(data:Object, token:Object=null):void {

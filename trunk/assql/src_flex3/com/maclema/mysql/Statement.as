@@ -1,18 +1,13 @@
 package com.maclema.mysql
 {
     import com.maclema.logging.Logger;
-    import com.maclema.mysql.events.MySqlErrorEvent;
-    import com.maclema.mysql.events.MySqlEvent;
     
     import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     
     import mx.formatters.DateFormatter;
     
-    [Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
-    [Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
-    [Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
-    public class Statement extends EventDispatcher
+    public class Statement
     {
         private var con:Connection;
         private var _sql:String = null;
@@ -106,7 +101,7 @@ package com.maclema.mysql
         {
         	Logger.info(this, "executeQuery");
         	
-        	var token = new MySqlToken();
+        	var token:MySqlToken = new MySqlToken();
         	
         	if ( sqlString != null ) {
         		this.sql = sqlString;
@@ -161,7 +156,7 @@ package com.maclema.mysql
         /**
         * Executes a binary query object
         **/
-        public function executeBinaryQuery(query:BinaryQuery):MySqlToken
+        internal function executeBinaryQuery(query:BinaryQuery):MySqlToken
         {
         	Logger.info(this, "executeBinaryQuery");
         	
