@@ -8,6 +8,9 @@ package com.maclema.mysql
 	
 	import mx.rpc.IResponder;
 	
+	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
+    [Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
+    [Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
 	public class MySqlToken extends EventDispatcher
 	{
 		/**

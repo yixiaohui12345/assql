@@ -36,7 +36,7 @@ package com.maclema.mysql
         private var _flags:int;
         private var _decimals:int;
         
-        private var _asType:int;
+        private var _as3Type:int;
         
         public function Field(packet:Packet)
         {
@@ -52,10 +52,10 @@ package com.maclema.mysql
             _type = packet.readByte() & 0xFF;
             _flags = packet.readTwoByteInt();
             _decimals = packet.readByte() & 0xFF;
-            _asType = determineAsType();
+            _as3Type = determineAs3Type();
         }
         
-        private function determineAsType():int {
+        private function determineAs3Type():int {
         	switch (_type)
 			{
 				case Mysql.FIELD_TYPE_DECIMAL:
@@ -69,25 +69,25 @@ package com.maclema.mysql
 				case Mysql.FIELD_TYPE_YEAR:
 				case Mysql.FIELD_TYPE_NEWDECIMAL:
 				case Mysql.FIELD_TYPE_BIT:
-					return Mysql.AS_TYPE_NUMBER;
+					return Mysql.AS3_TYPE_NUMBER;
 					
 				case Mysql.FIELD_TYPE_DATE:
 				case Mysql.FIELD_TYPE_TIMESTAMP:
 				case Mysql.FIELD_TYPE_DATETIME:
 				case Mysql.FIELD_TYPE_NEWDATE:
-					return Mysql.AS_TYPE_DATE;
+					return Mysql.AS3_TYPE_DATE;
 					
 				case Mysql.FIELD_TYPE_TIME:
-					return Mysql.AS_TYPE_TIME;
+					return Mysql.AS3_TYPE_TIME;
 					
 				case Mysql.FIELD_TYPE_BLOB:
 				case Mysql.FIELD_TYPE_LONG_BLOB:
 				case Mysql.FIELD_TYPE_MEDIUM_BLOB:
 				case Mysql.FIELD_TYPE_TINY_BLOB:
-					return Mysql.AS_TYPE_BYTEARRAY;
+					return Mysql.AS3_TYPE_BYTEARRAY;
 			}
 			
-			return Mysql.AS_TYPE_STRING;
+			return Mysql.AS3_TYPE_STRING;
         }
         
         /**
@@ -147,10 +147,10 @@ package com.maclema.mysql
         }
         
         /**
-         * Returns an actionscript type identifier which is defined in MySql.AS_TYPE_*
+         * Returns an actionscript type identifier which is defined in MySql.AS3_TYPE_*
          **/
         public function getAsType():int {
-        	return _asType;
+        	return _as3Type;
         }
         
         /**

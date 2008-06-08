@@ -2,11 +2,15 @@ package com.maclema.mysql
 {
 	import com.maclema.mysql.events.MySqlEvent;
 	
-	public class CommandHandler extends DataHandler
+	internal class CommandHandler extends DataHandler
 	{
-		public function CommandHandler(con:Connection)
+		private var token:MySqlToken;
+		
+		public function CommandHandler(con:Connection, token:MySqlToken)
 		{
 			super(con);
+			
+			this.token = token;
 		}
 		
 		override protected function newPacket():void
@@ -26,13 +30,13 @@ package com.maclema.mysql
 				if ( field_count == 0x00 )
 				{
 					evt = new MySqlEvent(MySqlEvent.RESPONSE);
-					con.dispatchEvent(evt);
+					token.dispatchEvent(evt);
 					unregister();
 				}
 				else if ( field_count == 0xFF || field_count == -1 )
 				{
 					unregister();
-					new ErrorHandler(packet, con);
+					new ErrorHandler(packet, token);
 				}
 			}
 		}

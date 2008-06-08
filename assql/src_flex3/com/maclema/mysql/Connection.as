@@ -1,7 +1,6 @@
 package com.maclema.mysql
 {
 	import com.maclema.logging.Logger;
-	import com.maclema.mysql.events.MySqlErrorEvent;
 	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -13,10 +12,9 @@ package com.maclema.mysql
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	
-	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
-	[Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
 	[Event(name="connect", type="flash.events.Event")]
 	[Event(name="close", type="flash.events.Event")]
+	[Event(name="ioError", type="flash.events.IOErrorEvent")]
 	public class Connection extends EventDispatcher
 	{
 		//the actual socket
@@ -118,7 +116,7 @@ package com.maclema.mysql
 		private function onSocketError(e:ErrorEvent):void
 		{
 			Logger.error(this, "Socket Error: " + e.toString());
-			dispatchEvent(new MySqlErrorEvent(e.text));
+			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false, e.text));
 		}
 		
 		private function onSocketConnect(e:Event):void
@@ -335,17 +333,30 @@ package com.maclema.mysql
         /**
         * Changes the database
         **/
-        public function changeDatabaseTo(whatDb:String, doNotChangeHandler:Boolean=false):void
+        public function changeDatabaseTo(whatDb:String):MySqlToken
         {	
         	Logger.info(this, "Change Database (" + whatDb + ")");
         	
-        	if ( doNotChangeHandler == false ) {
-        		setDataHandler(new CommandHandler(this));
-        	}
+        	var token:MySqlToken = new MySqlToken();
+        	
+        	setDataHandler(new CommandHandler(this, token));
+        	
+            if ( whatDb == null || whatDb.length == 0 ) {
+                throw new Error("Database Name cannot be null or empty");
+            }
+            
+            sendCommand(Mysql.COM_INIT_DB, whatDb);
+            
+            return token;
+        }
+        
+        internal function internalChangeDatabaseTo(whatDb:String):void
+        {	
+        	Logger.info(this, "Change Database (" + whatDb + ")");
         	
             if ( whatDb == null || whatDb.length == 0 )
                 return;
-                
+            
             sendCommand(Mysql.COM_INIT_DB, whatDb);
         }
         

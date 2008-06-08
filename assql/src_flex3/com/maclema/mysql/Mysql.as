@@ -84,11 +84,11 @@ package com.maclema.mysql
         public static const FIELD_TYPE_STRING:int = 0xfe;
         public static const FIELD_TYPE_GEOMETRY:int = 0xff;
         
-        public static const AS_TYPE_NUMBER:int = 1;
-        public static const AS_TYPE_DATE:int = 2;
-        public static const AS_TYPE_TIME:int = 3;
-        public static const AS_TYPE_STRING:int = 4;
-        public static const AS_TYPE_BYTEARRAY:int = 5;
+        public static const AS3_TYPE_NUMBER:int = 1;
+        public static const AS3_TYPE_DATE:int = 2;
+        public static const AS3_TYPE_TIME:int = 3;
+        public static const AS3_TYPE_STRING:int = 4;
+        public static const AS3_TYPE_BYTEARRAY:int = 5;
         
         /* column flags */
         public static const FLAG_NOT_NULL:int = 0001;

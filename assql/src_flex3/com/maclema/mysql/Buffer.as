@@ -7,7 +7,7 @@ package com.maclema.mysql
      * This is an extension of the ByteArray to provide helper
      * methods specific to the MySQL client/server protocol.
      **/
-    public class Buffer extends ByteArray
+    internal class Buffer extends ByteArray
     {	
         public function Buffer()
         {

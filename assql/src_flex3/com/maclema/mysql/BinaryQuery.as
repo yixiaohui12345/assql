@@ -6,7 +6,7 @@ package com.maclema.mysql
 	 * This class is used to build SQL quries that include binary data such as
 	 * files or images.
 	 **/
-	public class BinaryQuery extends Buffer
+	internal class BinaryQuery extends Buffer
 	{
 		public function BinaryQuery()
 		{

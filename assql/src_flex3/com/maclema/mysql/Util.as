@@ -4,7 +4,7 @@ package com.maclema.mysql
     
     import flash.utils.ByteArray;
     
-    public class Util
+    internal class Util
     {
     	/**
     	 * Handles the new encryption for 4.1 and newer servers.
