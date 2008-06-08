@@ -5,7 +5,7 @@ package com.maclema.mysql
     /**
      * @private
      **/
-    public class ServerInformation
+    internal class ServerInformation
     {
         public var protocolVersion:int;
         public var serverVersion:String;

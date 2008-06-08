@@ -127,11 +127,6 @@ package com.maclema.mysql
 		private function onSocketClose(e:Event):void
 		{
 			Logger.info(this, "Socket Closed (Expected: " + expectingClose +")");
-			
-			if ( !expectingClose )
-			{
-				trace("Connection Terminated Unexpectedly!");
-			}
 			dispatchEvent(new Event(Event.CLOSE));
 		}
 		
