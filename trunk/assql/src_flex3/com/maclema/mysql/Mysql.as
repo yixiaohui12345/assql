@@ -1,9 +1,9 @@
 package com.maclema.mysql
 {
     /**
-     * Static Fields
+     * This class contains many MySql and asSQL constants.
      **/
-    public class Mysql
+    public class MySql
     {
         public static const CLIENT_LONG_PASSWORD:int = 1;
         public static const CLIENT_FOUND_ROWS:int = 2;
@@ -24,7 +24,6 @@ package com.maclema.mysql
         public static const CLIENT_MULTI_STATEMENTS:int = 65536;
         public static const CLIENT_MULTI_RESULTS:int = 131072;
         
-        /* Commands */
         public static const COM_SLEEP:int = 0x00;
         public static const COM_QUIT:int = 0x01;
         public static const COM_INIT_DB:int = 0x02;

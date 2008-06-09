@@ -12,9 +12,28 @@ package com.maclema.mysql
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	
+	/**
+	 * Dispatched when successfully connected to the MySql Server
+	 **/
 	[Event(name="connect", type="flash.events.Event")]
+	
+	/**
+	 * Dispatched when the connection to the server is terminated.
+	 **/
 	[Event(name="close", type="flash.events.Event")]
+	
+	/**
+	 * Dispatched when a socket error occurs.
+	 **/
 	[Event(name="ioError", type="flash.events.IOErrorEvent")]
+	
+	/**
+	 * A Connection is used to manage the creation and connection to a MySql Database.
+	 * <br><br>
+	 * The connection class manages all data input/output from MySql using a Socket connection. Since all 
+	 * operations are asyncronous the Connection class also manages pooling queries and commands so they
+	 * are executed in the order called.
+	 **/
 	public class Connection extends EventDispatcher
 	{
 		//the actual socket
@@ -31,28 +50,24 @@ package com.maclema.mysql
 		private var dataHandler:DataHandler;
 		
 		//the server information
-		public var server:ServerInformation;
+		private var server:ServerInformation;
 		
-		//the client capabilities
-		public var clientParam:Number = 0;
+		//internal vars
+		internal var clientParam:Number = 0;
+		internal var hasLongColumnInfo:Boolean = false;
 		
+		//private vars
 		private var expectingClose:Boolean = false;
-		
-		public var hasLongColumnInfo:Boolean = false;
-		
 		private var buffer:Buffer;
-		
 		private var _connected:Boolean = false;
-		
 		private var _totalTX:Number;
 		private var _tx:Number;
 		private var _queryStart:Number;
 		private var _busy:Boolean = false;
-		
-		private var queryPool:Array;
+		private var commandPool:Array;
 		
 		/**
-		 * Creates a new connection to a MySql server.
+		 * Creates a new Connection instance.
 		 **/
 		public function Connection( host:String, port:int, username:String, password:String = null, database:String = null )
 		{
@@ -67,7 +82,7 @@ package com.maclema.mysql
 			this.password = password;
 			this.database = database;
 			
-			this.queryPool = new Array();
+			this.commandPool = new Array();
 			
 			if ( this.database == "" )
 			{
@@ -91,102 +106,13 @@ package com.maclema.mysql
             sock.addEventListener(ProgressEvent.SOCKET_DATA, onSocketData);
 		}
 		
-		private function onConnected(e:Event):void
-		{
-			Logger.info(this, "Connected");
-			
-			this._connected = true;
-			dispatchEvent(new Event("connectionStateChanged"));
-		}
-		
-		private function onDisconnect(e:Event):void
-		{
-			Logger.info(this, "Disconnected");
-			
-			this._connected = false;
-			dispatchEvent(new Event("connectionStateChanged"));
-		}
-		
+		/**
+		 * Returns true or false indicating if this Connection instance is connected to MySql
+		 **/
 		[Bindable("connectionStateChanged")]
 		public function get connected():Boolean
 		{
 			return _connected;
-		}
-		
-		private function onSocketError(e:ErrorEvent):void
-		{
-			Logger.error(this, "Socket Error: " + e.toString());
-			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false, e.text));
-		}
-		
-		private function onSocketConnect(e:Event):void
-		{
-			Logger.info(this, "Socket Connected");
-		}
-		
-		private function onSocketClose(e:Event):void
-		{
-			Logger.info(this, "Socket Closed (Expected: " + expectingClose +")");
-			dispatchEvent(new Event(Event.CLOSE));
-		}
-		
-		private function onSocketData(e:ProgressEvent):void
-		{	
-			_tx += sock.bytesAvailable;
-			_totalTX += sock.bytesAvailable;
-			
-			sock.readBytes( buffer, buffer.length, sock.bytesAvailable );
-			checkForPackets();		
-		}
-		
-		private function checkForPackets():void
-        {	
-        	buffer.position = 0;
-        	while ( buffer.bytesAvailable >= 4 ) {
-        		var len:int = buffer.readThreeByteInt();
-                buffer.readByte();
-                       	  
-           		if ( buffer.bytesAvailable >= len ) {
-           			buffer.position = 0;
-           			
-           			var pack:Packet = new Packet(buffer);
-           			
-           			var tmp:Buffer = buffer;
-                    buffer = new Buffer();
-                    tmp.readBytes(buffer);
-                    tmp = null;
-                    
-                   	if ( dataHandler != null )
-                   	{
-                   		dataHandler.pushPacket( pack );
-                   	}
-           		}
-        	}
-        }
-		
-		private function setDataHandler(handler:DataHandler):void
-		{
-			unregisterDataHandler(null);
-			
-			Logger.info(this, "Set Data Handler To: " + getQualifiedClassName(handler));
-			
-			dataHandler = handler;
-			dataHandler.addEventListener( "unregister", unregisterDataHandler );
-		}
-		
-		private function unregisterDataHandler(e:Event=null):void
-		{
-			if ( dataHandler != null ) {
-				Logger.info(this, "Unregistered Data Handler");
-			
-				dataHandler.removeEventListener( "unregister", unregisterDataHandler );
-				dataHandler = null;
-				
-				_busy = false;
-				dispatchEvent(new Event("busyChanged"));
-				
-				checkPool();
-			}
 		}
 		
 		/**
@@ -235,98 +161,9 @@ package com.maclema.mysql
             return new Statement(this);
         }
         
-        /**
-         * Used by Statement to execute a query or update sql statement. 
-         * @private
-         **/
-        internal function executeQuery(token:MySqlToken, sql:String):void
-        {
-        	Logger.info(this, "Execute Query (" + sql + ")");
-        	
-        	if ( dataHandler != null ) {
-        		poolQuery(token, sql);
-        	}
-        	else {
-	        	_busy = true;
-	        	dispatchEvent(new Event("busyChanged"));
-	        	_tx = 0;
-	        	_queryStart = getTimer();
-	            setDataHandler(new QueryHandler(this, token));
-	            sendCommand(Mysql.COM_QUERY, sql);
-	    	}
-        }
         
         /**
-        * Executes a binary query object as a sql statement.
-        * @private
-        **/
-        internal function executeBinaryQuery(token:MySqlToken, query:BinaryQuery):void
-        {
-        	Logger.info(this, "Execute Binary Query");
-        	
-        	if ( dataHandler != null ) {
-        		poolQuery(token, query);
-        	}
-        	else {
-	        	_busy = true;
-	        	dispatchEvent(new Event("busyChanged"));
-	        	_tx = 0;
-	        	_queryStart = getTimer();
-	        	setDataHandler(new QueryHandler(this, token));
-	        	sendBinaryCommand(Mysql.COM_QUERY, query);
-        	}
-        }
-        
-        private function poolQuery(token:MySqlToken, query:*):void {
-        	Logger.info(this, "Pooling Query");
-        	queryPool.push({token: token, query: query});
-        }
-        
-        private function checkPool():void {
-        	if ( queryPool.length > 0 ) {
-        		Logger.info(this, "Executing Pooled Query");
-        		
-        		var obj:Object = queryPool.shift();
-        		var token:MySqlToken = obj.token;
-        		var query:* = obj.query;
-        		
-        		if ( query is String ) {
-        			executeQuery(token, String(query));
-        		}
-        		else if ( query is BinaryQuery ) {
-        			executeBinaryQuery(token, BinaryQuery(query));
-        		}
-        		else {
-        			Logger.error(this, "Unknown query type in pool");
-        			throw new Error("Unknown query type in pool");
-        		}
-        	}
-        }
-        
-        private function sendBinaryCommand(command:int, data:BinaryQuery):void
-        {
-        	Logger.info(this, "Send Binary Command");
-        	//check that the data is at position 0
-        	data.position = 0;
-        	
-            var packet:Packet = new Packet();
-            packet.writeByte(command);
-            data.readBytes( packet, packet.position, data.bytesAvailable );
-            packet.send(sock);
-        }
-		
-		private function sendCommand(command:int, data:String):void
-        {
-        	Logger.info(this, "Send Command (Command: " + command + " Data: " + data + ")");
-        	
-            var packet:Packet = new Packet();
-            packet.writeByte(command);
-            packet.writeUTFBytes(data);
-            packet.send(sock);
-        }
-        
-        /**
-        * Changes the database
+        * Changes the currently selected database database
         **/
         public function changeDatabaseTo(whatDb:String):MySqlToken
         {	
@@ -334,25 +171,14 @@ package com.maclema.mysql
         	
         	var token:MySqlToken = new MySqlToken();
         	
-        	setDataHandler(new CommandHandler(this, token));
-        	
-            if ( whatDb == null || whatDb.length == 0 ) {
-                throw new Error("Database Name cannot be null or empty");
-            }
-            
-            sendCommand(Mysql.COM_INIT_DB, whatDb);
+        	if ( dataHandler != null ) {
+        		poolCommand(doChangeDatabaseTo, token, whatDb);
+        	}
+        	else {
+	        	doChangeDatabaseTo(token, whatDb);
+         	}
             
             return token;
-        }
-        
-        internal function internalChangeDatabaseTo(whatDb:String):void
-        {	
-        	Logger.info(this, "Change Database (" + whatDb + ")");
-        	
-            if ( whatDb == null || whatDb.length == 0 )
-                return;
-            
-            sendCommand(Mysql.COM_INIT_DB, whatDb);
         }
         
         /**
@@ -385,12 +211,293 @@ package com.maclema.mysql
         }
         
         /**
-        * Returns the actual socket.
+        * Returns the current size of the command pool
+        **/
+        public function get poolSize():int {
+        	return commandPool.length;
+        }
+        
+        /**
+        * Returns the server information object for this connection
+        **/
+        public function getServerInformation():ServerInformation {
+        	return server;
+        }
+        
+        /**
+         * Used by Statement to execute a query or update sql statement. 
+         * @private
+         **/
+        internal function executeQuery(token:MySqlToken, sql:String):void
+        {
+        	Logger.info(this, "Execute Query (" + sql + ")");
+        	
+        	if ( dataHandler != null ) {
+        		poolCommand(executeQuery, token, sql);
+        	}
+        	else {
+	        	_busy = true;
+	        	dispatchEvent(new Event("busyChanged"));
+	        	_tx = 0;
+	        	_queryStart = getTimer();
+	            setDataHandler(new QueryHandler(this, token));
+	            sendCommand(Mysql.COM_QUERY, sql);
+	    	}
+        }
+        
+        /**
+        * Executes a binary query object as a sql statement.
+        * @private
+        **/
+        internal function executeBinaryQuery(token:MySqlToken, query:BinaryQuery):void
+        {
+        	Logger.info(this, "Execute Binary Query");
+        	
+        	if ( dataHandler != null ) {
+        		poolCommand(executeBinaryQuery, token, query);
+        	}
+        	else {
+	        	_busy = true;
+	        	dispatchEvent(new Event("busyChanged"));
+	        	_tx = 0;
+	        	_queryStart = getTimer();
+	        	setDataHandler(new QueryHandler(this, token));
+	        	sendBinaryCommand(Mysql.COM_QUERY, query);
+        	}
+        }
+        
+        /**
+        * Used by HandshakeHandler to change the database when connecting.
+        * @private
+        **/
+        internal function internalChangeDatabaseTo(whatDb:String):void
+        {	
+        	Logger.info(this, "Change Database (" + whatDb + ")");
+        	
+            if ( whatDb == null || whatDb.length == 0 )
+                return;
+            
+            sendCommand(Mysql.COM_INIT_DB, whatDb);
+        }
+        
+        /**
+        * Used by Packet when sending data
         * @private
         **/
         internal function getSocket():Socket
         {
         	return sock;
+        }
+		
+		/**
+		 * Handshake handler dispatches a connection event on the Connection object
+		 * when successfully connected / authenticated to MySql. We need to update our
+		 * connected variable here.
+		 * @private
+		 **/
+		private function onConnected(e:Event):void
+		{
+			Logger.info(this, "Connected");
+			
+			this._connected = true;
+			dispatchEvent(new Event("connectionStateChanged"));
+		}
+		
+		/**
+		 * When we lose our connection, update our connected variable.
+		 * @private
+		 **/
+		private function onDisconnect(e:Event):void
+		{
+			Logger.info(this, "Disconnected");
+			
+			this._connected = false;
+			dispatchEvent(new Event("connectionStateChanged"));
+		}
+		
+		/**
+		 * Handle any socket errors.
+		 * @private
+		 **/
+		private function onSocketError(e:ErrorEvent):void
+		{
+			Logger.error(this, "Socket Error: " + e.toString());
+			dispatchEvent(new IOErrorEvent(IOErrorEvent.IO_ERROR, false, false, e.text));
+		}
+		
+		/**
+		 * Handle a new socket connection
+		 * @private
+		 **/
+		private function onSocketConnect(e:Event):void
+		{
+			Logger.info(this, "Socket Connected");
+		}
+		
+		/**
+		 * Handle a socket close event
+		 * @private
+		 **/
+		private function onSocketClose(e:Event):void
+		{
+			Logger.info(this, "Socket Closed (Expected: " + expectingClose +")");
+			dispatchEvent(new Event(Event.CLOSE));
+		}
+		
+		/**
+		 * Handle new socket data
+		 * @private
+		 **/
+		private function onSocketData(e:ProgressEvent):void
+		{	
+			_tx += sock.bytesAvailable;
+			_totalTX += sock.bytesAvailable;
+			
+			sock.readBytes( buffer, buffer.length, sock.bytesAvailable );
+			checkForPackets();		
+		}
+		
+		/**
+		 * Keep scanning our socket data buffer and pass new full packets to the 
+		 * currently active data handler. Be sure not to use recursion here because
+		 * if MySql sends data to fase we will end up with a StackOverflowError.
+		 * @private
+		 **/
+		private function checkForPackets():void
+        {	
+        	buffer.position = 0;
+        	while ( buffer.bytesAvailable >= 4 ) {
+        		var len:int = buffer.readThreeByteInt();
+                buffer.readByte();
+                       	  
+           		if ( buffer.bytesAvailable >= len ) {
+           			buffer.position = 0;
+           			
+           			var pack:Packet = new Packet(buffer);
+           			
+           			var tmp:Buffer = buffer;
+                    buffer = new Buffer();
+                    tmp.readBytes(buffer);
+                    tmp = null;
+                    
+                   	if ( dataHandler != null )
+                   	{
+                   		dataHandler.pushPacket( pack );
+                   	}
+           		}
+        	}
+        }
+		
+		/**
+		 * Sets a new DataHandler to handle the next batch of data coming
+		 * from MySql. If the dataHandler variable is null we are not pooling
+		 * commands properly somewhere so throw an error.
+		 * @private
+		 **/
+		private function setDataHandler(handler:DataHandler):void
+		{
+			if ( dataHandler != null ) {
+				throw new Error("Concurrency Error");
+			}
+			
+			Logger.info(this, "Set Data Handler To: " + getQualifiedClassName(handler));
+			
+			dataHandler = handler;
+			dataHandler.addEventListener( "unregister", unregisterDataHandler );
+		}
+		
+		/**
+		 * Handle the unregistration of a datahandler.
+		 * @private
+		 **/
+		private function unregisterDataHandler(e:Event=null):void
+		{
+			if ( dataHandler != null ) {
+				Logger.info(this, "Unregistered Data Handler");
+			
+				dataHandler.removeEventListener( "unregister", unregisterDataHandler );
+				dataHandler = null;
+				
+				_busy = false;
+				dispatchEvent(new Event("busyChanged"));
+				
+				checkPool();
+			}
+		}
+        
+        /**
+        * Pool a command. We need the method to call, the token to use, and the data to 
+        * pass to the method. Any method passed to this method should have a signature of:
+        * 
+        * method(token:MySqlToken, data:*):void
+        * @private
+        **/
+        private function poolCommand(method:Function, token:MySqlToken, data:*):void {
+        	Logger.info(this, "Pooling Query");
+        	commandPool.push({method: method, token: token, data: data});
+        }
+        
+        /**
+        * Check our pool, if there is any waiting commands, execute them.
+        * @private
+        **/
+        private function checkPool():void {
+        	if ( commandPool.length > 0 ) {
+        		Logger.info(this, "Executing Pooled Query");
+        		
+        		var obj:Object = commandPool.shift();
+        		var method:Function = obj.method;
+        		var token:MySqlToken = obj.token;
+        		var data:* = obj.data;
+        		
+        		method(token, data);
+        	}
+        }
+        
+        /**
+        * Send a query command that is an instance of BinaryQuery
+        * @private
+        **/
+        private function sendBinaryCommand(command:int, data:BinaryQuery):void
+        {
+        	Logger.info(this, "Send Binary Command");
+        	//check that the data is at position 0
+        	data.position = 0;
+        	
+            var packet:Packet = new Packet();
+            packet.writeByte(command);
+            data.readBytes( packet, packet.position, data.bytesAvailable );
+            packet.send(sock);
+        }
+		
+		/**
+		 * Send a query that is an instance of a String
+		 * @private
+		 **/
+		private function sendCommand(command:int, data:String):void
+        {
+        	Logger.info(this, "Send Command (Command: " + command + " Data: " + data + ")");
+        	
+            var packet:Packet = new Packet();
+            packet.writeByte(command);
+            packet.writeUTFBytes(data);
+            packet.send(sock);
+        }
+        
+        /**
+        * This is our private method to change the database. We need this method because of
+        * command pooling.
+        * @private
+        **/
+        private function doChangeDatabaseTo(token:MySqlToken, whatDb:String):void
+        {	
+        	setDataHandler(new CommandHandler(this, token));
+        	
+            if ( whatDb == null || whatDb.length == 0 ) {
+                throw new Error("Database Name cannot be null or empty");
+            }
+            
+            sendCommand(Mysql.COM_INIT_DB, whatDb);
         }
 	}
 }

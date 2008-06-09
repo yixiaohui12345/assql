@@ -7,18 +7,23 @@ package com.maclema.mysql
     
     import mx.formatters.DateFormatter;
     
+    /**
+    * The Statement class allows you to execute queries for the MySql connection.
+    **/
     public class Statement
     {
         private var con:Connection;
         private var _sql:String = null;
         private var params:Array;
         
+        /**
+        * Constructs a new Statement object. Should never be called directly, rather, use Connection.createStatement();
+        **/
         public function Statement(con:Connection)
         {
             this.con = con;
             this.params = new Array();
         }
-        
         
         
         /**

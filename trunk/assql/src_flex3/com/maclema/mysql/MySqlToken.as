@@ -8,24 +8,32 @@ package com.maclema.mysql
 	
 	import mx.rpc.IResponder;
 	
+	/**
+	 * Dispatched when an SQL error occurs
+	 **/
 	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
+	
+	/**
+	 * Dispatched when an query successfull executes
+	 **/
     [Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
+    
+    /**
+    * Dispatche when a data manipulation query successfully executes
+    **/
     [Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
-	public class MySqlToken extends EventDispatcher
+    
+    /**
+    * This class provieds a place to set additional token-level data for MySql queries. It also allows an IResponder to be attached
+    * for an individual call.
+    **/
+	public dynamic class MySqlToken extends EventDispatcher
 	{
-		/**
-		 * This is a property you can use to attach additional information to be returned in the reponders
-		 **/
-		public var info:Object;
+		private var _responders:Array = new Array();
 		
 		/**
-		 * An array of IResponder handlers that will be called when the query completes.
-		 **/
-		public var responders:Array = new Array();
-		
-		/**
-		 * The result returned by the query. Either a ResultSet (for query statements), and an object with
-		 * two properties, affectedRows and insertID
+		 * The result returned by the query. Either a ResultSet (for query statements), or an object with
+		 * two properties, affectedRows and insertID for a response event.
 		 **/
 		public var result:Object;
 		
@@ -37,6 +45,13 @@ package com.maclema.mysql
 			this.addEventListener(MySqlEvent.RESPONSE, handleResponse);
             this.addEventListener(MySqlEvent.RESULT, handleResponse);
             this.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError);
+		}
+		
+		/**
+		 * An array of IResponder handlers that will be called when the MySql query completes.
+		 **/
+		public function get responders():Array {
+			return _responders;
 		}
 		
 		private function handleResponse(e:MySqlEvent):void {

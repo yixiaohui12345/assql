@@ -8,6 +8,9 @@ package com.maclema.mysql
     import mx.collections.ArrayCollection;
     import mx.formatters.DateFormatter;
     
+    /**
+    * The ResultSet class represents a data set retuends by MySql for a query.
+    **/
     public class ResultSet
     {
         /**
@@ -52,6 +55,9 @@ package com.maclema.mysql
         
         private var todayDateString:String;
         
+        /**
+        * Constructs a new ResultSet object
+        **/
         public function ResultSet(token:MySqlToken)
         {
         	this._token = token;

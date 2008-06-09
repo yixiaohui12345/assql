@@ -1,7 +1,7 @@
 package com.maclema.mysql
 {
 	/**
-	 * This class represents a MySql column
+	 * The Field class represents a MySql table column.
 	 **/
     public class Field
     {
@@ -38,6 +38,9 @@ package com.maclema.mysql
         
         private var _as3Type:int;
         
+        /**
+        * Constructs a new Field instance by reading a Packet returned from MySql.
+        **/ 
         public function Field(packet:Packet)
         {
             _catalog = packet.readLengthCodedString();
@@ -55,6 +58,10 @@ package com.maclema.mysql
             _as3Type = determineAs3Type();
         }
         
+        /**
+        * Determins the Actionscript type that this column should map to.
+        * @priavte
+        **/
         private function determineAs3Type():int {
         	switch (_type)
 			{
