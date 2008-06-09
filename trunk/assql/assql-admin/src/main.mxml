@@ -10,6 +10,11 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import com.maclema.mysql.ResultSet;
+			import mx.rpc.AsyncResponder;
+			import com.maclema.mysql.MySqlToken;
+			import model.Model;
 			/* ***********************************************************
 			 * 
 			 *  CREDITS
@@ -19,7 +24,6 @@
 			 * **********************************************************/
 			import com.maclema.QueryData;
 			import com.maclema.mysql.events.MySqlEvent;
-			import com.maclema.mysql.MySqlResponser;
 			import com.maclema.mysql.Statement;
 			import com.maclema.DBConn;
 			import mx.events.CloseEvent;
@@ -36,11 +40,10 @@
 			[Bindable]
 			private var myConnections:MyConnections;
 			
-			[Bindable]
-			private var con:Connection;
+			private var m:Model = Model.getInstance();
 			
 			[Bindable]
-			private var connectedDatabaseName:String = "";
+			private var connectionName:String = "";
 			
 			private function onCreationComplete():void {
 				this.nativeWindow.width = 990;
@@ -63,7 +66,7 @@
 			
 			private function handleShowTable(e:Event):void {
 				var td:TableData = new TableData();
-				td.con = con;
+				td.connectionName = e.target.connectionName;
 				td.tableName = tablesview.tableName;
 				td.label = tablesview.tableName;
 				td.percentWidth = 100;
@@ -92,16 +95,16 @@
 			}
 			
 			private function openConnection():void {
-				if ( con && con.connected ) {
+				if ( connectionName != "" ) {
 					disconnect();
 				}
 				
 				if ( conslist.selectedItem != null ) {
 					var dbc:DBConn = DBConn(conslist.selectedItem);
 					
-					connectedDatabaseName = dbc.database;
+					connectionName = dbc.connectionName;
 					
-					con = new Connection(dbc.hostname, dbc.port, dbc.username, dbc.password, dbc.database);
+					var con:Connection = m.newConnection(connectionName, dbc.hostname, dbc.port, dbc.username, dbc.password, dbc.database);
 					con.addEventListener(Event.CONNECT, handleConnected);
 					con.addEventListener(MySqlErrorEvent.SQL_ERROR, handleConnectionError);
 					con.connect();
@@ -109,29 +112,31 @@
 			}
 			
 			private function executeQuery():void {
-				var st:Statement = con.createStatement();
-				st.executeQuery(query.text, new MySqlResponser(
-					function (e:MySqlEvent):void {
-						if ( e.type == MySqlEvent.RESULT ) {
+				var st:Statement = m.getConnection(connectionName).createStatement();
+				var token:MySqlToken = st.executeQuery(query.text);
+				token.addResponder(new AsyncResponder(
+					function (data:Object, token:Object):void {
+						if ( data is ResultSet ) {
 							var td:QueryData = new QueryData();
-							td.handleResult(e);
 							td.label = "Query";
+							td.handleResult(ResultSet(data));
 							tabsnav.addChild(td);
-							tabsnav.selectedChild = td;
 						}
 						else {
-							Alert.show( "Affected Rows: " + e.affectedRows );
+							Alert.show( "Affected Rows: " + data.affectedRows );
 						}
 					},
-					function (e:MySqlErrorEvent):void {
-						Alert.show("Error: " + e.text);	
-					}
+					function (info:Object, token:Object):void {
+						Alert.show("Error: " + info);
+					},
+					token
 				));
 			}
 			
 			private function disconnect():void {
-				con.disconnect();
-				connectedDatabaseName = "";
+				m.getConnection(connectionName).disconnect();
+				connectionName = "";
+				
 				if ( tablesview ) {
 					tablesview.clear();
 				}
@@ -141,8 +146,6 @@
 				}
 				
 				tabsnav.removeAllChildren();
-				
-				con = null;
 			}
 		]]>
 	</mx:Script>
@@ -166,11 +169,11 @@
 			<mx:Button x="55.5" y="10" label="-" width="40" click="deleteConnection();" enabled="{conslist.selectedItem!=null}" toolTip="Delete Connection"/>
 			<mx:Button x="103.5" y="10" label="..." width="40" click="editConnection();" enabled="{conslist.selectedItem!=null}" toolTip="Edit Connection"/>
 			</mx:Panel>
-		<mx:TitleWindow layout="absolute" title="{connectedDatabaseName}" left="171" top="10" bottom="10" right="10" showCloseButton="true" close="disconnect()" enabled="{con != null}" disabledOverlayAlpha="0" alpha="{con != null ? 1 : 0.3}">
+		<mx:TitleWindow layout="absolute" title="{connectionName}" left="171" top="10" bottom="10" right="10" showCloseButton="true" close="disconnect()" enabled="{connectionName != ''}" disabledOverlayAlpha="0" alpha="{connectionName != '' ? 1 : 0.3}">
 			<mx:VDividedBox id="vbox" left="10" right="10" top="10" bottom="10">
 				<mx:TabNavigator width="100%" height="50%">
 					<mx:Canvas label="Tables" width="100%">
-						<ns1:TablesView id="tablesview" con="{con}" left="0" right="0" top="0" bottom="0">
+						<ns1:TablesView id="tablesview" connectionName="{connectionName}" left="0" right="0" top="0" bottom="0">
 						</ns1:TablesView>
 					</mx:Canvas>
 					<mx:Canvas label="Query" width="100%" height="100%">
@@ -188,6 +191,4 @@
 	<!-- Application ControlBar -->
 	<controlbar:TopControlBar top="11" left="11" right="11" mouseDown="nativeWindow.startMove()" />
 	
-	<!-- Application StatusBar -->
-	<chrome:StatusBar bottom="11" left="11" right="11" selectedIndex="{con.connected ? con.busy ? 2 : 0 : 1}" />
 </mx:WindowedApplication>
