@@ -84,7 +84,7 @@ package com.maclema.mysql
 	        	
 	        	for ( var i:int=0; i<responders.length; i++ ) {
 	        		var responder:IResponder = IResponder(responders[i]);
-	        		responder.result(data);
+	        		responder.fault(data);
 	        	}
         	}
         }
