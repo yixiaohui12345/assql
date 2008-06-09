@@ -42,7 +42,9 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 </table>
 <p></p>
-<p></p>
+  MySqlErrorEvent's are dispatched when MySql sends us an error related to connecting, authentication,
+  or a command that was sent.
+  <p></p>
 <br>
 <hr>
 </div>
@@ -54,11 +56,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#id">id</a> : int<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#id">id</a> : int<div class="summaryTableDescription">
+        The error code returned by MySql
+        </div>
 </td><td class="summaryTableOwnerCol">MySqlErrorEvent</td>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#msg">msg</a> : String<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#msg">msg</a> : String<div class="summaryTableDescription">
+        The error message returned by MySql
+        </div>
 </td><td class="summaryTableOwnerCol">MySqlErrorEvent</td>
 </tr>
 </table>
@@ -74,7 +80,9 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#MySqlErrorEvent()">MySqlErrorEvent</a>(msg:String, id:int = 0)</div>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+        Constructs a new MySqlErrorEvent
+        </div>
 </td><td class="summaryTableOwnerCol">MySqlErrorEvent</td>
 </tr>
 </table>
@@ -106,8 +114,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public var id:int</code>
-</div>
+<code>public var id:int</code><p>
+        The error code returned by MySql
+        </p></div>
 <a name="msg"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -115,8 +124,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public var msg:String</code>
-</div>
+<code>public var msg:String</code><p>
+        The error message returned by MySql
+        </p></div>
 <a name="constructorDetail"></a>
 <div class="detailSectionHeader">Constructor detail</div>
 <a name="MySqlErrorEvent()"></a>
@@ -126,7 +136,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function MySqlErrorEvent(msg:String, id:int = 0)</code><span class="label">Parameters</span>
+<code>public function MySqlErrorEvent(msg:String, id:int = 0)</code><p>
+        Constructs a new MySqlErrorEvent
+        </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">msg</span>:String</code></td>

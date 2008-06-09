@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="Statement,com.maclema.mysql.Statement,sql,executeBinaryQuery,executeQuery,getConnection,setBinary,setDate,setNumber,setString" name="keywords">
+<meta content="Statement,com.maclema.mysql.Statement,sql,executeBinaryQuery,executeQuery,getConnection,setBinary,setDate,setDateTime,setNumber,setString,setTime" name="keywords">
 <title>com.maclema.mysql.Statement</title>
 </head>
 <body>
@@ -19,7 +19,7 @@
 <td align="left" class="titleTableTitle">asSQL Documentation</td><td align="right" class="titleTableTopNav"><a onclick="loadClassListFrame('../../../all-classes.html')" href="../../../package-summary.html">All&nbsp;Packages</a>&nbsp;|&nbsp;<a onclick="loadClassListFrame('../../../all-classes.html')" href="../../../class-summary.html">All&nbsp;Classes</a>&nbsp;|&nbsp;<a onclick="loadClassListFrame('../../../index-list.html')" href="../../../all-index-A.html">Index</a>&nbsp;|&nbsp;<a href="../../../index.html?com/maclema/mysql/Statement.html&amp;com/maclema/mysql/class-list.html" id="framesLink1">Frames</a><a onclick="parent.location=document.location" href="" style="display:none" id="noFramesLink1">No&nbsp;Frames</a></td><td rowspan="3" align="right" class="titleTableLogo"><img alt="Adobe Logo" title="Adobe Logo" class="logoImage" src="../../../images/logo.jpg"></td>
 </tr>
 <tr class="titleTableRow2">
-<td align="left" id="subTitle" class="titleTableSubTitle">Class&nbsp;Statement</td><td align="right" id="subNav" class="titleTableSubNav"><a href="#propertySummary">Properties</a>&nbsp;| <a href="#methodSummary">Methods</a>&nbsp;| <a href="#eventSummary">Events</a></td>
+<td align="left" id="subTitle" class="titleTableSubTitle">Class&nbsp;Statement</td><td align="right" id="subNav" class="titleTableSubNav"><a href="#propertySummary">Properties</a>&nbsp;| <a href="#methodSummary">Methods</a></td>
 </tr>
 <tr class="titleTableRow3">
 <td colspan="2">&nbsp;</td>
@@ -27,7 +27,7 @@
 </table>
 <script type="text/javascript" language="javascript">
 <!--
-if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Class Statement"); titleBar_setSubNav(false,true,false,false,true,false,true,false,false,false,false,false,false,false);}
+if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Class Statement"); titleBar_setSubNav(false,true,false,false,false,false,true,false,false,false,false,false,false,false);}
 --></script>
 <div class="MainContent">
 <table cellspacing="0" cellpadding="0" class="classHeaderTable">
@@ -37,12 +37,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr>
 <td class="classHeaderTableLabel">Class</td><td class="classSignature">public class Statement</td>
 </tr>
-<tr>
-<td class="classHeaderTableLabel">Inheritance</td><td class="inheritanceList">Statement <img class="inheritArrow" alt="Inheritance" title="Inheritance" src="../../../images/inherit-arrow.gif"> flash.events.EventDispatcher</td>
-</tr>
 </table>
 <p></p>
-<p></p>
+    The Statement class allows you to execute queries for the MySql connection.
+    <p></p>
 <br>
 <hr>
 </div>
@@ -72,13 +70,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#Statement()">Statement</a>(con:<a href="Connection.html">Connection</a>)</div>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+        Constructs a new Statement object.</div>
 </td><td class="summaryTableOwnerCol">Statement</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#executeBinaryQuery()">executeBinaryQuery</a>(query:<a href="BinaryQuery.html">BinaryQuery</a>, responder:<a href="MySqlResponser.html">MySqlResponser</a> = null):void</div>
+<a class="signatureLink" href="#executeBinaryQuery()">executeBinaryQuery</a>(query:BinaryQuery):<a href="../mysql/MySqlToken.html">MySqlToken</a>
+</div>
 <div class="summaryTableDescription">
         Executes a binary query object
         </div>
@@ -87,7 +87,8 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#executeQuery()">executeQuery</a>(sqlString:String = null, responder:<a href="MySqlResponser.html">MySqlResponser</a> = null):void</div>
+<a class="signatureLink" href="#executeQuery()">executeQuery</a>(sqlString:String = null):<a href="../mysql/MySqlToken.html">MySqlToken</a>
+</div>
 <div class="summaryTableDescription">
          Executes the specified sql statement.</div>
 </td><td class="summaryTableOwnerCol">Statement</td>
@@ -116,7 +117,16 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="#setDate()">setDate</a>(index:int, value:Date):void</div>
 <div class="summaryTableDescription">
-        Set a Date parameter
+        Set a Date parameter (YYYY-MM-DD)
+        </div>
+</td><td class="summaryTableOwnerCol">Statement</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#setDateTime()">setDateTime</a>(index:int, value:Date):void</div>
+<div class="summaryTableDescription">
+        Set a DateTime parameter (YYYY-MM-DD J:NN:SS)
         </div>
 </td><td class="summaryTableOwnerCol">Statement</td>
 </tr>
@@ -138,35 +148,14 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
         </div>
 </td><td class="summaryTableOwnerCol">Statement</td>
 </tr>
-</table>
-</div>
-<a name="eventSummary"></a>
-<div class="summarySection">
-<div class="summaryTableTitle">Events</div>
-<table id="summaryTableEvent" class="summaryTable " cellpadding="3" cellspacing="0">
-<tr>
-<th>&nbsp;</th><th colspan="2">Event</th><th>Summary</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
-</tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#event:sql_response">sql_response</a>
-</div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Statement</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#event:sql_result">sql_result</a>
-</div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Statement</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#event:sqlError">sqlError</a>
-</div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Statement</td>
+<a class="signatureLink" href="#setTime()">setTime</a>(index:int, value:Date):void</div>
+<div class="summaryTableDescription">
+        Set a Time parameter (H:MM:SS)
+        </div>
+</td><td class="summaryTableOwnerCol">Statement</td>
 </tr>
 </table>
 </div>
@@ -202,7 +191,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function Statement(con:<a href="Connection.html">Connection</a>)</code><span class="label">Parameters</span>
+<code>public function Statement(con:<a href="Connection.html">Connection</a>)</code><p>
+        Constructs a new Statement object. Should never be called directly, rather, use Connection.createStatement();
+        </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">con</span>:<a href="Connection.html">Connection</a></code></td>
@@ -218,18 +209,19 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function executeBinaryQuery(query:<a href="BinaryQuery.html">BinaryQuery</a>, responder:<a href="MySqlResponser.html">MySqlResponser</a> = null):void</code><p>
+<code>public function executeBinaryQuery(query:BinaryQuery):<a href="../mysql/MySqlToken.html">MySqlToken</a></code><p>
         Executes a binary query object
         </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td width="20px"></td><td><code><span class="label">query</span>:<a href="BinaryQuery.html">BinaryQuery</a></code></td>
+<td width="20px"></td><td><code><span class="label">query</span>:BinaryQuery</code></td>
 </tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td class="paramSpacer">&nbsp;</td>
-</tr>
-<tr>
-<td width="20px"></td><td><code><span class="label">responder</span>:<a href="MySqlResponser.html">MySqlResponser</a></code> (default = <code>null</code>)<code></code></td>
+<td width="20"></td><td><code><a href="../mysql/MySqlToken.html">MySqlToken</a></code></td>
 </tr>
 </table>
 </div>
@@ -240,19 +232,24 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function executeQuery(sqlString:String = null, responder:<a href="MySqlResponser.html">MySqlResponser</a> = null):void</code><p>
+<code>public function executeQuery(sqlString:String = null):<a href="../mysql/MySqlToken.html">MySqlToken</a></code><p>
          Executes the specified sql statement. The statement can be provided using either the sql property
-         or as the first parameter. You may also specify a MySqlResponder object as the second parameter.
+         or as the first parameter of this method. You may also specify a IResponder object as the second parameter.
+         <br><br>
+         When result(data:Object) is called on the IResponder the data object will be either a ResultSet, in the case
+         of query statements, and in the case of data manipulation statements, will be an object with two properties, 
+         affectedRows, and insertID. 
          </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">sqlString</span>:String</code> (default = <code>null</code>)<code></code></td>
 </tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td class="paramSpacer">&nbsp;</td>
-</tr>
-<tr>
-<td width="20px"></td><td><code><span class="label">responder</span>:<a href="MySqlResponser.html">MySqlResponser</a></code> (default = <code>null</code>)<code></code></td>
+<td width="20"></td><td><code><a href="../mysql/MySqlToken.html">MySqlToken</a></code></td>
 </tr>
 </table>
 </div>
@@ -303,7 +300,29 @@ showHideInherited();
 </table>
 <div class="detailBody">
 <code>public function setDate(index:int, value:Date):void</code><p>
-        Set a Date parameter
+        Set a Date parameter (YYYY-MM-DD)
+        </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">index</span>:int</code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">value</span>:Date</code></td>
+</tr>
+</table>
+</div>
+<a name="setDateTime()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">setDateTime</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public function setDateTime(index:int, value:Date):void</code><p>
+        Set a DateTime parameter (YYYY-MM-DD J:NN:SS)
         </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
@@ -361,39 +380,27 @@ showHideInherited();
 </tr>
 </table>
 </div>
-<div class="detailSectionHeader">Event detail</div>
-<a name="event:sql_response"></a>
+<a name="setTime()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">sql_response</td><td class="detailHeaderType">event&nbsp;</td>
+<td class="detailHeaderName">setTime</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
-<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
-<br>
-<p></p>
-</div>
-<a name="event:sql_result"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
+<code>public function setTime(index:int, value:Date):void</code><p>
+        Set a Time parameter (H:MM:SS)
+        </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td class="detailHeaderName">sql_result</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
+<td width="20px"></td><td><code><span class="label">index</span>:int</code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">value</span>:Date</code></td>
 </tr>
 </table>
-<div class="detailBody">
-<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
-<br>
-<p></p>
-</div>
-<a name="event:sqlError"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">sqlError</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<span class="label">Event object type: </span><a href="events/MySqlErrorEvent.html"><code>com.maclema.mysql.events.MySqlErrorEvent</code></a>
-<br>
-<p></p>
 </div>
 <br>
 <br>

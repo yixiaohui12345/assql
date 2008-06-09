@@ -3,7 +3,7 @@ package com.maclema.mysql
     /**
      * This class contains many MySql and asSQL constants.
      **/
-    public class MySql
+    public class Mysql
     {
         public static const CLIENT_LONG_PASSWORD:int = 1;
         public static const CLIENT_FOUND_ROWS:int = 2;

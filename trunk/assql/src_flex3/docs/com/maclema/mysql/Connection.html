@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="Connection,com.maclema.mysql.Connection,clientParam,hasLongColumnInfo,server,busy,connected,lastQueryStart,totalTX,tx,changeDatabaseTo,connect,createStatement,disconnect" name="keywords">
+<meta content="Connection,com.maclema.mysql.Connection,busy,connected,lastQueryStart,poolSize,totalTX,tx,changeDatabaseTo,connect,createStatement,disconnect,getServerInformation" name="keywords">
 <title>com.maclema.mysql.Connection</title>
 </head>
 <body>
@@ -42,7 +42,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 </table>
 <p></p>
-<p></p>
+  A Connection is used to manage the creation and connection to a MySql Database.
+  <br><br>
+  The connection class manages all data input/output from MySql using a Socket connection. Since all 
+  operations are asyncronous the Connection class also manages pooling queries and commands so they
+  are executed in the order called.
+  <p></p>
 <br>
 <hr>
 </div>
@@ -60,15 +65,9 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#clientParam">clientParam</a> : Number = 0<div class="summaryTableDescription"></div>
-</td><td class="summaryTableOwnerCol">Connection</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#connected">connected</a> : Boolean<div class="summaryTableDescription">[read-only]</div>
-</td><td class="summaryTableOwnerCol">Connection</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#hasLongColumnInfo">hasLongColumnInfo</a> : Boolean = false<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#connected">connected</a> : Boolean<div class="summaryTableDescription">[read-only]
+   Returns true or false indicating if this Connection instance is connected to MySql
+   </div>
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
@@ -78,7 +77,9 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#server">server</a> : ServerInformation<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#poolSize">poolSize</a> : int<div class="summaryTableDescription">[read-only]
+        Returns the current size of the command pool
+        </div>
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
@@ -107,15 +108,16 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="#Connection()">Connection</a>(host:String, port:int, username:String, password:String = null, database:String = null)</div>
 <div class="summaryTableDescription">
-   Creates a new connection to a MySql server.</div>
+   Creates a new Connection instance.</div>
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#changeDatabaseTo()">changeDatabaseTo</a>(whatDb:String, doNotChangeHandler:Boolean = false):void</div>
+<a class="signatureLink" href="#changeDatabaseTo()">changeDatabaseTo</a>(whatDb:String):<a href="../mysql/MySqlToken.html">MySqlToken</a>
+</div>
 <div class="summaryTableDescription">
-        Changes the database
+        Changes the currently selected database database
         </div>
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
@@ -146,6 +148,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
    Disconnects the socket from the server.</div>
 </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#getServerInformation()">getServerInformation</a>():ServerInformation</div>
+<div class="summaryTableDescription">
+        Returns the server information object for this connection
+        </div>
+</td><td class="summaryTableOwnerCol">Connection</td>
+</tr>
 </table>
 </div>
 <a name="eventSummary"></a>
@@ -160,28 +171,25 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summarySignature">
 <a class="signatureLink" href="#event:close">close</a>
 </div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Connection</td>
+</td><td class="summaryTableDescription summaryTableCol">
+  Dispatched when the connection to the server is terminated.</td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#event:connect">connect</a>
 </div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Connection</td>
+</td><td class="summaryTableDescription summaryTableCol">
+  Dispatched when successfully connected to the MySql Server
+  </td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#event:sql_response">sql_response</a>
+<a class="signatureLink" href="#event:ioError">ioError</a>
 </div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Connection</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#event:sqlError">sqlError</a>
-</div>
-</td><td class="summaryTableDescription summaryTableCol">&nbsp;</td><td class="summaryTableOwnerCol">Connection</td>
+</td><td class="summaryTableDescription summaryTableCol">
+  Dispatched when a socket error occurs.</td><td class="summaryTableOwnerCol">Connection</td>
 </tr>
 </table>
 </div>
@@ -207,15 +215,6 @@ showHideInherited();
 <code>&nbsp;&nbsp;&nbsp;&nbsp;public function get busy():Boolean</code>
 <br>
 </div>
-<a name="clientParam"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">clientParam</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public var clientParam:Number = 0</code>
-</div>
 <a name="connected"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -223,20 +222,13 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>connected:Boolean</code>&nbsp;&nbsp;[read-only]<p>This property can be used as the source for data binding.</p>
+<code>connected:Boolean</code>&nbsp;&nbsp;[read-only]<p>
+   Returns true or false indicating if this Connection instance is connected to MySql
+   </p><p>This property can be used as the source for data binding.</p>
 <span class="label">Implementation</span>
 <br>
 <code>&nbsp;&nbsp;&nbsp;&nbsp;public function get connected():Boolean</code>
 <br>
-</div>
-<a name="hasLongColumnInfo"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">hasLongColumnInfo</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public var hasLongColumnInfo:Boolean = false</code>
 </div>
 <a name="lastQueryStart"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
@@ -252,14 +244,19 @@ showHideInherited();
 <code>&nbsp;&nbsp;&nbsp;&nbsp;public function get lastQueryStart():Number</code>
 <br>
 </div>
-<a name="server"></a>
+<a name="poolSize"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">server</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
+<td class="detailHeaderName">poolSize</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
-<code>public var server:ServerInformation</code>
+<code>poolSize:int</code>&nbsp;&nbsp;[read-only]<p>
+        Returns the current size of the command pool
+        </p><span class="label">Implementation</span>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function get poolSize():int</code>
+<br>
 </div>
 <a name="totalTX"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
@@ -299,7 +296,7 @@ showHideInherited();
 </table>
 <div class="detailBody">
 <code>public function Connection(host:String, port:int, username:String, password:String = null, database:String = null)</code><p>
-   Creates a new connection to a MySql server.
+   Creates a new Connection instance.
    </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
@@ -340,18 +337,19 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function changeDatabaseTo(whatDb:String, doNotChangeHandler:Boolean = false):void</code><p>
-        Changes the database
+<code>public function changeDatabaseTo(whatDb:String):<a href="../mysql/MySqlToken.html">MySqlToken</a></code><p>
+        Changes the currently selected database database
         </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">whatDb</span>:String</code></td>
 </tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
 <tr>
-<td class="paramSpacer">&nbsp;</td>
-</tr>
-<tr>
-<td width="20px"></td><td><code><span class="label">doNotChangeHandler</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
+<td width="20"></td><td><code><a href="../mysql/MySqlToken.html">MySqlToken</a></code></td>
 </tr>
 </table>
 </div>
@@ -392,6 +390,23 @@ showHideInherited();
 <code>public function disconnect():void</code><p>
    Disconnects the socket from the server.
    </p></div>
+<a name="getServerInformation()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">getServerInformation</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public function getServerInformation():ServerInformation</code><p>
+        Returns the server information object for this connection
+        </p><p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>ServerInformation</code></td>
+</tr>
+</table>
+</div>
 <div class="detailSectionHeader">Event detail</div>
 <a name="event:close"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
@@ -402,8 +417,9 @@ showHideInherited();
 <div class="detailBody">
 <span class="label">Event object type: </span><a href=""><code>flash.events.Event</code></a>
 <br>
-<p></p>
-</div>
+<p></p><p>
+  Dispatched when the connection to the server is terminated.
+  </p></div>
 <a name="event:connect"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -413,30 +429,21 @@ showHideInherited();
 <div class="detailBody">
 <span class="label">Event object type: </span><a href=""><code>flash.events.Event</code></a>
 <br>
-<p></p>
-</div>
-<a name="event:sql_response"></a>
+<p></p><p>
+  Dispatched when successfully connected to the MySql Server
+  </p></div>
+<a name="event:ioError"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">sql_response</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
+<td class="detailHeaderName">ioError</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
-<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
+<span class="label">Event object type: </span><a href=""><code>flash.events.IOErrorEvent</code></a>
 <br>
-<p></p>
-</div>
-<a name="event:sqlError"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">sqlError</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<span class="label">Event object type: </span><a href="events/MySqlErrorEvent.html"><code>com.maclema.mysql.events.MySqlErrorEvent</code></a>
-<br>
-<p></p>
-</div>
+<p></p><p>
+  Dispatched when a socket error occurs.
+  </p></div>
 <br>
 <br>
 <hr>

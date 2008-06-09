@@ -13,13 +13,24 @@ package com.maclema.mysql.events
 		public static const RESPONSE:String = "response";
 		public static const RESULT:String = "result";
 		
-		//related to RESPONSE
+		/**
+		 * The number of affected rows for a RESPONSE event.
+		 **/
 		public var affectedRows:int;
+		
+		/**
+		 * The insert id for a RESPONSE event.
+		 **/
 		public var insertID:int;
 		
-		//related to RESULT
+		/**
+		 * The ResultSet for a RESULT event
+		 **/
 		public var resultSet:ResultSet;
 		
+		/**
+		 * Constructs a new MySqlEvent object.
+		 **/
 		public function MySqlEvent(type:String)
 		{
 			super(type);

@@ -50,10 +50,20 @@ package com.maclema.mysql
 		private var dataHandler:DataHandler;
 		
 		//the server information
-		private var server:ServerInformation;
+		/**
+		 * @private
+		 **/
+		internal var server:ServerInformation;
 		
 		//internal vars
+		/**
+		 * @private
+		 **/
 		internal var clientParam:Number = 0;
+		
+		/**
+		 * @private
+		 **/
 		internal var hasLongColumnInfo:Boolean = false;
 		
 		//private vars

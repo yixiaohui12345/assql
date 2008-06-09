@@ -7,6 +7,9 @@ package com.maclema.util
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.formatters.DateFormatter;
 	
+	/**
+	 * Provides some useful utility methods for dealing with ResultSet's
+	 **/
 	public class ResultsUtil
 	{
 		/**
@@ -34,6 +37,9 @@ package com.maclema.util
 			return newcols;
 		}
 		
+		/**
+		 * This is the labelFunction used for DataGrid Date columns
+		 **/
 		public static function columnDateFunction(item:Object, column:DataGridColumn):String {
 			if ( item[column.dataField] is String ) {
 				return item[column.dataField];
@@ -44,6 +50,9 @@ package com.maclema.util
 			return df.format(dt);
 		};
 		
+		/**
+		 * This is the labelFunction used for DataGrid Time columns
+		 **/
 		public static function columnTimeFunction(item:Object, column:DataGridColumn):String {
 			if ( item[column.dataField] is String ) {
 				return item[column.dataField];
