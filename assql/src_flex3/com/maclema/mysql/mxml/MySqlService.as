@@ -13,7 +13,7 @@ package com.maclema.mysql.mxml
 	import mx.rpc.mxml.IMXMLSupport;
 	
 	/**
-	 * Use the <assql:MySqlService> tag to represent a MySqlService object in an MXML file. When you call the MySqlService object's
+	 * Use the &lt;assql:MySqlService&gt; tag to represent a MySqlService object in an MXML file. When you call the MySqlService object's
 	 * send method, it makes a query to the currently connection MySql database.
 	 * 
 	 * @see com.maclema.mysql.mxml.MySqlService

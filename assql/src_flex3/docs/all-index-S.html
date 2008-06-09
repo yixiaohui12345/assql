@@ -35,26 +35,18 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("SÂ
 <td colspan="2"><a name="S"></a><a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-A.html">A</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-B.html">B</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-C.html">C</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-D.html">D</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-E.html">E</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-F.html">F</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-G.html">G</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-H.html">H</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-I.html">I</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-J.html">J</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-K.html">K</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-L.html">L</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-M.html">M</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-N.html">N</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-O.html">O</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-P.html">P</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-Q.html">Q</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-R.html">R</a>&nbsp;&nbsp;<font style="bold" size="10px" color="black">S</font>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-T.html">T</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-U.html">U</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-V.html">V</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-W.html">W</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-X.html">X</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-Y.html">Y</a>&nbsp;&nbsp;<a onclick="javascript:loadClassListFrame('index-list.html');" href="all-index-Z.html">Z</a>&nbsp;&nbsp;</td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Util.html#scramble411()">scramble411</a>(password, seed) &mdash; Static method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Util.html">Util</a></td>
-</tr>
-<tr>
-<td width="20"></td><td>
-        Handles the 4.1 or newer encryption
-        </td>
-</tr>
-<tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html#send()">send</a>(queryObject) &mdash; Method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html">MySqlService</a></td>
 </tr>
 <tr>
 <td width="20"></td><td>
-   Executes a query, you may pass in either an sql string,
-   or a BinaryQuery object.</td>
+   Executes a query, you may pass in either an sql string or a Statement object.</td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html#server">server</a> &mdash; Property in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html">Connection</a></td>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/mxml/class-list.html');" href="com/maclema/mysql/mxml/MySqlService.html#send()">send</a>(queryObject) &mdash; Method in class com.maclema.mysql.mxml.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/mxml/class-list.html');" href="com/maclema/mysql/mxml/MySqlService.html">MySqlService</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+   Executes a query, you may pass in either an sql string or a Statement object.</td>
 </tr>
 <tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#setBinary()">setBinary</a>(index, value) &mdash; Method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
@@ -69,7 +61,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("SÂ
 </tr>
 <tr>
 <td width="20"></td><td>
-        Set a Date parameter
+        Set a Date parameter (YYYY-MM-DD)
+        </td>
+</tr>
+<tr>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#setDateTime()">setDateTime</a>(index, value) &mdash; Method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
+</tr>
+<tr>
+<td width="20"></td><td>
+        Set a DateTime parameter (YYYY-MM-DD J:NN:SS)
         </td>
 </tr>
 <tr>
@@ -89,14 +89,19 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("SÂ
         </td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/adobe/crypto/class-list.html');" href="com/adobe/crypto/SHA1.html">SHA1</a> &mdash; Class in package <a onclick="javascript:loadClassListFrame('com/adobe/crypto/class-list.html');" href="com/adobe/crypto/package-detail.html">com.adobe.crypto</a></td>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#setTime()">setTime</a>(index, value) &mdash; Method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
 </tr>
 <tr>
 <td width="20"></td><td>
-      US Secure Hash Algorithm 1 (SHA1)
-           Implementation based on algorithm description at 
-      http://www.faqs.org/rfcs/rfc3174.html
-     </td>
+        Set a Time parameter (H:MM:SS)
+        </td>
+</tr>
+<tr>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/mxml/class-list.html');" href="com/maclema/mysql/mxml/MySqlService.html#showBusyCursor">showBusyCursor</a> &mdash; Property in class com.maclema.mysql.mxml.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/mxml/class-list.html');" href="com/maclema/mysql/mxml/MySqlService.html">MySqlService</a></td>
+</tr>
+<tr>
+<td width="20"></td><td>
+   Returns true or false indicating is the busy cursor is show when executing queries.</td>
 </tr>
 <tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/ResultSet.html#size()">size</a>() &mdash; Method in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/ResultSet.html">ResultSet</a></td>
@@ -115,22 +120,19 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("SÂ
         </td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html#event:sqlError">sqlError</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html">Connection</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html#event:sqlError">sqlError</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html">MySqlService</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+  Dispatched when an SQL error occurs.</td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#event:sqlError">sqlError</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
+<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlToken.html#event:sqlError">sqlError</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlToken.html">MySqlToken</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+  Dispatched when an SQL error occurs
+  </td>
 </tr>
 <tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/events/class-list.html');" href="com/maclema/mysql/events/MySqlErrorEvent.html#SQL_ERROR">SQL_ERROR</a> &mdash; Constant static property in class com.maclema.mysql.events.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/events/class-list.html');" href="com/maclema/mysql/events/MySqlErrorEvent.html">MySqlErrorEvent</a></td>
@@ -139,46 +141,18 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("SÂ
 <td width="20"></td><td></td>
 </tr>
 <tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html#event:sql_response">sql_response</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Connection.html">Connection</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html#event:sql_response">sql_response</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html">MySqlService</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#event:sql_response">sql_response</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html#event:sql_result">sql_result</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/MySqlService.html">MySqlService</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
-<td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#event:sql_result">sql_result</a> &mdash; Event in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
-</tr>
-<tr>
-<td width="20"></td><td></td>
-</tr>
-<tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a> &mdash; Class in package <a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/package-detail.html">com.maclema.mysql</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+    The Statement class allows you to execute queries for the MySql connection.</td>
 </tr>
 <tr>
 <td colspan="2" class="idxrow"><a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html#Statement()">Statement</a>(con:<a href="com/maclema/mysql/Connection.html" onclick="javascript:loadClassListFrame('com/maclema/mysql./class-list.html');">com.maclema.mysql:Connection</a>) &mdash; Constructor in class com.maclema.mysql.<a onclick="javascript:loadClassListFrame('com/maclema/mysql/class-list.html');" href="com/maclema/mysql/Statement.html">Statement</a></td>
 </tr>
 <tr>
-<td width="20"></td><td></td>
+<td width="20"></td><td>
+        Constructs a new Statement object.</td>
 </tr>
 <tr>
 <td style="padding-bottom:20px" colspan="2"></td>

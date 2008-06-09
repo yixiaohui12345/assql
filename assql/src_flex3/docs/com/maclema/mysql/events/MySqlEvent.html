@@ -42,7 +42,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 </table>
 <p></p>
-<p></p>
+  MySql Events are dispatched on successful sql queries or commands to the database. If the command sent results
+  is a data set, a MySqlEvent.RESULT event is dispatched. In the case of a data manipulation command, a
+  MySqlEvent.RESPONSE event is dispatched.
+  <p></p>
 <br>
 <hr>
 </div>
@@ -54,16 +57,20 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#affectedRows">affectedRows</a> : int<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#affectedRows">affectedRows</a> : int<div class="summaryTableDescription">
+   The number of affected rows for a RESPONSE event.</div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#insertID">insertID</a> : int<div class="summaryTableDescription"></div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#insertID">insertID</a> : int<div class="summaryTableDescription">
+   The insert id for a RESPONSE event.</div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#resultSet">resultSet</a> : <a href="../../mysql/ResultSet.html">ResultSet</a>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+   The ResultSet for a RESULT event
+   </div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 </table>
@@ -79,7 +86,8 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
 <a class="signatureLink" href="#MySqlEvent()">MySqlEvent</a>(type:String)</div>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+   Constructs a new MySqlEvent object.</div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 </table>
@@ -92,11 +100,11 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <th>&nbsp;</th><th colspan="2">Constant</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#RESPONSE">RESPONSE</a> : String = "sql_response"<div class="summaryTableDescription">[static]</div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#RESPONSE">RESPONSE</a> : String = "response"<div class="summaryTableDescription">[static]</div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 <tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#RESULT">RESULT</a> : String = "sql_result"<div class="summaryTableDescription">[static]</div>
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#RESULT">RESULT</a> : String = "result"<div class="summaryTableDescription">[static]</div>
 </td><td class="summaryTableOwnerCol">MySqlEvent</td>
 </tr>
 </table>
@@ -115,8 +123,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public var affectedRows:int</code>
-</div>
+<code>public var affectedRows:int</code><p>
+   The number of affected rows for a RESPONSE event.
+   </p></div>
 <a name="insertID"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -124,8 +133,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public var insertID:int</code>
-</div>
+<code>public var insertID:int</code><p>
+   The insert id for a RESPONSE event.
+   </p></div>
 <a name="resultSet"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -133,8 +143,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public var resultSet:<a href="../../mysql/ResultSet.html">ResultSet</a></code>
-</div>
+<code>public var resultSet:<a href="../../mysql/ResultSet.html">ResultSet</a></code><p>
+   The ResultSet for a RESULT event
+   </p></div>
 <a name="constructorDetail"></a>
 <div class="detailSectionHeader">Constructor detail</div>
 <a name="MySqlEvent()"></a>
@@ -144,7 +155,9 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function MySqlEvent(type:String)</code><span class="label">Parameters</span>
+<code>public function MySqlEvent(type:String)</code><p>
+   Constructs a new MySqlEvent object.
+   </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">type</span>:String</code></td>
@@ -160,7 +173,7 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static const RESPONSE:String = "sql_response"</code>
+<code>public static const RESPONSE:String = "response"</code>
 </div>
 <a name="RESULT"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
@@ -169,7 +182,7 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public static const RESULT:String = "sql_result"</code>
+<code>public static const RESULT:String = "result"</code>
 </div>
 <br>
 <br>

@@ -2,6 +2,9 @@ package com.maclema.util
 {
 	import mx.formatters.NumberFormatter;
 	
+	/**
+	 * @private
+	 **/
 	public class ByteFormatter
 	{
 		public static const KBYTES : int = 1;

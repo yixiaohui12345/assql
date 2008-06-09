@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="ResultSet,com.maclema.mysql.ResultSet,numColumns,first,getBinary,getColumns,getDate,getInt,getNumber,getRows,getString,last,next,size" name="keywords">
+<meta content="ResultSet,com.maclema.mysql.ResultSet,numColumns,token,first,getBinary,getBoolean,getColumns,getDate,getInt,getNumber,getRows,getString,getTime,last,next,previous,size" name="keywords">
 <title>com.maclema.mysql.ResultSet</title>
 </head>
 <body>
@@ -39,7 +39,8 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 </tr>
 </table>
 <p></p>
-<p></p>
+    The ResultSet class represents a data set retuends by MySql for a query.
+    <p></p>
 <br>
 <hr>
 </div>
@@ -56,6 +57,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
          </div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#token">token</a> : <a href="../mysql/MySqlToken.html">MySqlToken</a>
+<div class="summaryTableDescription">[read-only]
+        Returns the token object that created this result set.</div>
+</td><td class="summaryTableOwnerCol">ResultSet</td>
+</tr>
 </table>
 </div>
 <a name="methodSummary"></a>
@@ -68,8 +75,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#ResultSet()">ResultSet</a>()</div>
-<div class="summaryTableDescription"></div>
+<a class="signatureLink" href="#ResultSet()">ResultSet</a>(token:<a href="MySqlToken.html">MySqlToken</a>)</div>
+<div class="summaryTableDescription">
+        Constructs a new ResultSet object
+        </div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -88,6 +97,14 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <div class="summaryTableDescription">
          Returns a binary ByteArray for the specified column
          </div>
+</td><td class="summaryTableOwnerCol">ResultSet</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#getBoolean()">getBoolean</a>(column:*):Boolean</div>
+<div class="summaryTableDescription">
+        Returns a boolean value for the specified column.</div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -129,10 +146,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#getRows()">getRows</a>():ArrayCollection</div>
+<a class="signatureLink" href="#getRows()">getRows</a>(dateTimesAsStrings:Boolean = false):ArrayCollection</div>
 <div class="summaryTableDescription">
-         Returns all rows as a bindable ArrayCollection
-         </div>
+         Returns all rows as a bindable ArrayCollection, you can optionally pass a single
+         boolean value indicating if date's and time's should just be casted to plain strings.</div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -141,6 +158,16 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <a class="signatureLink" href="#getString()">getString</a>(column:*):String</div>
 <div class="summaryTableDescription">
          Returns a String value from the specified column.</div>
+</td><td class="summaryTableOwnerCol">ResultSet</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#getTime()">getTime</a>(column:*):Date</div>
+<div class="summaryTableDescription">
+        Returns a Date object, where yyyy-mm-dd is always the current date, but
+        the time values are HH:mm:ss from the column
+        </div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -157,6 +184,15 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <a class="signatureLink" href="#next()">next</a>():Boolean</div>
 <div class="summaryTableDescription">
          Advances the pointer to the next row
+         </div>
+</td><td class="summaryTableOwnerCol">ResultSet</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#previous()">previous</a>():Boolean</div>
+<div class="summaryTableDescription">
+         Moves the pointer to the previous row
          </div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
@@ -192,6 +228,20 @@ showHideInherited();
 <code>&nbsp;&nbsp;&nbsp;&nbsp;public function get numColumns():int</code>
 <br>
 </div>
+<a name="token"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">token</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>token:<a href="../mysql/MySqlToken.html">MySqlToken</a></code>&nbsp;&nbsp;[read-only]<p>
+        Returns the token object that created this result set.
+        </p><span class="label">Implementation</span>
+<br>
+<code>&nbsp;&nbsp;&nbsp;&nbsp;public function get token():<a href="../mysql/MySqlToken.html">MySqlToken</a></code>
+<br>
+</div>
 <a name="constructorDetail"></a>
 <div class="detailSectionHeader">Constructor detail</div>
 <a name="ResultSet()"></a>
@@ -201,7 +251,14 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function ResultSet()</code>
+<code>public function ResultSet(token:<a href="MySqlToken.html">MySqlToken</a>)</code><p>
+        Constructs a new ResultSet object
+        </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">token</span>:<a href="MySqlToken.html">MySqlToken</a></code></td>
+</tr>
+</table>
 </div>
 <a name="methodDetail"></a>
 <div class="detailSectionHeader">Method detail</div>
@@ -242,6 +299,29 @@ showHideInherited();
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20"></td><td><code>ByteArray</code></td>
+</tr>
+</table>
+</div>
+<a name="getBoolean()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">getBoolean</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public function getBoolean(column:*):Boolean</code><p>
+        Returns a boolean value for the specified column.
+        </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">column</span>:*</code></td>
+</tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>Boolean</code></td>
 </tr>
 </table>
 </div>
@@ -338,9 +418,17 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function getRows():ArrayCollection</code><p>
-         Returns all rows as a bindable ArrayCollection
-         </p><p></p>
+<code>public function getRows(dateTimesAsStrings:Boolean = false):ArrayCollection</code><p>
+         Returns all rows as a bindable ArrayCollection, you can optionally pass a single
+         boolean value indicating if date's and time's should just be casted to plain strings.
+         Casting to plain strings is a lot faster then parsing the dates.
+         </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">dateTimesAsStrings</span>:Boolean</code> (default = <code>false</code>)<code></code></td>
+</tr>
+</table>
+<p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
@@ -372,6 +460,30 @@ showHideInherited();
 </tr>
 </table>
 </div>
+<a name="getTime()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">getTime</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public function getTime(column:*):Date</code><p>
+        Returns a Date object, where yyyy-mm-dd is always the current date, but
+        the time values are HH:mm:ss from the column
+        </p><span class="label">Parameters</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20px"></td><td><code><span class="label">column</span>:*</code></td>
+</tr>
+</table>
+<p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>Date</code></td>
+</tr>
+</table>
+</div>
 <a name="last()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -398,6 +510,23 @@ showHideInherited();
 <div class="detailBody">
 <code>public function next():Boolean</code><p>
          Advances the pointer to the next row
+         </p><p></p>
+<span class="label">Returns</span>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="20"></td><td><code>Boolean</code></td>
+</tr>
+</table>
+</div>
+<a name="previous()"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">previous</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public function previous():Boolean</code><p>
+         Moves the pointer to the previous row
          </p><p></p>
 <span class="label">Returns</span>
 <table border="0" cellspacing="0" cellpadding="0">

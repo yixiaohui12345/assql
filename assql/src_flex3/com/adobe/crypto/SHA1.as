@@ -47,6 +47,8 @@ package com.adobe.crypto
      *
      *  Implementation based on algorithm description at 
      *  http://www.faqs.org/rfcs/rfc3174.html
+     * 
+     * @private
      */
     public class SHA1
     {

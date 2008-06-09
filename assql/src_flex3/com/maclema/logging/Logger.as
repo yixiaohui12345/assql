@@ -2,6 +2,9 @@ package com.maclema.logging
 {
 	import flash.utils.getQualifiedClassName;
 	
+	/**
+	 * Provides logging for asSQl
+	 **/
 	public class Logger
 	{
 		public static var NONE:int = 1000;
@@ -11,20 +14,35 @@ package com.maclema.logging
 		public static var INFO:int = 2;
 		public static var ALL:int = 0;
 		
+		/**
+		 * The current logging level. Default is NONE.
+		 **/
 		public static var level:int = NONE;
 		
+		/**
+		 * @private
+		 **/
 		public static function info(context:Object, message:String):void {
 			log(INFO, context, message);
 		}
 		
+		/**
+		 * @private
+		 **/
 		public static function debug(context:Object, message:String):void {
 			log(DEBUG, context, message);
 		}
 		
+		/**
+		 * @private
+		 **/
 		public static function error(context:Object, message:String):void {
 			log(ERROR, context, message);
 		}
 		
+		/**
+		 * @private
+		 **/
 		public static function fatal(context:Object, message:String):void {
 			log(FATAL, context, message);
 		}

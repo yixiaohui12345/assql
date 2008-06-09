@@ -5,6 +5,8 @@ package com.adobe.utils {
     /**
      * Contains reusable methods for operations pertaining 
      * to int values.
+     * 
+     * @private
      */
     public class IntUtil {
         
