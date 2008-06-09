@@ -57,45 +57,41 @@ This example is using MySqlService and DataGrid. The data grid's columns propert
 This is an example of using an AsyncResponder to handle a query.
 
 {{{
-<mx:Script>
-<![CDATA[
-	import com.maclema.mysql.Statement;
-	import com.maclema.mysql.Connection;
-	import com.maclema.mysql.ResultSet;
-	import mx.controls.Alert;
-	import mx.rpc.AsyncResponder;
-	import com.maclema.mysql.MySqlToken;
-	import com.maclema.util.ResultsUtil;
+import com.maclema.mysql.Statement;
+import com.maclema.mysql.Connection;
+import com.maclema.mysql.ResultSet;
+import mx.controls.Alert;
+import mx.rpc.AsyncResponder;
+import com.maclema.mysql.MySqlToken;
+import com.maclema.util.ResultsUtil;
 
-	//The MySql Connection
-	private var con:Connection;
+//The MySql Connection
+private var con:Connection;
+
+private function onCreationComplete():void {
+	con = new Connection("localhost", 3306, "root", "", "assql-test");
+	con.addEventListener(Event.CONNECT, handleConnected);
+	con.connect();
+}
+
+private function handleConnected(e:Event):void {
+	var st:Statement = con.createStatement();
 	
-	private function onCreationComplete():void {
-		con = new Connection("localhost", 3306, "root", "", "assql-test");
-		con.addEventListener(Event.CONNECT, handleConnected);
-		con.connect();
-	}
+	var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
 	
-	private function handleConnected(e:Event):void {
-		var st:Statement = con.createStatement();
+	token.addResponder(new AsyncResponder(
+		function(data:Object, token:Object):void {
+			var rs:ResultSet = ResultSet(data);
+			Alert.show("Found " + rs.size() + " employees!");
+		},
 		
-		var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+		function(info:Object, token:Object):void {
+			Alert.show("Error: " + info);
+		},
 		
-		token.addResponder(new AsyncResponder(
-			function(data:Object, token:Object):void {
-				var rs:ResultSet = ResultSet(data);
-				Alert.show("Found " + rs.size() + " employees!");
-			},
-			
-			function(info:Object, token:Object):void {
-				Alert.show("Error: " + info);
-			},
-			
-			token
-		));
-	}
-]]>
-</mx:Script>
+		token
+	));
+}
 }}}
 
 === Token Responder Example 2 ===
