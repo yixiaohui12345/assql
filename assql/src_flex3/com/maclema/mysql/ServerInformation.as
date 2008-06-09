@@ -84,6 +84,7 @@ package com.maclema.mysql
             useLongPassword = true; //we only support min protocol version 10.
             
             Logger.debug(this, "Version: " + serverVersion);
+            Logger.debug(this, "Server Language: " + serverLanguage);
         }
         
         public function meetsVersion(mjr:int, mnr:int, rvn:int):Boolean
