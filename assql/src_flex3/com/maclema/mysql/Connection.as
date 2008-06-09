@@ -11,6 +11,7 @@ package com.maclema.mysql
 	import flash.net.Socket;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	/**
 	 * Dispatched when successfully connected to the MySql Server
@@ -376,12 +377,14 @@ package com.maclema.mysql
 		 * Keep scanning our socket data buffer and pass new full packets to the 
 		 * currently active data handler. Be sure not to use recursion here because
 		 * if MySql sends data to fase we will end up with a StackOverflowError.
+		 * We also cannot use a while loop because there are times where it will 
+		 * continue looping and get stuck. So instead, use setTimout.
 		 * @private
 		 **/
 		private function checkForPackets():void
         {	
         	buffer.position = 0;
-        	while ( buffer.bytesAvailable >= 4 ) {
+        	if ( buffer.bytesAvailable >= 4 ) {
         		var len:int = buffer.readThreeByteInt();
                 buffer.readByte();
                        	  
@@ -400,6 +403,8 @@ package com.maclema.mysql
                    		dataHandler.pushPacket( pack );
                    	}
            		}
+           		
+           		setTimeout(checkForPackets, 1);
         	}
         }
 		

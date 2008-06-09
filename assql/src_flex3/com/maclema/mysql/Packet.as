@@ -35,6 +35,11 @@ package com.maclema.mysql
                 _packetLength = packetHeader.readThreeByteInt();
                 _packetNumber = packetHeader.readByte() & 0xFF;
                 
+                /*trace("Packet Length: " + _packetLength);
+                trace("Bytes Available: " + buf.bytesAvailable);
+                trace("Position: " + buf.position);
+                trace("Length: " + buf.length);*/
+                
                 //read the packet data
                 buf.readBytes(this, 0, _packetLength);
                 
