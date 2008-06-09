@@ -8,8 +8,6 @@
 
 [Examples#Token_Responder_Example_2 Token Responder Example 2]
 
-[Examples#Event_Listeners_Example Event Listeners Example]
-
 [Examples#Statement_Parameters_Example Statement Parameters Example]
 
 [Examples#Inserting_Binary_Data_Example Inserting Binary Data Example]
@@ -22,27 +20,35 @@
 This example is using MySqlService and DataGrid. The data grid's columns property and dataProvider property are bound to the MySqlService lastResult (ArrayCollection of Rows) and lastResultSet (The actual ResultSet).
 
 {{{
-<mx:Script>
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:assql="com.maclema.mysql.mxml.*" 
+	layout="absolute">
+	
+	<mx:Script>
 	<![CDATA[
 		import com.maclema.util.ResultsUtil;
-		
-		private function handleConnect(e:Event):void {
-			service.send("select * from employees");
+
+		private function handleConnected(e:Event):void {
+			service.send("SELECT * FROM employees");
 		}
 	]]>
-</mx:Script>
-<assql:MySqlService id="service"
-	hostname="localhost"
-	username="root"
-	password=""
-	database="sampledb"
-	autoConnect="true"
-	connect="handleConnect(event)" />
+	</mx:Script>
 	
-<mx:DataGrid left="10" right="10" top="10" bottom="10" 
-	columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" 
-	dataProvider="{service.lastResult}">
-</mx:DataGrid>
+	<assql:MySqlService id="service"
+		hostname="localhost" 
+		username="root"
+		password=""
+		database="assql-test"
+		autoConnect="true"
+		connect="handleConnected(event)" />
+		
+	<mx:DataGrid id="grid" left="10" right="10" top="10" bottom="10"
+		dataProvider="{service.lastResult}"
+		columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" />
+		
+</mx:WindowedApplication>
 }}}
 
 
@@ -119,14 +125,6 @@ public class DatabaseAccess extends AsyncResponder
 		Alert.show("Error: " + info);
 	}
 }
-}}}
-
-=== Event Listeners Example ===
-
-This is an example of using only event listeners to handle queries and responses.
-
-{{{
-TODO: Put code here.
 }}}
 
 
