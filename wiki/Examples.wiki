@@ -1,4 +1,4 @@
-#labels Pending
+#labels Featured
 #Examples of using asSQL (Beta 2.5 and later)
 
 === On This Page ===
