@@ -224,5 +224,62 @@ This is an example of selecting binary data.
 
 
 {{{
-TODO: Put code here
+import com.maclema.mysql.Statement;
+import com.maclema.mysql.Connection;
+import com.maclema.mysql.ResultSet;
+import mx.controls.Alert;
+import mx.rpc.AsyncResponder;
+import com.maclema.mysql.MySqlToken;
+import com.maclema.util.ResultsUtil;
+
+//The MySql Connection
+private var con:Connection;
+
+private function onCreationComplete():void {
+	con = new Connection("localhost", 3306, "root", "", "assql-test");
+	con.addEventListener(Event.CONNECT, handleConnected);
+	con.connect();
+}
+
+private function handleConnected(e:Event):void {
+	//do something here
+}
+
+private function getEmployeePhoto(employeeID:int, writeToFile:File):void {
+	//execute the query
+	var st:Statement = con.createStatement();
+	st.sql = "SELECT photo FROM employees WHERE employeeID = ?";
+	st.setNumber(1, employeeID);
+	
+	var token:MySqlToken = st.executeQuery();
+	token.employeeID = employeeID;
+	token.writeToFile = writeToFile;
+	token.addResponder(new AsyncResponder(
+		function (data:Object, token:Object):void {
+			var rs:ResultSet = ResultSet(data);
+			if ( rs.next() ) {
+				//get the outFile from the token
+				var outFile:File = token.writeToFile;
+				
+				//get the file data from the result set
+				var filedata:ByteArray = rs.getBinary("photo");
+				
+				//write the file
+				var fs:FileStream = new FileStream();
+				fs.open(outFile, FileMode.WRITE);
+				fs.writeBytes(filedata);
+				fs.close();
+				
+				Alert.show("Photo written to: " + outFile.nativePath);
+			}
+			else {
+				Alert.show("Employee " + token.employeeID + " not found!");
+			}
+		},
+		function (info:Object, token:Object):void {
+			Alert.show("Error getting photo: " + info);
+		},
+		token
+	));
+}
 }}}
