@@ -2,6 +2,11 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="onCreationComplete()">
 	<mx:Script>
 		<![CDATA[
+			import com.maclema.mysql.ResultSet;
+			import mx.controls.Alert;
+			import mx.rpc.AsyncResponder;
+			import com.maclema.mysql.MySqlToken;
+			import model.Model;
 			import com.maclema.util.ResultsUtil;
 			import com.maclema.mysql.Field;
 			import mx.controls.dataGridClasses.DataGridColumn;
@@ -9,7 +14,9 @@
 			import com.maclema.mysql.Statement;
 			import com.maclema.mysql.Connection;
 			
-			public var con:Connection;
+			private var m:Model = Model.getInstance();
+			
+			public var connectionName:String = "";
 			
 			private var _tableName:String = null;
 			
@@ -27,16 +34,22 @@
 			}
 			
 			private function refresh():void {
-				if ( con && grid ) {
-					var st:Statement = con.createStatement();
-					st.addEventListener(MySqlEvent.RESULT, handleResult);
-					st.executeQuery("select * from " + tableName);
+				if ( connectionName != "" && grid ) {
+					var st:Statement = m.getConnection(connectionName).createStatement();
+					
+					var token:MySqlToken = st.executeQuery("select * from " + tableName);
+					token.addResponder(new AsyncResponder(
+						function(data:Object, token:Object):void {
+							var rs:ResultSet = ResultSet(data);
+							grid.columns = ResultsUtil.getDataGridColumns(rs);
+							grid.dataProvider = rs.getRows();
+						},
+						function(info:Object, token:Object):void {
+							Alert.show("Error getting table data: " + info);
+						},
+						token
+					));
 				}
-			}
-			
-			private function handleResult(e:MySqlEvent):void {
-				grid.columns = ResultsUtil.getDataGridColumns(e.resultSet);
-				grid.dataProvider = e.resultSet.getRows();
 			}
 		]]>
 	</mx:Script>

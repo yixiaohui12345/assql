@@ -2,25 +2,29 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="608" height="380" xmlns:ns1="flexlib.containers.*">
 	<mx:Script>
 		<![CDATA[
+			import com.maclema.mysql.ResultSet;
+			import mx.rpc.AsyncResponder;
+			import com.maclema.mysql.MySqlToken;
+			import model.Model;
 			import com.maclema.util.ByteFormatter;
 			import com.maclema.mysql.events.MySqlErrorEvent;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			import com.maclema.util.ResultsUtil;
 			import mx.controls.Alert;
 			import com.maclema.mysql.events.MySqlEvent;
-			import com.maclema.mysql.MySqlResponser;
 			import com.maclema.mysql.Statement;
 			import com.maclema.mysql.Connection;
 			
-			[Bindable]
-			public var con:Connection;
+			private var m:Model = Model.getInstance();
 			
-			private var tableData:TableData;
+			public var connectionName:String = "";
 			
 			public function refresh():void {
-				var st:Statement = con.createStatement();
-				st.executeQuery("show table status", new MySqlResponser(
-					function (e:MySqlEvent):void {
+				var st:Statement = m.getConnection(connectionName).createStatement();
+				
+				var token:MySqlToken = st.executeQuery("show table status");
+				token.addResponder(new AsyncResponder(
+					function(data:Object, token:Object):void {
 						grid.columns = [
 							new DataGridColumn("Name"),
 							new DataGridColumn("Rows"),
@@ -31,11 +35,12 @@
 						
 						DataGridColumn(grid.columns[3]).headerText = "Auto Increment";
 						
-						grid.dataProvider = e.resultSet.getRows();
+						grid.dataProvider = ResultSet(data).getRows();
 					},
-					function (e:MySqlErrorEvent):void {
-						Alert.show("Error Refreshing Table List\n\n"+e.text);
-					}
+					function(info:Object, token:Object):void {
+						Alert.show("Error Getting Tables List: " + info);
+					},
+					token
 				));
 			}
 			
