@@ -57,20 +57,45 @@ This example is using MySqlService and DataGrid. The data grid's columns propert
 This is an example of using an AsyncResponder to handle a query.
 
 {{{
-public function getAllEmployees():void {
-	var st:Statement = con.createStatement();
+<mx:Script>
+<![CDATA[
+	import com.maclema.mysql.Statement;
+	import com.maclema.mysql.Connection;
+	import com.maclema.mysql.ResultSet;
+	import mx.controls.Alert;
+	import mx.rpc.AsyncResponder;
+	import com.maclema.mysql.MySqlToken;
+	import com.maclema.util.ResultsUtil;
+
+	//The MySql Connection
+	private var con:Connection;
 	
-	var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
-	token.addResponder(new AsyncResponder(
-		function result(data:Object, token:Object):void {
-			Alert.show("Found " + ResultSet(data).size() + " employees!");
-		},
+	private function onCreationComplete():void {
+		con = new Connection("localhost", 3306, "root", "", "assql-test");
+		con.addEventListener(Event.CONNECT, handleConnected);
+		con.connect();
+	}
+	
+	private function handleConnected(e:Event):void {
+		var st:Statement = con.createStatement();
 		
-		function fault(info:Object):void {
-			Alert.show("Error: " + info);
-		}
-	));
-}
+		var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+		
+		token.addResponder(new AsyncResponder(
+			function(data:Object, token:Object):void {
+				var rs:ResultSet = ResultSet(data);
+				Alert.show("Found " + rs.size() + " employees!");
+			},
+			
+			function(info:Object, token:Object):void {
+				Alert.show("Error: " + info);
+			},
+			
+			token
+		));
+	}
+]]>
+</mx:Script>
 }}}
 
 === Token Responder Example 2 ===
