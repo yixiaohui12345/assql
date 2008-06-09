@@ -8,8 +8,6 @@
 
 [Examples#Token_Responder_Example_2 Token Responder Example 2]
 
-[Examples#Statement_Parameters_Example Statement Parameters Example]
-
 [Examples#Inserting_Binary_Data_Example Inserting Binary Data Example]
 
 [Examples#Selecting_Binary_Data_Example Selecting Binary Data Example]
@@ -96,65 +94,70 @@ private function handleConnected(e:Event):void {
 
 === Token Responder Example 2 ===
 
-This is a more in depth example, using a class that extends AsyncResponder. With each statement, an info property is set on the MySqlToken. This way all queries and responses can be handled with the same result and fault handlers.
+This is a more in depth example. With each statement, an info property is set on the MySqlToken. This way all queries and responses can be handled with the same result and fault handlers. This example also uses a statement that uses parameters.
 
 {{{
-public class DatabaseAccess extends AsyncResponder
-{
-	private var con:Connection;
-	
-	public function DatabaseAccess()
-	{
-		//create the connection and connect
-		con = new Connection("localhost", 3306, "root", "", "sampledb");
-		con.addEventListener(Event.CONNECT, handleConnected);
-		con.connect();
-	}
-	
-	public function getAllEmployees():void {
-		var st:Statement = con.createStatement();
-		
-		var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
-		token.info = "getAllEmployees";
-		token.addResponder(this);
-	}
+import com.maclema.mysql.Statement;
+import com.maclema.mysql.Connection;
+import com.maclema.mysql.ResultSet;
+import mx.controls.Alert;
+import mx.rpc.AsyncResponder;
+import com.maclema.mysql.MySqlToken;
+import com.maclema.util.ResultsUtil;
 
-	override public function result(data:Object, token:Object):void {
-		var rs:ResultSet;
-		var affectedRows:int;
-		var insertID:int;
-		
-		if ( data is ResultSet ) {
-			//SELECT statement
-			rs = ResultSet(data);
+//The MySql Connection
+private var con:Connection;
+
+private function onCreationComplete():void {
+	con = new Connection("localhost", 3306, "root", "", "assql-test");
+	con.addEventListener(Event.CONNECT, handleConnected);
+	con.connect();
+}
+
+private function handleConnected(e:Event):void {
+	getAllEmployees();
+}
+
+private function getAllEmployees():void {
+	var st:Statement = con.createStatement();
+	
+	var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+	token.info = "GetAllEmployees";
+	token.addResponder(new AsyncResponder(result, fault, token));
+}
+
+private function getEmployee(employeeID:int):void {
+	var st:Statement = con.createStatement();
+	st.sql = "SELECT * FROM employees WHERE employeeID = ?";
+	st.setNumber(1, employeeID);
+	
+	var token:MySqlToken = st.executeQuery();
+	token.info = "GetEmployee";
+	token.employeeID = employeeID;
+	token.addResponder(new AsyncResponder(result, fault, token));
+}
+
+private function result(data:Object, token:Object):void {
+	var rs:ResultSet;
+	
+	if ( token.info == "GetAllEmployees" ) {
+		rs = ResultSet(data);
+		Alert.show("Found " + rs.size() + " employees!");	
+	}
+	else if ( token.info == "GetEmployee" ) {
+		rs = ResultSet(data);
+		if ( rs.next() ) {
+			Alert.show("Employee " + token.employeeID + " username is '" + rs.getString("username") + "'");
 		}
 		else {
-			//INSERT/UPDATE/DELETE statement
-			affectedRows = data.affectedRows;
-			insertID = data.insertID;
+			Alert.show("No such employee for id " + token.employeeID);
 		}
-		
-		if ( token.info == "getAllEmployees" ) {
-			Alert.show("Found " + rs.size() + " employees!");
-		}
-		else if ( token.info == "insertEmployee" ) {
-			Alert.show("New Employee ID: " + insertID);
-		}
-	}
-	
-	override public function fault(info:Object):void {
-		Alert.show("Error: " + info);
 	}
 }
-}}}
 
-
-=== Statement Parameters Example ===
-
-This is an example of using parameters in a Statement.
-
-{{{
-TODO: Put code here.
+private function fault(info:Object, token:Object):void {
+	Alert.show(token.info + " Error: " + info);
+}
 }}}
 
 
