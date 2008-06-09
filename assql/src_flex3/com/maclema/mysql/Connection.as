@@ -28,6 +28,11 @@ package com.maclema.mysql
 	[Event(name="ioError", type="flash.events.IOErrorEvent")]
 	
 	/**
+	 * Dispatch when an SQL error occurs on connecting to MySql
+	 **/
+	[Event(name="sqlError", type="com.maclema.mysql.events.MySqlErrorEvent")]
+	
+	/**
 	 * A Connection is used to manage the creation and connection to a MySql Database.
 	 * <br><br>
 	 * The connection class manages all data input/output from MySql using a Socket connection. Since all 
