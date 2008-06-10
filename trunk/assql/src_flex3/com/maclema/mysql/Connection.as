@@ -1,6 +1,7 @@
 package com.maclema.mysql
 {
 	import com.maclema.logging.Logger;
+	import com.maclema.mysql.events.MySqlErrorEvent;
 	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
@@ -11,7 +12,8 @@ package com.maclema.mysql
 	import flash.net.Socket;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
-	import flash.utils.setTimeout;
+	
+	import mx.rpc.AsyncResponder;
 	
 	/**
 	 * Dispatched when successfully connected to the MySql Server
@@ -51,6 +53,11 @@ package com.maclema.mysql
 		private var username:String;
 		private var password:String;
 		private var database:String;
+		
+		/**
+		 * @private
+		 **/
+		internal var connectionCharSet:String = "utf-8";
 		
 		//the current data reader
 		private var dataHandler:DataHandler;
@@ -134,12 +141,14 @@ package com.maclema.mysql
 		/**
 		 * Opens the socket connection to the server
 		 **/
-		public function connect():void
+		public function connect(charSet:String="utf-8"):void
 		{
 			Logger.info(this, "connect()");
 			
 			_tx = 0;
 			_totalTX = 0;
+			
+			this.connectionCharSet = charSet;
 			
 			//set the dataHandler
 			setDataHandler( new HandshakeHandler(this, username, password, database) );
@@ -304,6 +313,28 @@ package com.maclema.mysql
         {
         	return sock;
         }
+        
+        internal function initConnection():void {
+        	var mysqlCharSet:String = CharSets.mysqlCharSetFromAs3CharSet(connectionCharSet);
+        	
+        	var st:Statement = createStatement();
+        	st.sql = "SET NAMES ?";
+        	st.setString(1, mysqlCharSet);
+        	
+        	Logger.debug(this, "SET NAMES " + mysqlCharSet);
+        	
+        	var token:MySqlToken = st.executeQuery();
+        	token.addResponder(new AsyncResponder(
+        		function(data:Object, token:Object):void {
+        			
+        			dispatchEvent(new Event(Event.CONNECT));
+        		},
+        		function(info:Object, token:Object):void {
+        			var evt:MySqlErrorEvent = new MySqlErrorEvent("Error connection char set");
+        		},
+        		token
+        	));
+        }
 		
 		/**
 		 * Handshake handler dispatches a connection event on the Connection object
@@ -357,6 +388,11 @@ package com.maclema.mysql
 		private function onSocketClose(e:Event):void
 		{
 			Logger.info(this, "Socket Closed (Expected: " + expectingClose +")");
+			
+			if ( !expectingClose ) {
+				throw new Error("Server terminated connection!");
+			}
+			
 			dispatchEvent(new Event(Event.CLOSE));
 		}
 		
@@ -377,34 +413,31 @@ package com.maclema.mysql
 		 * Keep scanning our socket data buffer and pass new full packets to the 
 		 * currently active data handler. Be sure not to use recursion here because
 		 * if MySql sends data to fase we will end up with a StackOverflowError.
-		 * We also cannot use a while loop because there are times where it will 
-		 * continue looping and get stuck. So instead, use setTimout.
 		 * @private
 		 **/
 		private function checkForPackets():void
-        {	
+        {
         	buffer.position = 0;
-        	if ( buffer.bytesAvailable >= 4 ) {
+        	if ( buffer.bytesAvailable > 4 ) {
         		var len:int = buffer.readThreeByteInt();
-                buffer.readByte();
-                       	  
+        		
            		if ( buffer.bytesAvailable >= len ) {
-           			buffer.position = 0;
+           			var num:int = buffer.readByte() & 0xFF;
            			
-           			var pack:Packet = new Packet(buffer);
-           			
-           			var tmp:Buffer = buffer;
-                    buffer = new Buffer();
-                    tmp.readBytes(buffer);
-                    tmp = null;
+           			var pack:Packet = new Packet(len, num);
+           			buffer.readBytes(pack, 0, len);
                     
-                   	if ( dataHandler != null )
-                   	{
-                   		dataHandler.pushPacket( pack );
-                   	}
+                    //remove read bytes from the buffer.
+                    var newbuffer:Buffer = new Buffer();
+                    buffer.readBytes(newbuffer, 0, buffer.bytesAvailable);
+                    buffer = newbuffer;
+                    
+                   	dataHandler.pushPacket( pack );
+                   	
+                   	if ( buffer.bytesAvailable > 4 ) {
+	           			checkForPackets();
+	           		}
            		}
-           		
-           		setTimeout(checkForPackets, 1);
         	}
         }
 		
@@ -480,7 +513,7 @@ package com.maclema.mysql
         **/
         private function sendBinaryCommand(command:int, data:BinaryQuery):void
         {
-        	Logger.info(this, "Send Binary Command");
+        	Logger.info(this, "Send Binary Command (" + command + ")");
         	//check that the data is at position 0
         	data.position = 0;
         	
@@ -500,7 +533,7 @@ package com.maclema.mysql
         	
             var packet:Packet = new Packet();
             packet.writeByte(command);
-            packet.writeUTFBytes(data);
+            packet.writeMultiByte(data, connectionCharSet);
             packet.send(sock);
         }
         

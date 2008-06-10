@@ -10,43 +10,20 @@ package com.maclema.mysql
     internal class Packet extends Buffer
     {	
         private static const maxAllowedPacket:int = 1024 * 1024 * 1024; //1GB
-        public static const maxThreeBytes:int = (256 * 256 * 256) - 1;
+        public static const maxThreeBytes:int = (256 * 256 * 256) - 1; //16MB
         
-        private var packetHeader:Buffer;
         private var _packetLength:int = -1;
         private var _packetNumber:int = 0;
         
         private var packetSeq:int = 0;
         
-        public var waiting:Boolean = false;
-        
-        public function Packet(buf:Buffer=null)
-        {
-            super();
-            
-            packetHeader = new Buffer();
-            
-            if ( buf != null )
-            {
-                //read the packet header...
-                buf.readBytes(packetHeader, 0, 4);
+        public function Packet(len:int=-1, num:int=0) {
+        	if ( this.length > 4 ) {
+        		_packetLength = len;
+                _packetNumber = num;
                 
-                packetHeader.position = 0;
-                _packetLength = packetHeader.readThreeByteInt();
-                _packetNumber = packetHeader.readByte() & 0xFF;
-                
-                /*trace("Packet Length: " + _packetLength);
-                trace("Bytes Available: " + buf.bytesAvailable);
-                trace("Position: " + buf.position);
-                trace("Length: " + buf.length);*/
-                
-                //read the packet data
-                buf.readBytes(this, 0, _packetLength);
-                
-                //move the positions to 0
-                this.position = 0;
-                packetHeader.position = 0;
-            }
+                position = 0;
+        	}
         }
         
         public function get packetLength():int
@@ -62,16 +39,12 @@ package com.maclema.mysql
             return _packetNumber;
         }
         
-        public function get header():Buffer
-        {
-            return packetHeader;
-        }
-        
         public function send(sock:Socket, seqOverride:int=0):int
         {
             if ( packetLength > maxAllowedPacket )
             {
             	Logger.error(this, "Packet Larger Than maxAllowedPacket of " + maxAllowedPacket + " bytes");
+            	throw new Error("Packet Larger Than maxAllowedPacket of " + maxAllowedPacket + " bytes");
             }
             
             if ( seqOverride != 0 ) {
@@ -90,54 +63,53 @@ package com.maclema.mysql
             return packetSeq;
         }
         
-        private function getPacketToSend():Buffer
+        private function buildAndSendPacket(uncompressedLength:int, seq:int, sock:Socket):void
         {
             var packetToSend:Buffer = new Buffer();
+            var compPacket:Buffer;
+            var sendCompressed:Boolean = false;
             
-            packetHeader.position = 0;
-            packetHeader.readBytes(packetToSend, 0, 4);
+            seq = seq & 0xFF;
             
-            this.position = 0;
-            this.readBytes(packetToSend, 4, this.packetLength);
+        	packetToSend.writeThreeByteInt(uncompressedLength);
+        	packetToSend.writeByte(seq);
+        	this.readBytes(packetToSend, 4, uncompressedLength);
             
             packetToSend.position = 0;
             
-            return packetToSend;
+          	sock.writeBytes( packetToSend );
+            sock.flush();
         }
         
         private function sendFullPacket(sock:Socket):void
-        {
-            packetHeader.position = 0;
-            packetHeader.writeThreeByteInt( this.packetLength );
-            packetHeader.writeByte( this.packetSeq & 0xFF );
+        {   
+            var seq:int = this.packetSeq;
+            
             this.packetSeq++;
             
-            sock.writeBytes( getPacketToSend() );
-            sock.flush();
+            this.position = 0;
+            buildAndSendPacket(this.packetLength, seq, sock);
         }
         
         private function sendSplitPackets(sock:Socket):void
         {
-            var len:int = packetLength;
-            var pos:int = 0;
             var seq:int = 0;
             var pack:Packet;
             
-            while ( len > maxThreeBytes )
-            {
-                seq++;
-                
+            this.position = 0;
+            
+            while ( this.bytesAvailable > maxThreeBytes )
+            {           
                 pack = new Packet();
-                readBytes(pack, pos, maxThreeBytes);
-                pos += maxThreeBytes;
-                
+                pack.packetSeq = seq++;
+                this.readBytes(pack, 0, maxThreeBytes);
                 pack.send(sock);
             }
             
             //send last packet
-            seq++;
             pack = new Packet();
-            readBytes(pack, pos, (len-pos));
+            pack.packetSeq = seq++;
+            this.readBytes(pack, 0, this.bytesAvailable);
             pack.send(sock);
         }
     }

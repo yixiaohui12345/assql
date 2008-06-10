@@ -27,6 +27,8 @@ package com.maclema.mysql
 		{
 			super(con);
 			
+			CharSets.initCharSets();
+			
 			this.username = username;
 			this.password = password;
 			this.database = database;
@@ -61,6 +63,7 @@ package com.maclema.mysql
 				else if ( field_count == 0x00 )
 				{
 					Logger.info(this, "Success Packet");
+					
 					//ok packet
 					if ( connectWithDb )
 					{
@@ -71,7 +74,7 @@ package com.maclema.mysql
 					{
 						//woop! were authenticated
 						unregister();
-						con.dispatchEvent(new Event(Event.CONNECT));
+						con.initConnection();
 					}
 				}
 				else if ( field_count == 0xFF )
@@ -92,7 +95,7 @@ package com.maclema.mysql
 					
 					//woop! were authenticated
 					unregister();
-					con.dispatchEvent(new Event(Event.CONNECT));
+					con.initConnection();
 				}
 				else if ( field_count == 0xFF || field_count == -1 )
 				{
@@ -174,7 +177,7 @@ package com.maclema.mysql
 			packet.writeThreeByteInt( Packet.maxThreeBytes );
 			
 			//the username
-			packet.writeString(username);
+			packet.writeString(username, "latin1");
 			
 			if ( password != null )
 			{
@@ -191,7 +194,7 @@ package com.maclema.mysql
 			//are we connecting using a database name?
 			if ( connectWithDb && database != null )
 			{
-			    packet.writeString(database);
+			    packet.writeString(database, "latin1");
 			}
 			
 			packet.send(con.getSocket(), 1);
@@ -232,7 +235,7 @@ package com.maclema.mysql
 			packet.writeNullBytes(23);
 			
 			//the username
-			packet.writeString(username);
+			packet.writeString(username, "latin1");
 			
 			if ( password != null )
 			{
@@ -250,7 +253,7 @@ package com.maclema.mysql
 			//are we connecting using a database name?
 			if ( connectWithDb && database != null )
 			{
-			    packet.writeString(database);
+			    packet.writeString(database, "latin1");
 			}
 			
 			savePacketSequence = packet.send(con.getSocket(), 1);

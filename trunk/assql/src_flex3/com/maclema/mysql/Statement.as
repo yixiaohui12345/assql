@@ -2,10 +2,10 @@ package com.maclema.mysql
 {
     import com.maclema.logging.Logger;
     
-    import flash.events.EventDispatcher;
     import flash.utils.ByteArray;
     
     import mx.formatters.DateFormatter;
+    import mx.utils.StringUtil;
     
     /**
     * The Statement class allows you to execute queries for the MySql connection.
@@ -30,7 +30,7 @@ package com.maclema.mysql
         * Set the sql string to execute
         **/
         public function set sql(value:String):void {
-        	this._sql = value;
+        	this._sql = StringUtil.trim(value);
         }
         
         /**
@@ -109,7 +109,7 @@ package com.maclema.mysql
         	var token:MySqlToken = new MySqlToken();
         	
         	if ( sqlString != null ) {
-        		this.sql = sqlString;
+        		this.sql = StringUtil.trim(sqlString);
         	}
         	
         	//parameters
@@ -128,7 +128,7 @@ package com.maclema.mysql
         
         private function addParametersToSql():BinaryQuery {
         	var parts:Array = this.sql.split("?");
-    		var binq:BinaryQuery = new BinaryQuery();
+    		var binq:BinaryQuery = new BinaryQuery(con.connectionCharSet);
     		for ( var i:int = 0; i<parts.length; i++ ) {
     			binq.append(parts[i]);
     			
