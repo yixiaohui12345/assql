@@ -35,8 +35,10 @@ package com.maclema.mysql
          * Used by Connection when building the ResultSet.
          * @private
          **/
-        internal static function initialize(rs:ResultSet):void
+        internal static function initialize(rs:ResultSet, charSet:String):void
         {
+        	rs.charSet = charSet;
+        	
             rs.map = new Object();
             for ( var i:int=0; i<rs.columns.length; i++ )
             {
@@ -52,6 +54,8 @@ package com.maclema.mysql
         private var columns:Array;
         private var rows:Array;
         private var map:Object;
+        
+        private var charSet:String = "";
         
         private var todayDateString:String;
         
@@ -154,7 +158,7 @@ package com.maclema.mysql
         		return null;
         	}
         	data.position = 0;
-        	return data.readUTFBytes(data.bytesAvailable);
+        	return data.readMultiByte(data.bytesAvailable, charSet);
         }
         
         /**

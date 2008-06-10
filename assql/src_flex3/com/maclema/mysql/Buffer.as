@@ -70,7 +70,7 @@ package com.maclema.mysql
         /**
          * Reads a null-terminated string
          **/
-        public function readString():String
+        public function readString(charSet:String):String
         {
             var byte:int;
             var bytes:ByteArray = new ByteArray();
@@ -79,12 +79,12 @@ package com.maclema.mysql
                 bytes.writeByte(byte & 0xFF);
             }
             bytes.position = 0;
-            return bytes.readUTFBytes(bytes.length);
+            return bytes.readMultiByte(bytes.length, charSet);
         }
         
-        public function writeString(string:String):void
+        public function writeString(string:String, charSet:String):void
         {
-        	writeUTFBytes(string);
+        	writeMultiByte(string, charSet);
         	writeByte(0x00);
         }
         
@@ -136,7 +136,7 @@ package com.maclema.mysql
         /**
          * Reades a length-coded string
          **/
-        public function readLengthCodedString():String
+        public function readLengthCodedString(charSet:String):String
         {
             var len:Number = readLengthCodedBinary();
             
@@ -145,7 +145,7 @@ package com.maclema.mysql
                 return null;
             }
             
-            return readUTFBytes(len);
+            return readMultiByte(len, charSet);
         }
         
         public function readLengthCodedData():ByteArray

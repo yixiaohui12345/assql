@@ -62,7 +62,7 @@ package com.maclema.mysql
 						unregister();
 						new ErrorHandler(packet, token);	
 					}
-					else if ( field_count == 0xFE || field_count == -2 )
+					else if ( packet.length == 5 && (field_count == 0xFE || field_count == -2) )
 					{	
 						packet.position = 0;
 						
@@ -70,13 +70,12 @@ package com.maclema.mysql
 						if ( !readFields )
 						{
 							readFields = true;
-						
 							working = false;
 							handleNextPacket();
 						}
 						else
 						{
-							ResultSet.initialize(rs);
+							ResultSet.initialize(rs, con.connectionCharSet);
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
@@ -105,7 +104,7 @@ package com.maclema.mysql
 						}
 						else if ( !readFields )
 						{
-							var field:Field = new Field(packet);
+							var field:Field = new Field(packet, con.connectionCharSet);
 							ResultSet.addColumn(rs, field);
 						
 							working = false;

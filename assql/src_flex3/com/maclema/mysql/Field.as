@@ -41,14 +41,14 @@ package com.maclema.mysql
         /**
         * Constructs a new Field instance by reading a Packet returned from MySql.
         **/ 
-        public function Field(packet:Packet)
+        public function Field(packet:Packet, charSet:String)
         {
-            _catalog = packet.readLengthCodedString();
-            _db = packet.readLengthCodedString();
-            _table = packet.readLengthCodedString();
-            _orgTable = packet.readLengthCodedString();
-            _name = packet.readLengthCodedString();
-            _orgName = packet.readLengthCodedString();
+            _catalog = packet.readLengthCodedString(charSet);
+            _db = packet.readLengthCodedString(charSet);
+            _table = packet.readLengthCodedString(charSet);
+            _orgTable = packet.readLengthCodedString(charSet);
+            _name = packet.readLengthCodedString(charSet);
+            _orgName = packet.readLengthCodedString(charSet);
             packet.readByte(); //filler
             _charsetnr = packet.readTwoByteInt();
             _length = packet.readInt();

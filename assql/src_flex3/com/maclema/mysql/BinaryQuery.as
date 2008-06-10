@@ -8,9 +8,13 @@ package com.maclema.mysql
 	 **/
 	internal class BinaryQuery extends Buffer
 	{
-		public function BinaryQuery()
+		private var charSet:String = "";
+		
+		public function BinaryQuery(charSet:String)
 		{
 			super();
+			
+			this.charSet = charSet;
 		}
 		
 		/**
@@ -21,11 +25,11 @@ package com.maclema.mysql
 		{
 			if ( !escape )
 			{
-				writeUTFBytes(str);
+				writeMultiByte(str, charSet);
 			}
 			else
 			{
-				writeUTFBytes( Mysql.escapeString(str) );
+				writeMultiByte( Mysql.escapeString(str), charSet );
 			}
 		}
 		
