@@ -13,7 +13,6 @@ package com.maclema.mysql
         public var seed:String;
         public var serverCapabilities:int;
         public var serverLanguage:int;
-        public var serverCharSetName:String = "";
         public var serverStatus:int;
         
         public var useLongPassword:Boolean;
@@ -77,7 +76,6 @@ package com.maclema.mysql
             if ( meetsVersion(4, 1, 1) ) {
 	            var oldpos:int = packet.position;
 	            serverLanguage = packet.readByte() & 0xff;
-	            serverCharSetName = CharSets.mysqlToActionscriptCharSet(serverLanguage);
 	            serverStatus = packet.readTwoByteInt();
 	            packet.position = oldpos+16;
 	            
@@ -86,7 +84,6 @@ package com.maclema.mysql
             useLongPassword = true; //we only support min protocol version 10.
             
             Logger.debug(this, "Version: " + serverVersion);
-            Logger.debug(this, "Server Language: " + serverLanguage + " (" + serverCharSetName + ")");
         }
         
         public function meetsVersion(mjr:int, mnr:int, rvn:int):Boolean

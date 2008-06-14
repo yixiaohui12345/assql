@@ -8,35 +8,78 @@ package com.maclema.mysql
 		
 		private static var INDEX_TO_COLLATION:Array;
 		
-		private static var AS3_TO_MYSQL_CHARSET_MAP:Object;
+		private static var MYSQL_TO_AS3_CHARSET_MAP:Object;
 		
-		public static function mysqlToActionscriptCharSet(mysqlCharSet:int):String {
+		private static function mysqlToActionscriptCharSet(mysqlCharSet:int):String {
 			return INDEX_TO_CHARSET[mysqlCharSet];
 		}
 		
-		public static function mysqlCharSetIndexToCollation(mysqlCharSet:int):String {
+		private static function mysqlCharSetIndexToCollation(mysqlCharSet:int):String {
 			return INDEX_TO_COLLATION[mysqlCharSet];
 		}
 		
-		public static function mysqlCharSetFromAs3CharSet(as3charSet:String):String {
-			as3charSet = as3charSet.toLocaleLowerCase();
-			if ( AS3_TO_MYSQL_CHARSET_MAP[as3charSet] ) {
-				return AS3_TO_MYSQL_CHARSET_MAP[as3charSet];
+		public static function as3CharSetFromMysqlCharSet(mysqlCharSet:String):String {
+			var as3CharSet:String = null;
+			
+			if ( MYSQL_TO_AS3_CHARSET_MAP[mysqlCharSet] != null ) {
+				var parts:Array = MYSQL_TO_AS3_CHARSET_MAP[mysqlCharSet].split(", ");
+				if ( parts.length > 0 ) {
+					as3CharSet = parts[0];
+				}
 			}
-			else {
-				return as3charSet;
+			
+			if ( as3CharSet == null ) {
+				throw new Error("Unsupported Char Set");
 			}
+			
+			return as3CharSet;
 		}
 		
 		public static function initCharSets():void {
 			if ( inited ) { return; }
 			
-			AS3_TO_MYSQL_CHARSET_MAP = {};
-			AS3_TO_MYSQL_CHARSET_MAP["utf-8"] = "utf8";
-			//TODO map actionscript charsets to mysql char sets
+			//Maps MySql CharSet's To All Possible Actionscript CharSets
+			MYSQL_TO_AS3_CHARSET_MAP = {};
+			MYSQL_TO_AS3_CHARSET_MAP['big5'] = 'big5, cn-big5, csbig5, x-x-big5';
+			MYSQL_TO_AS3_CHARSET_MAP['dec8'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['cp850'] = 'ibm850';
+			MYSQL_TO_AS3_CHARSET_MAP['hp8'] = 'us-ascii, ANSI_X3.4-1968, ANSI_X3.4-1986, ascii, cp367, csASCII, IBM367, ISO_646.irv:1991, ISO646-US, iso-ir-6us';
+			MYSQL_TO_AS3_CHARSET_MAP['koi8r'] = 'koi8-r, csKOI8R, koi, koi8, koi8r';
+			MYSQL_TO_AS3_CHARSET_MAP['latin1'] = ' 	iso-8859-1, cp819, csISO, Latin1, ibm819, iso_8859-1, iso_8859-1:1987, iso8859-1, iso-ir-100, l1, latin1';
+			MYSQL_TO_AS3_CHARSET_MAP['latin2'] = 'iso-8859-2, csISOLatin2, iso_8859-2, iso_8859-2:1987, iso8859-2, iso-ir-101, l2, latin2';
+			MYSQL_TO_AS3_CHARSET_MAP['swe7'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['ascii'] = 'us-ascii, ANSI_X3.4-1968, ANSI_X3.4-1986, ascii, cp367, csASCII, IBM367, ISO_646.irv:1991, ISO646-US, iso-ir-6us';
+			MYSQL_TO_AS3_CHARSET_MAP['ujis'] = 'euc-jp, csEUCPkdFmtJapanese, Extended_UNIX_Code_Packed_Format_for_Japanese, x-euc, x-euc-jp';
+			MYSQL_TO_AS3_CHARSET_MAP['sjis'] = 'shift_jis, csShiftJIS, csWindows31J, ms_Kanji, shift-jis, x-ms-cp932, x-sjis';
+			MYSQL_TO_AS3_CHARSET_MAP['hebrew'] = 'iso-8859-8, csISOLatinHebrew, hebrew, ISO_8859-8, ISO_8859-8:1988, ISO-8859-8, iso-ir-138, visual';
+			MYSQL_TO_AS3_CHARSET_MAP['tis620'] = 'windows-874, DOS-874, iso-8859-11, TIS-620';
+			MYSQL_TO_AS3_CHARSET_MAP['euckr'] = 'ks_c_5601-1987, csKSC56011987, euc-kr, iso-ir-149, korean, ks_c_5601, ks_c_5601_1987, ks_c_5601-1989, KSC_5601, KSC5601';
+			MYSQL_TO_AS3_CHARSET_MAP['koi8u'] = 'koi8-u, koi8-ru';
+			MYSQL_TO_AS3_CHARSET_MAP['gb2312'] = 'gb2312, chinese, CN-GB, csGB2312, csGB231280, csISO58GB231280, GB_2312-80, GB231280, GB2312-80, GBK, iso-ir-58';
+			MYSQL_TO_AS3_CHARSET_MAP['greek'] = 'iso-8859-7, csISOLatinGreek, ECMA-118, ELOT_928, greek, greek8, ISO_8859-7, ISO_8859-7:1987, iso-ir-126';
+			MYSQL_TO_AS3_CHARSET_MAP['cp1250'] = 'windows-1250, x-cp1250';
+			MYSQL_TO_AS3_CHARSET_MAP['gbk'] = 'gb2312, chinese, CN-GB, csGB2312, csGB231280, csISO58GB231280, GB_2312-80, GB231280, GB2312-80, GBK, iso-ir-58';
+			MYSQL_TO_AS3_CHARSET_MAP['latin5'] = 'iso-8859-9, csISO, Latin5, ISO_8859-9, ISO_8859-9:1989, iso-ir-148, l5, latin5';
+			MYSQL_TO_AS3_CHARSET_MAP['armscii8'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['utf8'] = 'utf-8';
+			MYSQL_TO_AS3_CHARSET_MAP['ucs2'] = 'unicode, utf-16';
+			MYSQL_TO_AS3_CHARSET_MAP['cp866'] = 'cp866, ibm866';
+			MYSQL_TO_AS3_CHARSET_MAP['keybcs2'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['macce'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['macroman'] = 'us-ascii, ANSI_X3.4-1968, ANSI_X3.4-1986, ascii, cp367, csASCII, IBM367, ISO_646.irv:1991, ISO646-US, iso-ir-6us';
+			MYSQL_TO_AS3_CHARSET_MAP['cp852'] = 'ibm852, cp852';
+			MYSQL_TO_AS3_CHARSET_MAP['latin7'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['cp1251'] = 'windows-1251, x-cp1251';
+			MYSQL_TO_AS3_CHARSET_MAP['cp1256'] = 'windows-1256, cp1256';
+			MYSQL_TO_AS3_CHARSET_MAP['cp1257'] = 'windows-1257';
+			MYSQL_TO_AS3_CHARSET_MAP['binary'] = 'ascii';
+			MYSQL_TO_AS3_CHARSET_MAP['geostd8'] = null;
+			MYSQL_TO_AS3_CHARSET_MAP['cp932'] = 'shift_jis, csShiftJIS, csWindows31J, ms_Kanji, shift-jis, x-ms-cp932, x-sjis';
+			MYSQL_TO_AS3_CHARSET_MAP['eucjpms'] = 'euc-jp, csEUCPkdFmtJapanese, Extended_UNIX_Code_Packed_Format_for_Japanese, x-euc, x-euc-jp';
 
 			var i:int;
 			
+			//MAPS MySql CharSet Index To An Actionscript CharSet
 			INDEX_TO_CHARSET = new Array(255);
 			INDEX_TO_CHARSET[1] = "big5";
 			INDEX_TO_CHARSET[2] = "utf-8";
@@ -72,7 +115,7 @@ package com.maclema.mysql
 			INDEX_TO_CHARSET[32] = "iso-8859-1";
 			INDEX_TO_CHARSET[33] = "utf-8"; 
 			INDEX_TO_CHARSET[34] = "windows-1250"; 
-			INDEX_TO_CHARSET[35] = "unicodeFFFE";
+			INDEX_TO_CHARSET[35] = "unicode";
 			INDEX_TO_CHARSET[36] = "cp866";
 			INDEX_TO_CHARSET[37] = "utf-8"; //Cp895 ??
 			INDEX_TO_CHARSET[38] = "utf-8"; //macce ??
@@ -127,7 +170,7 @@ package com.maclema.mysql
 			INDEX_TO_CHARSET[87] = "gb2312";
 			INDEX_TO_CHARSET[88] = "shift_jis";
 			INDEX_TO_CHARSET[89] = "TIS-620";
-			INDEX_TO_CHARSET[90] = "unicodeFFFE";
+			INDEX_TO_CHARSET[90] = "unicode";
 			INDEX_TO_CHARSET[91] = "shift_jis";
 			INDEX_TO_CHARSET[92] = "us-ascii";
 			INDEX_TO_CHARSET[93] = "us-ascii";
@@ -140,7 +183,7 @@ package com.maclema.mysql
 			//99-127 not used
 			
 			for ( i=99; i<= 146; i++ ) {
-				INDEX_TO_CHARSET[i] == "unicodeFFFE";
+				INDEX_TO_CHARSET[i] == "unicode";
 			}
 			
 			//147-191 not used
