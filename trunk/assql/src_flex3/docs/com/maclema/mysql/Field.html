@@ -54,7 +54,7 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#Field()">Field</a>(packet:Packet)</div>
+<a class="signatureLink" href="#Field()">Field</a>(packet:Packet, charSet:String)</div>
 <div class="summaryTableDescription">
         Constructs a new Field instance by reading a Packet returned from MySql.</div>
 </td><td class="summaryTableOwnerCol">Field</td>
@@ -180,12 +180,18 @@ showHideInherited();
 </tr>
 </table>
 <div class="detailBody">
-<code>public function Field(packet:Packet)</code><p>
+<code>public function Field(packet:Packet, charSet:String)</code><p>
         Constructs a new Field instance by reading a Packet returned from MySql.
         </p><span class="label">Parameters</span>
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20px"></td><td><code><span class="label">packet</span>:Packet</code></td>
+</tr>
+<tr>
+<td class="paramSpacer">&nbsp;</td>
+</tr>
+<tr>
+<td width="20px"></td><td><code><span class="label">charSet</span>:String</code></td>
 </tr>
 </table>
 </div>

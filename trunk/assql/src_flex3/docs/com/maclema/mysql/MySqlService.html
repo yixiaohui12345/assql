@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="MySqlService,com.maclema.mysql.MySqlService,database,hostname,password,port,responder,username,connected,lastAffectedRows,lastInsertID,lastResult,lastResultSet,connect,disconnect,send" name="keywords">
+<meta content="MySqlService,com.maclema.mysql.MySqlService,charSet,database,hostname,password,port,responder,username,connected,lastAffectedRows,lastInsertID,lastResult,lastResultSet,connect,disconnect,send" name="keywords">
 <title>com.maclema.mysql.MySqlService</title>
 </head>
 <body>
@@ -64,6 +64,12 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <table id="summaryTableProperty" class="summaryTable " cellpadding="3" cellspacing="0">
 <tr>
 <th>&nbsp;</th><th colspan="2">Property</th><th class="summaryTableOwnerCol">Defined&nbsp;by</th>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#charSet">charSet</a> : String = "utf-8"<div class="summaryTableDescription">
+   The character set to use for the connection
+   </div>
+</td><td class="summaryTableOwnerCol">MySqlService</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol"><a class="signatureLink" href="#connected">connected</a> : Boolean<div class="summaryTableDescription">[read-only]
@@ -238,10 +244,20 @@ showHideInherited();
 <div class="MainContent">
 <a name="propertyDetail"></a>
 <div class="detailSectionHeader">Property detail</div>
+<a name="charSet"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">charSet</td><td class="detailHeaderType">property</td>
+</tr>
+</table>
+<div class="detailBody">
+<code>public var charSet:String = "utf-8"</code><p>
+   The character set to use for the connection
+   </p></div>
 <a name="connected"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">connected</td><td class="detailHeaderType">property</td>
+<td class="detailHeaderName">connected</td><td class="detailHeaderType">property</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
