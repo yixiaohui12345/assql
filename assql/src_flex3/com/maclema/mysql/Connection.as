@@ -139,9 +139,12 @@ package com.maclema.mysql
 		}
 		
 		/**
-		 * Opens the socket connection to the server
+		 * Opens the socket connection to the server. You can optionally specify a character set. The specified charset
+		 * should match a charset found in INFORMATION_SCHEMA.CHARACTER_SETS of the MySql database you are connecting
+		 * to. It will then be converted to a compatible actionscript character set name and used for the duration of
+		 * the connection. The default character set if utf8;
 		 **/
-		public function connect(charSet:String="utf-8"):void
+		public function connect(charSet:String="utf8"):void
 		{
 			Logger.info(this, "connect()");
 			
@@ -315,7 +318,8 @@ package com.maclema.mysql
         }
         
         internal function initConnection():void {
-        	var mysqlCharSet:String = CharSets.mysqlCharSetFromAs3CharSet(connectionCharSet);
+        	var mysqlCharSet:String = connectionCharSet;
+        	connectionCharSet = CharSets.as3CharSetFromMysqlCharSet(connectionCharSet);
         	
         	var st:Statement = createStatement();
         	st.sql = "SET NAMES ?";

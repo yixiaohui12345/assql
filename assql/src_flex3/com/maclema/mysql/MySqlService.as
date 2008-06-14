@@ -69,6 +69,11 @@ package com.maclema.mysql
 		public var database:String = "";
 		
 		/**
+		 * The character set to use for the connection
+		 **/
+		public var charSet:String = "utf-8";
+		
+		/**
 		 * The responder to use for the mysql service
 		 **/
 		public var responder:IResponder;
@@ -140,7 +145,7 @@ package com.maclema.mysql
 			con.addEventListener(Event.CONNECT, handleConnected);
 			con.addEventListener(Event.CLOSE, handleDisconnected);
 			con.addEventListener(MySqlErrorEvent.SQL_ERROR, handleConnectError);
-			con.connect();
+			con.connect(charSet);
 		}
 		
 		/**
