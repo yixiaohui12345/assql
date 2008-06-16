@@ -18,14 +18,18 @@ See the JavaPolicyFileServer page for information how to accomplish this in Java
 
 ----
 
-Here is a page with a PHP Flash Policy Daemon:
+PHP Flash Policy Daemon:
 
 http://ammonlauritzen.com/blog/2008/04/22/flash-policy-service-daemon/
 
 ----
 
-For more (not really helpful) information see:
-
-http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security_04.html
+Python / Perl Flash Policy Servers:
 
 http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html
+
+----
+
+More Information:
+
+http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security_04.html
