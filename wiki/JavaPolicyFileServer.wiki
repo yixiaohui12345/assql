@@ -1,6 +1,8 @@
 # Sample Java Flash Policy File Server.
 
-This is a java servlet that will serve the socket policy files that 9.0.124.0 now requires.
+This is a simple Java servlet, that opens a server socket on port 843 when the web application is started. It listens for "<policy-file-request/>\0" requests, and writes the policy file to the connected client.
+
+The policy file is read from "/tomcat/policyserver/ROOT/flashpolicy.xml", this can be changed in the servlet code.
 
 Here is what you will need in web.xml:
 
@@ -127,4 +129,14 @@ public class PolicyServerServlet extends HttpServlet {
 		}
 	}
 }
+}}}
+
+and this is my flashpolicy.xml:
+
+{{{
+<?xml version="1.0"?>
+<!DOCTYPE cross-domain-policy SYSTEM "/xml/dtds/cross-domain-policy.dtd">
+<cross-domain-policy>
+   <allow-access-from domain="*" to-ports="3306" />
+</cross-domain-policy>
 }}}
