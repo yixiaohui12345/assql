@@ -14,7 +14,11 @@ Here is the absolute simplest configuration for the socket policy file:
 
 The policy file needs to be served from a socket, listening on port 843 (TCP). Flash will send the request "<policy-file-request/>\0", when the server receives this string, it should return the policy file, followed by a null byte.
 
-See the JavaPolicyFileServer page for information how to accomplish this in Java.
+----
+
+Java Policy File Server:
+
+See JavaPolicyFileServer wiki entry.
 
 ----
 
