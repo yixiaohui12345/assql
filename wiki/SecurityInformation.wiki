@@ -1,3 +1,4 @@
+#labels Featured
 # Some basic security information.
 
 As of Flash Player 9.0.124.0, Sockets are not allowed to make requests to ports on the same, or other domains, unless the domain you are connecting to is serving a socket policy file. Prior to 9.0.124.0, a crossdomain.xml file would work just fine. Now, however, you need to setup a server socket on port 843, that listens for socket connections from flash, and serves a socket policy file.
