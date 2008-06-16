@@ -28,6 +28,12 @@ http://ammonlauritzen.com/blog/2008/04/22/flash-policy-service-daemon/
 
 ----
 
+C# Flash Policy Server:
+
+http://giantflyingsaucer.com/blog/?p=15
+
+----
+
 Python / Perl Flash Policy Servers:
 
 http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html
