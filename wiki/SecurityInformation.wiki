@@ -34,6 +34,12 @@ http://giantflyingsaucer.com/blog/?p=15
 
 ----
 
+VB.NET Flash Policy Server:
+
+http://www.gamedev.net/community/forums/topic.asp?topic_id=455949
+
+----
+
 Python / Perl Flash Policy Servers:
 
 http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html
