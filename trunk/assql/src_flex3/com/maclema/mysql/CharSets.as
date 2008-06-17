@@ -29,7 +29,7 @@ package com.maclema.mysql
 			}
 			
 			if ( as3CharSet == null ) {
-				throw new Error("Unsupported Char Set");
+				throw new Error("Unsupported Char Set '" + mysqlCharSet + "'");
 			}
 			
 			return as3CharSet;
