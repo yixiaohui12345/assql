@@ -143,7 +143,7 @@ package com.maclema.mysql
                 return false;
             }
             
-            index = rows.length;
+            index = rows.length-1;
             return true;
         }
         
@@ -234,26 +234,31 @@ package com.maclema.mysql
          * boolean value indicating if date's and time's should just be casted to plain strings.
          * Casting to plain strings is a lot faster then parsing the dates.
          **/
-        public function getRows(dateTimesAsStrings:Boolean=false):ArrayCollection
-        {
-        	var st:Number = getTimer();
-        	
-        	var arr:Array = new Array();
-        	while ( this.next() ) {
-        		var obj:Object = new Object();
-        		
-        		columns.forEach(function(c:Field, index:int, arr:Array):void {
-        			obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
-        		});
-        		
-     			arr.push(obj);
-        	}
-        	first();
-        	
-        	var run:Number = getTimer()-st;
-        	Logger.debug(this, "getRows() in " + run + " ms");
-            return new ArrayCollection(arr);
-        }
+		public function getRows(dateTimesAsStrings:Boolean=false):ArrayCollection
+		{
+			var st:Number = getTimer();
+			
+			var oldIndex:int = index;
+			
+			index = -1;
+			
+			var arr:Array = new Array();
+			while ( this.next() ) {
+				var obj:Object = new Object();
+				
+				columns.forEach(function(c:Field, index:int, arr:Array):void {
+					obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
+				});
+				
+		 		arr.push(obj);
+			}
+			
+			index = oldIndex;
+			
+			var run:Number = getTimer()-st;
+			Logger.debug(this, "getRows() in " + run + " ms");
+		    return new ArrayCollection(arr);
+		}
         
         private function getCastedValue(field:Field, dateTimesAsStrings:Boolean):*
 		{
