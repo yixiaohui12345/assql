@@ -75,7 +75,7 @@ package com.maclema.mysql
 						}
 						else
 						{
-							ResultSet.initialize(rs, con.connectionCharSet);
+							rs.initialize(con.connectionCharSet);
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
@@ -105,7 +105,7 @@ package com.maclema.mysql
 						else if ( !readFields )
 						{
 							var field:Field = new Field(packet, con.connectionCharSet);
-							ResultSet.addColumn(rs, field);
+							rs.addColumn(field);
 						
 							working = false;
 							handleNextPacket();
@@ -115,11 +115,10 @@ package com.maclema.mysql
 							var row:Array = new Array();
 							while ( packet.bytesAvailable > 0 )
 							{
-								var value:ByteArray = packet.readLengthCodedData();
-								row.push( value );
+								row.push( packet.readLengthCodedData() );
 							}
 							
-							ResultSet.addRow(rs, row);
+							rs.addRow(row);
 						
 							working = false;
 							handleNextPacket();
