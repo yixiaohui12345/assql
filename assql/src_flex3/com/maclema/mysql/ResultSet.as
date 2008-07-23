@@ -12,42 +12,7 @@ package com.maclema.mysql
     * The ResultSet class represents a data set retuends by MySql for a query.
     **/
     public class ResultSet
-    {
-        /**
-         * Used by Connection when building the ResultSet.
-         * @private
-         **/
-        internal static function addColumn(rs:ResultSet, column:Field):void
-        {
-            rs.columns.push(column);
-        }
-        
-        /**
-         * Used by Connection when building the ResultSet.
-         * @private
-         **/
-        internal static function addRow(rs:ResultSet, row:Array):void
-        {
-            rs.rows.push(row);
-        }
-        
-        /**
-         * Used by Connection when building the ResultSet.
-         * @private
-         **/
-        internal static function initialize(rs:ResultSet, charSet:String):void
-        {
-        	rs.charSet = charSet;
-        	
-            rs.map = new Object();
-            for ( var i:int=0; i<rs.columns.length; i++ )
-            {
-                var c:Field = Field(rs.columns[i]);
-                rs.map[c.getName()] = i;
-                rs.map[String((i+1))] = i;
-            }
-        }
-        
+    {        
         private var _token:MySqlToken;
         
         private var index:int = -1;
@@ -72,6 +37,26 @@ package com.maclema.mysql
             var df:DateFormatter = new DateFormatter();
             df.formatString = "YYYY/MM/DD";
             todayDateString = df.format(new Date());
+        }
+        
+        internal function initialize(charSet:String):void {
+        	charSet = charSet;
+        	
+            map = new Object();
+            for ( var i:int=0; i<columns.length; i++ )
+            {
+                var c:Field = Field(columns[i]);
+                map[c.getName()] = i;
+                map[String((i+1))] = i;
+            }
+        }
+        
+        internal function addColumn(field:Field):void {
+        	this.columns[this.columns.length] = field;
+        }
+        
+        internal function addRow(row:Array):void {
+        	this.rows[this.rows.length] = row;
         }
         
         /**
