@@ -419,9 +419,10 @@ package com.maclema.mysql
 		 * if MySql sends data to fase we will end up with a StackOverflowError.
 		 * @private
 		 **/
+		private var cfpPosition:int = 0;
 		private function checkForPackets():void
         {
-        	buffer.position = 0;
+        	buffer.position = cfpPosition;
         	if ( buffer.bytesAvailable > 4 ) {
         		var len:int = buffer.readThreeByteInt();
         		
@@ -431,16 +432,11 @@ package com.maclema.mysql
            			var pack:Packet = new Packet(len, num);
            			buffer.readBytes(pack, 0, len);
                     
-                    //remove read bytes from the buffer.
-                    var newbuffer:Buffer = new Buffer();
-                    buffer.readBytes(newbuffer, 0, buffer.bytesAvailable);
-                    buffer = newbuffer;
+                    cfpPosition = buffer.position;
                     
                    	dataHandler.pushPacket( pack );
                    	
-                   	if ( buffer.bytesAvailable > 4 ) {
-	           			checkForPackets();
-	           		}
+	           		checkForPackets();
            		}
         	}
         }
