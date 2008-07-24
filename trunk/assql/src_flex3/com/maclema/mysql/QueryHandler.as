@@ -112,13 +112,7 @@ package com.maclema.mysql
 						}
 						else
 						{
-							var row:Array = new Array();
-							while ( packet.bytesAvailable > 0 )
-							{
-								row.push( packet.readLengthCodedData() );
-							}
-							
-							rs.addRow(row);
+							rs.addRow(packet);
 						
 							working = false;
 							handleNextPacket();
