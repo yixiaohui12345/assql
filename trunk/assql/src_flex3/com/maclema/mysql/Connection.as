@@ -12,6 +12,7 @@ package com.maclema.mysql
 	import flash.net.Socket;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
+	import flash.utils.setTimeout;
 	
 	import mx.rpc.AsyncResponder;
 	
@@ -424,20 +425,32 @@ package com.maclema.mysql
         {
         	buffer.position = cfpPosition;
         	if ( buffer.bytesAvailable > 4 ) {
-        		var len:int = buffer.readThreeByteInt();
-        		
-           		if ( buffer.bytesAvailable >= len ) {
-           			var num:int = buffer.readByte() & 0xFF;
-           			
-           			var pack:Packet = new Packet(len, num);
-           			buffer.readBytes(pack, 0, len);
-                    
-                    cfpPosition = buffer.position;
-                    
-                   	dataHandler.pushPacket( pack );
-                   	
-	           		checkForPackets();
-           		}
+        		try {
+	        		var len:int = buffer.readThreeByteInt();
+	        		
+	           		if ( buffer.bytesAvailable >= len ) {
+	           			var num:int = buffer.readByte() & 0xFF;
+	           			
+	           			var pack:Packet = new Packet(len, num);
+	           			buffer.readBytes(pack, 0, len);
+	                    
+	                    cfpPosition = buffer.position;
+	                    
+	                   	dataHandler.pushPacket( pack );
+	                   	
+		           		checkForPackets();
+	           		}
+	         	}
+	         	catch ( e:Error ) {
+	         		//this needs to be here for when we are quering very large data sets.
+	         		//sometimes the checkForPackets method causes a stack overflow and
+	         		//actually throws an EOF error. So if we use setTimeout, it will stop
+	         		//the recurssion, and continue normally.
+					
+					Logger.debug(this, "checkForPackets Stack Overflow Error. Breaking out of recurssion to recover.");
+	         		
+	         		setTimeout(checkForPackets, 1);
+	         	}
         	}
         }
 		
