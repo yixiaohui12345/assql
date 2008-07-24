@@ -19,7 +19,6 @@ package com.maclema.mysql
         private var columns:Array;
         private var rows:Array;
         private var map:Object;
-        
         private var charSet:String = "";
         
         private var todayDateString:String;
@@ -55,8 +54,19 @@ package com.maclema.mysql
         	this.columns[this.columns.length] = field;
         }
         
-        internal function addRow(row:Array):void {
-        	this.rows[this.rows.length] = row;
+        internal function addRow(data:Packet):void {
+        	var colLengths:Array = new Array();
+        	var colStarts:Array = new Array();
+        	var col:int = 0;
+        	while ( data.bytesAvailable > 0 ) {
+        		colLengths[col] = data.readLengthCodedBinary();
+        		colStarts[col] = data.position;
+        		data.position += colLengths[col];
+        		col++;
+        	}
+        	data.position = 0;
+        	
+        	this.rows[this.rows.length] = [data, colStarts, colLengths];
         }
         
         /**
@@ -211,7 +221,16 @@ package com.maclema.mysql
          **/
         public function getBinary(column:*):ByteArray
         {
-        	return ByteArray(rows[index][int(map[String(column)])]);
+        	var rowData:Packet = rows[index][0];
+        	var colStarts:Array = rows[index][1];
+        	var colLengths:Array = rows[index][2];
+        	var colIndex:int = int(map[String(column)]);
+        	
+        	var out:ByteArray = new ByteArray();
+        	rowData.position = colStarts[colIndex];
+        	rowData.readBytes(out, 0, colLengths[colIndex]);
+        	
+        	return out;
         }
         
         /**
