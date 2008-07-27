@@ -2,7 +2,6 @@ package com.maclema.mysql
 {
 	import com.maclema.logging.Logger;
 	
-	import flash.events.Event;
 	import flash.utils.ByteArray;
 	
 	/**
@@ -23,9 +22,11 @@ package com.maclema.mysql
 		
 		private var savePacketSequence:int;
 		
-		public function HandshakeHandler(con:Connection, username:String, password:String, database:String)
+		private var server:ServerInformation;
+		
+		public function HandshakeHandler(connInstanceID:int, username:String, password:String, database:String)
 		{
-			super(con);
+			super(connInstanceID);
 			
 			CharSets.initCharSets();
 			
@@ -37,13 +38,15 @@ package com.maclema.mysql
 		override protected function newPacket():void
 		{	
 			inPacketCount++;
-			var packet:Packet;
+			var packet:ProxiedPacket;
 			var field_count:int;
 			
 			if ( inPacketCount == 1 )
 			{
 				Logger.info(this, "Server Information Packet");
-				con.server = new ServerInformation( nextPacket() );
+				packet= nextPacket();
+				server = new ServerInformation( packet );
+				Connection.getInstance(connInstanceID).server = new ServerInformation( packet );
 				doHandshake();
 			}
 			else if ( inPacketCount == 2 )
@@ -68,20 +71,20 @@ package com.maclema.mysql
 					if ( connectWithDb )
 					{
 						//send command
-						con.internalChangeDatabaseTo(database);
+						Connection.getInstance(connInstanceID).internalChangeDatabaseTo(database);
 					}
 					else
 					{
 						//woop! were authenticated
 						unregister();
-						con.initConnection();
+						Connection.getInstance(connInstanceID).initConnection();
 					}
 				}
 				else if ( field_count == 0xFF )
 				{
 					Logger.info(this, "Error Packet");
 					unregister();
-					new ErrorHandler( packet, con );
+					new ErrorHandler( packet, Connection.getInstance(connInstanceID) );
 				}
 			}
 			else if ( connectWithDb && inPacketCount == 3 )
@@ -95,14 +98,14 @@ package com.maclema.mysql
 					
 					//woop! were authenticated
 					unregister();
-					con.initConnection();
+					Connection.getInstance(connInstanceID).initConnection();
 				}
 				else if ( field_count == 0xFF || field_count == -1 )
 				{
 					Logger.info(this, "Connect With DB Error Packet");
 					
 					unregister();
-					new ErrorHandler( packet, con );
+					new ErrorHandler( packet, Connection.getInstance(connInstanceID) );
 				}
 			}
 		}
@@ -110,40 +113,41 @@ package com.maclema.mysql
 		private function doHandshake():void
 		{
 			Logger.info(this, "doHandshake");
-			if ( con.server.meetsVersion( 4, 1, 22 ) )
+			if ( server.meetsVersion( 4, 1, 22 ) )
 			{
-				con.clientParam = 0;
+				var clientParam:Number = 0;
+				Connection.getInstance(connInstanceID).clientParam = 0;
 				
 				if ( database != null && database.length > 0 )
 				{
-					con.clientParam |= Mysql.CLIENT_CONNECT_WITH_DB;
+					clientParam |= Mysql.CLIENT_CONNECT_WITH_DB;
 					connectWithDb = true;
 				}
 				
-				if ( con.server.isCapableOf( Mysql.CLIENT_LONG_FLAG ) )
+				if ( server.isCapableOf( Mysql.CLIENT_LONG_FLAG ) )
 				{
-					con.clientParam |= Mysql.CLIENT_LONG_FLAG;
-					con.hasLongColumnInfo = true;
+					clientParam |= Mysql.CLIENT_LONG_FLAG;
 				}
 				
 				//return found rows
-                con.clientParam |= Mysql.CLIENT_FOUND_ROWS;
+                clientParam |= Mysql.CLIENT_FOUND_ROWS;
     
                 //use the new password encryption
-                con.clientParam |= Mysql.CLIENT_LONG_PASSWORD;
+                clientParam |= Mysql.CLIENT_LONG_PASSWORD;
                 
                 //use the 4.1.1 protocol
-                con.clientParam |= Mysql.CLIENT_PROTOCOL_41;
+                clientParam |= Mysql.CLIENT_PROTOCOL_41;
                 
                 //use transactions
-                con.clientParam |= Mysql.CLIENT_TRANSACTIONS;
+                clientParam |= Mysql.CLIENT_TRANSACTIONS;
                 
                 //return multiple result sets
-                con.clientParam |= Mysql.CLIENT_MULTI_RESULTS;
+                clientParam |= Mysql.CLIENT_MULTI_RESULTS;
                 
-                if ( con.server.isCapableOf(Mysql.CLIENT_SECURE_CONNECTION) )
+                if ( server.isCapableOf(Mysql.CLIENT_SECURE_CONNECTION) )
                 {
-                	con.clientParam |= Mysql.CLIENT_SECURE_CONNECTION;
+                	clientParam |= Mysql.CLIENT_SECURE_CONNECTION;
+                	Connection.getInstance(connInstanceID).clientParam = clientParam;
                 	doSecureAuthentication411();
                 }
                 else
@@ -151,6 +155,7 @@ package com.maclema.mysql
                 	//since we are doing the check for 4.1.22, we should
                 	//never get here. Fix: Adjust checks to allow previous
                 	//versions
+                	Connection.getInstance(connInstanceID).clientParam = clientParam;
                 	doAuthentication();
                 }
 			}
@@ -165,23 +170,25 @@ package com.maclema.mysql
 		{
 			Logger.info(this, "doAuthentication");
 			
+			var clientParam:Number = Connection.getInstance(connInstanceID).clientParam;
+			
 			//the packet to send
-			var packet:Packet = new Packet();
+			var packet:OutputPacket = new OutputPacket();
 			
 			//write the client parameters
 			//packet.writeShort( con.clientParam );
-			packet.writeByte( con.clientParam & 0xFF );
-			packet.writeByte( con.clientParam >>> 8 );
+			packet.writeByte( clientParam & 0xFF );
+			packet.writeByte( clientParam >>> 8 );
 			
 			// write the maximum packet sixe
-			packet.writeThreeByteInt( Packet.maxThreeBytes );
+			packet.writeThreeByteInt( OutputPacket.maxThreeBytes );
 			
 			//the username
 			packet.writeString(username, "latin1");
 			
 			if ( password != null )
 			{
-				var scrambledPassword:ByteArray = Util.newCrypt( password, con.server.seed );
+				var scrambledPassword:ByteArray = Util.newCrypt( password, server.seed );
 				packet.writeBytes( scrambledPassword );
 				packet.writeByte(0x00);
 			}
@@ -197,18 +204,18 @@ package com.maclema.mysql
 			    packet.writeString(database, "latin1");
 			}
 			
-			packet.send(con.getSocket(), 1);
+			packet.send(Connection.getInstance(connInstanceID).getSocket(), 1);
 		}
 	
 		private function sendScramble323():void
 		{
-			var packet:Packet = new Packet();
+			var packet:OutputPacket = new OutputPacket();
 			
-			var seed323:String = con.server.seed.substring(0, 8);
+			var seed323:String = server.seed.substring(0, 8);
 			var scrambled323:ByteArray = Util.newCrypt(password, seed323);
 			packet.writeBytes( scrambled323 );
 			packet.writeByte(0x00);
-			packet.send(con.getSocket(), ++savePacketSequence);
+			packet.send(Connection.getInstance(connInstanceID).getSocket(), ++savePacketSequence);
 		}
 		
 		/* completes the authentication */
@@ -216,17 +223,19 @@ package com.maclema.mysql
 		{
 			Logger.info(this, "doSecureAuthentication");
 			
+			var clientParam:Number = Connection.getInstance(connInstanceID).clientParam;
+			
 			//the packet to send
-			var packet:Packet = new Packet();
+			var packet:OutputPacket = new OutputPacket();
 			
 			//write the client parameters
-			packet.writeByte( con.clientParam & 0xFF );
-			packet.writeByte( con.clientParam >>> 8 );
-			packet.writeByte( con.clientParam >>> 16 );
-			packet.writeByte( con.clientParam >>> 24 );
+			packet.writeByte( clientParam & 0xFF );
+			packet.writeByte( clientParam >>> 8 );
+			packet.writeByte( clientParam >>> 16 );
+			packet.writeByte( clientParam >>> 24 );
 			
 			// write the maximum packet sixe
-			packet.writeInt( Packet.maxThreeBytes );
+			packet.writeInt( OutputPacket.maxThreeBytes );
 			
 			//language
 			packet.writeByte( 8 ); //charset
@@ -240,7 +249,7 @@ package com.maclema.mysql
 			if ( password != null )
 			{
 				packet.writeByte(0x14);
-				var scrambledPassword:ByteArray = Util.scramble411( password, con.server.seed );
+				var scrambledPassword:ByteArray = Util.scramble411( password, server.seed );
 				
 				packet.writeBytes(scrambledPassword);
 			}
@@ -256,7 +265,7 @@ package com.maclema.mysql
 			    packet.writeString(database, "latin1");
 			}
 			
-			savePacketSequence = packet.send(con.getSocket(), 1);
+			savePacketSequence = packet.send(Connection.getInstance(connInstanceID).getSocket(), 1);
 		}
 	}
 }

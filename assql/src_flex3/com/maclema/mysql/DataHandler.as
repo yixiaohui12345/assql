@@ -1,7 +1,6 @@
 package com.maclema.mysql
 {
 	import com.maclema.logging.Logger;
-	import com.maclema.util.ByteFormatter;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -12,15 +11,16 @@ package com.maclema.mysql
 	 **/
 	internal class DataHandler extends EventDispatcher
 	{
-		protected var con:Connection;
+		protected var connInstanceID:int = -1;
+		
 		private var packets:Array;
 		private var _joinNextPacket:Boolean = false;
 		
-		public function DataHandler(con:Connection)
+		public function DataHandler(connInstanceID:int)
 		{
 			super();
 			
-			this.con = con;
+			this.connInstanceID = connInstanceID;
 			
 			packets = new Array();
 		}
@@ -29,7 +29,7 @@ package com.maclema.mysql
 		 * Called by the Connection and adds a new/recieved packet to
 		 * the array of packets that need be handled.
 		 **/
-		public function pushPacket(packet:Packet):void
+		public function pushPacket(packet:ProxiedPacket):void
 		{
 			packets.push(packet);
 			
@@ -37,7 +37,7 @@ package com.maclema.mysql
 			body. It serves as an indicator that there are no more packet parts left in the 
 			stream for this large packet. */
 			//http://tutorialsforu.info/mysql/mysql-coding/client/server-communication-in-mysql--packet-format.html
-			if ( packet.length == Packet.maxThreeBytes ) {
+			if ( packet.length == ProxiedPacket.maxThreeBytes ) {
 				_joinNextPacket = true;
 			}
 			
@@ -58,30 +58,24 @@ package com.maclema.mysql
         /**
         * Returns the next packet that needs to be handled
         **/
-        protected function nextPacket():Packet
+        protected function nextPacket():ProxiedPacket
         {	
         	if ( packets != null && packets.length > 0 )
-	        	return Packet(packets.shift());
+	        	return ProxiedPacket(packets.shift());
 	        else
 	        	return null;
         }
 		
 		private function joinPackets():void {
 			if ( packets.length > 1 ) {
-				var pack1:Packet = nextPacket();
-				var pack2:Packet = nextPacket();
+				var pack1:ProxiedPacket = nextPacket();
+				var pack2:ProxiedPacket = nextPacket();
 				
-				pack1.position = pack1.length;
-				pack1.writeBytes(pack2);
-				
-				pack1.position = 0;
-        		packets.splice(0, 0, pack1);
-				
-				trace("Joining Packets: " + ByteFormatter.format(pack1.length, ByteFormatter.KBYTES));
+				pack1.position = pack2.length;
 				
 				//don't call newPacket until we get a packet smaller
 				//than maxThreeBytes
-				if ( pack2.length < Packet.maxThreeBytes ) {
+				if ( pack2.length < ProxiedPacket.maxThreeBytes ) {
 					_joinNextPacket = false;
 					newPacket();
 				}

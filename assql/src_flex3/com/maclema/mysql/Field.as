@@ -41,7 +41,7 @@ package com.maclema.mysql
         /**
         * Constructs a new Field instance by reading a Packet returned from MySql.
         **/ 
-        public function Field(packet:Packet, charSet:String)
+        public function Field(packet:ProxiedPacket, charSet:String)
         {
             _catalog = packet.readLengthCodedString(charSet);
             _db = packet.readLengthCodedString(charSet);

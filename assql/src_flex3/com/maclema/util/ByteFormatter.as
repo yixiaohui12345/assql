@@ -14,9 +14,10 @@ package com.maclema.util
 	    
 	    private static var _formats : Array = [ "KB", "MB", "GB", "TB" ];
 	
+		private static var nf:NumberFormatter = new NumberFormatter();
+		
 	    public static function format( value:Number, format:int, decimals:int = 2 ):String {
 	        var divider : Number = Math.pow( 1024, format )
-	        var nf:NumberFormatter = new NumberFormatter();
 	        nf.precision = decimals;
 	        return nf.format( value / divider ) + " " + _formats[format-1];
 	    }

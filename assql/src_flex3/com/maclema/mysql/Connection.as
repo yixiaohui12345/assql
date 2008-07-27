@@ -15,6 +15,7 @@ package com.maclema.mysql
 	import flash.utils.setTimeout;
 	
 	import mx.rpc.AsyncResponder;
+	import mx.utils.ObjectUtil;
 	
 	/**
 	 * Dispatched when successfully connected to the MySql Server
@@ -45,8 +46,22 @@ package com.maclema.mysql
 	 **/
 	public class Connection extends EventDispatcher
 	{
+		//connection instances.
+		private static var instances:Array = new Array();
+		
+		internal static function getInstance(instanceID:int):Connection {
+			return Connection(instances[instanceID]);
+		}
+		
+		/*internal static function getInstance(connInstanceID:int):Connection {
+			return instances[connInstanceID];
+		}*/
+		
+		//this instanceID;
+		private var instanceID:int = -1;
+		
 		//the actual socket
-		private var sock:Socket;
+		internal var sock:Socket;
 		
 		//connection information
 		private var host:String;
@@ -63,32 +78,24 @@ package com.maclema.mysql
 		//the current data reader
 		private var dataHandler:DataHandler;
 		
+		internal var clientParam:Number = 0;
+		
 		//the server information
 		/**
 		 * @private
 		 **/
 		internal var server:ServerInformation;
 		
-		//internal vars
-		/**
-		 * @private
-		 **/
-		internal var clientParam:Number = 0;
-		
-		/**
-		 * @private
-		 **/
-		internal var hasLongColumnInfo:Boolean = false;
-		
 		//private vars
 		private var expectingClose:Boolean = false;
-		private var buffer:Buffer;
 		private var _connected:Boolean = false;
 		private var _totalTX:Number;
 		private var _tx:Number;
 		private var _queryStart:Number;
 		private var _busy:Boolean = false;
 		private var commandPool:Array;
+		
+		private var mgr:DataManager;
 		
 		/**
 		 * Creates a new Connection instance.
@@ -97,7 +104,10 @@ package com.maclema.mysql
 		{
 			super();
 			
-			buffer = new Buffer();
+			instanceID = instances.length;
+			instances.push(this);
+			
+			mgr = new DataManager();
 			
 			//set the connection information	
 			this.host = host;
@@ -155,7 +165,7 @@ package com.maclema.mysql
 			this.connectionCharSet = charSet;
 			
 			//set the dataHandler
-			setDataHandler( new HandshakeHandler(this, username, password, database) );
+			setDataHandler( new HandshakeHandler(instanceID, username, password, database) );
 			
 			sock.connect( host, port );
 		}
@@ -250,7 +260,7 @@ package com.maclema.mysql
         * Returns the server information object for this connection
         **/
         public function getServerInformation():ServerInformation {
-        	return server;
+        	return ServerInformation(ObjectUtil.copy(server));
         }
         
         /**
@@ -269,7 +279,7 @@ package com.maclema.mysql
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	            setDataHandler(new QueryHandler(this, token));
+	            setDataHandler(new QueryHandler(instanceID, token));
 	            sendCommand(Mysql.COM_QUERY, sql);
 	    	}
         }
@@ -290,7 +300,7 @@ package com.maclema.mysql
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	        	setDataHandler(new QueryHandler(this, token));
+	        	setDataHandler(new QueryHandler(instanceID, token));
 	        	sendBinaryCommand(Mysql.COM_QUERY, query);
         	}
         }
@@ -307,15 +317,6 @@ package com.maclema.mysql
                 return;
             
             sendCommand(Mysql.COM_INIT_DB, whatDb);
-        }
-        
-        /**
-        * Used by Packet when sending data
-        * @private
-        **/
-        internal function getSocket():Socket
-        {
-        	return sock;
         }
         
         internal function initConnection():void {
@@ -339,6 +340,10 @@ package com.maclema.mysql
         		},
         		token
         	));
+        }
+        
+        internal function getSocket():Socket {
+        	return sock;
         }
 		
 		/**
@@ -410,8 +415,8 @@ package com.maclema.mysql
 			_tx += sock.bytesAvailable;
 			_totalTX += sock.bytesAvailable;
 			
-			sock.readBytes( buffer, buffer.length, sock.bytesAvailable );
-			checkForPackets();		
+			sock.readBytes( mgr.buffer, mgr.buffer.length, sock.bytesAvailable );
+			checkForPackets();
 		}
 		
 		/**
@@ -421,37 +426,47 @@ package com.maclema.mysql
 		 * @private
 		 **/
 		private var cfpPosition:int = 0;
+		private var cfpAvail:int = 0;
 		private function checkForPackets():void
         {
-        	buffer.position = cfpPosition;
-        	if ( buffer.bytesAvailable > 4 ) {
-        		try {
-	        		var len:int = buffer.readThreeByteInt();
+        	try {
+        		cfpAvail = mgr.buffer.length-cfpPosition;
+        		while ( cfpAvail > 4 ) {
+	        		var len:int = ((mgr.buffer[cfpPosition] & 0xff)) |
+                        		  ((mgr.buffer[cfpPosition+1] & 0xff) << 8) |
+                        		  ((mgr.buffer[cfpPosition+2] & 0xff) << 16);
 	        		
-	           		if ( buffer.bytesAvailable >= len ) {
-	           			var num:int = buffer.readByte() & 0xFF;
+	           		if ( (cfpAvail-3) >= len ) {
+	           			var num:int = mgr.buffer[cfpPosition+3] & 0xFF;
 	           			
-	           			var pack:Packet = new Packet(len, num);
-	           			buffer.readBytes(pack, 0, len);
+	           			var pack:ProxiedPacket = new ProxiedPacket(mgr, (cfpPosition+4), len, num);
 	                    
-	                    cfpPosition = buffer.position;
+	                    cfpPosition = (cfpPosition+4) + len;
 	                    
 	                   	dataHandler.pushPacket( pack );
 	                   	
-		           		checkForPackets();
+	                   	cfpAvail = mgr.buffer.length-cfpPosition;
 	           		}
-	         	}
-	         	catch ( e:Error ) {
+	           		else {
+	           			//we dont have enough data, wait for 
+	           			//the socket to give us some more data
+	           			break;
+	           		}
+        		}
+        	}
+         	catch ( err:Error ) {
+         		if ( dataHandler is HandshakeHandler == false ) {
 	         		//this needs to be here for when we are quering very large data sets.
 	         		//sometimes the checkForPackets method causes a stack overflow and
 	         		//actually throws an EOF error. So if we use setTimeout, it will stop
 	         		//the recurssion, and continue normally.
-					
-					Logger.debug(this, "checkForPackets Stack Overflow Error. Breaking out of recurssion to recover.");
-	         		
+					Logger.debug(this, "checkForPackets Overflow. Breaking out of recurssion to recover.");
 	         		setTimeout(checkForPackets, 1);
-	         	}
-        	}
+         		}
+         		else {
+         			throw err;
+         		}
+         	}
         }
 		
 		/**
@@ -530,7 +545,7 @@ package com.maclema.mysql
         	//check that the data is at position 0
         	data.position = 0;
         	
-            var packet:Packet = new Packet();
+            var packet:OutputPacket = new OutputPacket();
             packet.writeByte(command);
             data.readBytes( packet, packet.position, data.bytesAvailable );
             packet.send(sock);
@@ -544,7 +559,7 @@ package com.maclema.mysql
         {
         	Logger.info(this, "Send Command (Command: " + command + " Data: " + data + ")");
         	
-            var packet:Packet = new Packet();
+            var packet:OutputPacket = new OutputPacket();
             packet.writeByte(command);
             packet.writeMultiByte(data, connectionCharSet);
             packet.send(sock);
@@ -557,7 +572,7 @@ package com.maclema.mysql
         **/
         private function doChangeDatabaseTo(token:MySqlToken, whatDb:String):void
         {	
-        	setDataHandler(new CommandHandler(this, token));
+        	setDataHandler(new CommandHandler(instanceID, token));
         	
             if ( whatDb == null || whatDb.length == 0 ) {
                 throw new Error("Database Name cannot be null or empty");
