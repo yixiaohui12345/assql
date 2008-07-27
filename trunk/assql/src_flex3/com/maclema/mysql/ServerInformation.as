@@ -21,8 +21,10 @@ package com.maclema.mysql
         private var minor:int;
         private var revision:int;
         
-        public function ServerInformation(packet:Buffer)
+        public function ServerInformation(packet:ProxiedBuffer)
         {
+        	packet.position = 0;
+        	
             protocolVersion = packet.readByte() & 0xFF;
             
             if ( protocolVersion < 10 )

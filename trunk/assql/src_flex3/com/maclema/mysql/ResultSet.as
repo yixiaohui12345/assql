@@ -2,11 +2,11 @@ package com.maclema.mysql
 {
     import com.maclema.logging.Logger;
     
+    import flash.system.System;
     import flash.utils.ByteArray;
     import flash.utils.getTimer;
     
     import mx.collections.ArrayCollection;
-    import mx.formatters.DateFormatter;
     
     /**
     * The ResultSet class represents a data set retuends by MySql for a query.
@@ -30,12 +30,10 @@ package com.maclema.mysql
         {
         	this._token = token;
             this.columns = new Array();
-            this.rows = new Array();    
+            this.rows = new Array();   
             
             //for getTime optimization
-            var df:DateFormatter = new DateFormatter();
-            df.formatString = "YYYY/MM/DD";
-            todayDateString = df.format(new Date());
+            todayDateString = Util.getTodayDateString()
         }
         
         internal function initialize(charSet:String):void {
@@ -54,19 +52,28 @@ package com.maclema.mysql
         	this.columns[this.columns.length] = field;
         }
         
-        internal function addRow(data:Packet):void {
-        	var colLengths:Array = new Array();
-        	var colStarts:Array = new Array();
-        	var col:int = 0;
-        	while ( data.bytesAvailable > 0 ) {
-        		colLengths[col] = data.readLengthCodedBinary();
-        		colStarts[col] = data.position;
-        		data.position += colLengths[col];
-        		col++;
+        internal function addRow(data:ProxiedPacket):void {
+        	this.rows[this.rows.length] = [data, null, null, false];
+        }
+        
+        private function initRow(index:int):void {
+        	if ( this.rows[index][3] == false ) {
+        		var data:ProxiedPacket = this.rows[index][0];
+        		var colLengths:Array = new Array();
+	        	var colStarts:Array = new Array();
+	        	var col:int = 0;
+	        	while ( data.bytesAvailable > 0 ) {
+	        		colLengths[col] = data.readLengthCodedBinary();
+	        		colStarts[col] = data.position;
+	        		data.position += colLengths[col];
+	        		col++;
+	        	}
+	        	data.position = 0;
+	        	
+	        	this.rows[index][1] = colStarts;
+	        	this.rows[index][2] = colLengths;
+	        	this.rows[index][3] = true;
         	}
-        	data.position = 0;
-        	
-        	this.rows[this.rows.length] = [data, colStarts, colLengths];
         }
         
         /**
@@ -92,6 +99,7 @@ package com.maclema.mysql
             if ( index < rows.length-1 )
             {
                 index++;
+                initRow(index);
                 return true;
             }
             
@@ -106,6 +114,7 @@ package com.maclema.mysql
             if ( index > 0 )
             {
                 index--;
+                initRow(index);
                 return true;
             }
             
@@ -120,6 +129,7 @@ package com.maclema.mysql
             if ( rows.length == 0 )
             {
                 index = -1;
+                initRow(index);
                 return false;
             }
             
@@ -135,6 +145,7 @@ package com.maclema.mysql
             if ( rows.length == 0 )
             {
                 index = -1;
+                initRow(index);
                 return false;
             }
             
@@ -148,12 +159,19 @@ package com.maclema.mysql
          **/
         public function getString(column:*):String
         {
-        	var data:ByteArray = getBinary(column);
-        	if ( data == null ) {
+        	var rowData:ProxiedPacket = rows[index][0];
+        	var colStarts:Array = rows[index][1];
+        	var colLengths:Array = rows[index][2];
+        	var colIndex:int = int(map[String(column)]);
+        	
+        	if ( colLengths[colIndex] == 0 ) {
         		return null;
         	}
-        	data.position = 0;
-        	return data.readMultiByte(data.bytesAvailable, charSet);
+        	
+        	rowData.position = colStarts[colIndex];
+        	var out:String = rowData.readMultiByte(colLengths[colIndex], charSet);
+        	
+        	return out;
         }
         
         /**
@@ -221,10 +239,14 @@ package com.maclema.mysql
          **/
         public function getBinary(column:*):ByteArray
         {
-        	var rowData:Packet = rows[index][0];
+        	var rowData:ProxiedPacket = rows[index][0];
         	var colStarts:Array = rows[index][1];
         	var colLengths:Array = rows[index][2];
         	var colIndex:int = int(map[String(column)]);
+        	
+        	if ( colLengths[colIndex] == 0 ) {
+        		return null;
+        	}
         	
         	var out:ByteArray = new ByteArray();
         	rowData.position = colStarts[colIndex];
@@ -234,33 +256,56 @@ package com.maclema.mysql
         }
         
         /**
-         * Returns all rows as a bindable ArrayCollection, you can optionally pass a single
-         * boolean value indicating if date's and time's should just be casted to plain strings.
-         * Casting to plain strings is a lot faster then parsing the dates.
+         * Returns all rows as a bindable ArrayCollection. <br>
+         * <br>
+         * You can optionally pass a single boolean value indicating if date's and time's should be returned
+         * as simple String's rather then being casted to Date objects. This is a lot faster then casting to
+         * date objects.<br>
+         * <br>
+         * You may also pass an offset and length for the number of rows you wish to return, starting at the
+         * specified index. This is useful for creating a pageable display.<br>
+         * <br>
+         * The results of getRows are cached, so additional calls to getRows() will be a lot faster.
          **/
-		public function getRows(dateTimesAsStrings:Boolean=false):ArrayCollection
+        private var getRowsCache:Array = new Array();
+		public function getRows(dateTimesAsStrings:Boolean=false, offset:int=0, len:int=0):ArrayCollection
 		{
+			Logger.debug(this, "Converting ResultSet to ArrayCollection...");
 			var st:Number = getTimer();
 			
 			var oldIndex:int = index;
 			
-			index = -1;
+			index = (offset-1);
+			
+			var count:int = 0;
 			
 			var arr:Array = new Array();
 			while ( this.next() ) {
-				var obj:Object = new Object();
+				count++;
 				
-				columns.forEach(function(c:Field, index:int, arr:Array):void {
-					obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
-				});
-				
-		 		arr.push(obj);
+				if ( getRowsCache[index] != null ) {
+					arr.push( getRowsCache[index] );
+				}
+				else {
+					var obj:Object = new Object();
+					
+					columns.forEach(function(c:Field, index:int, arr:Array):void {
+						obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
+					});
+					
+					getRowsCache[index] = obj;
+			 		arr.push(obj);
+		 		}
+		 	
+		 		if ( count == len ) {
+		 			break;
+		 		}
 			}
 			
 			index = oldIndex;
 			
 			var run:Number = getTimer()-st;
-			Logger.debug(this, "getRows() in " + run + " ms");
+			Logger.debug(this, "  Converted to ArrayCollection in " + run + " ms");
 		    return new ArrayCollection(arr);
 		}
         
@@ -301,6 +346,28 @@ package com.maclema.mysql
         **/
         public function size():int {
         	return rows.length;
+        }
+        
+        public function dispose():void {
+        	for ( var i:int=0; i<rows.length; i++ ) {
+        		delete rows[i][0];
+        		delete rows[i][1];
+        		delete rows[i][2];
+        		delete rows[i];
+        		rows[i] = null;
+        	}
+        	
+        	for ( var i:int=0; i<columns.length; i++ ) {
+        		delete columns[i];
+        		columns[i] = null;
+        	}
+        	
+			System.gc();
+			        	
+        	rows = new Array();
+        	columns = new Array();
+        	
+        	System.gc();
         }
     }
 }

@@ -4,6 +4,8 @@ package com.maclema.mysql
     
     import flash.utils.ByteArray;
     
+    import mx.formatters.DateFormatter;
+    
     internal class Util
     {
     	/**
@@ -110,6 +112,13 @@ package com.maclema.mysql
         	xored.position = 0;
         	
         	return xored;
+        }
+        
+        public static function getTodayDateString():String {
+        	var df:DateFormatter = new DateFormatter();
+            df.formatString = "YYYY/MM/DD";
+            var dt:Date = new Date();
+            return df.format(dt);
         }
     }
 }

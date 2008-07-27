@@ -6,9 +6,9 @@ package com.maclema.mysql
 	{
 		private var token:MySqlToken;
 		
-		public function CommandHandler(con:Connection, token:MySqlToken)
+		public function CommandHandler(connInstanceID:int, token:MySqlToken)
 		{
-			super(con);
+			super(connInstanceID);
 			
 			this.token = token;
 		}
@@ -20,7 +20,7 @@ package com.maclema.mysql
 		
 		private function handleNextPacket():void
 		{
-			var packet:Packet = nextPacket();
+			var packet:ProxiedPacket = nextPacket();
 			
 			if ( packet != null )
 			{

@@ -4,7 +4,6 @@ package com.maclema.mysql
 	import com.maclema.mysql.events.MySqlEvent;
 	import com.maclema.util.ByteFormatter;
 	
-	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	
 	/**
@@ -21,9 +20,9 @@ package com.maclema.mysql
 		
 		private var working:Boolean = false;
 		
-		public function QueryHandler(con:Connection, token:MySqlToken)
+		public function QueryHandler(connInstanceID:int, token:MySqlToken)
 		{
-			super(con);
+			super(connInstanceID);
 			
 			this.token = token;
 		}
@@ -39,7 +38,7 @@ package com.maclema.mysql
 			{
 				working = true;
 		
-				var packet:Packet = nextPacket();
+				var packet:ProxiedPacket = nextPacket();
 				
 				if ( packet != null )
 				{
@@ -69,22 +68,25 @@ package com.maclema.mysql
 						//eof packet
 						if ( !readFields )
 						{
+							Logger.info(this, "Reading Row Data...");
 							readFields = true;
 							working = false;
 							handleNextPacket();
 						}
 						else
 						{
-							rs.initialize(con.connectionCharSet);
+							Logger.info(this, "Initializating ResultSet...");
+							
+							rs.initialize(Connection.getInstance(connInstanceID).connectionCharSet);
 							
 							evt = new MySqlEvent(MySqlEvent.RESULT);
 							evt.resultSet = rs;
 							
 							Logger.debug(this, "Mysql Result");
 							Logger.debug(this, "  Rows:       " + rs.size());
-							Logger.debug(this, "  Query Size: " + ByteFormatter.format(con.tx, ByteFormatter.KBYTES, 2));
-							Logger.debug(this, "  Total TX:   " + ByteFormatter.format(con.totalTX, ByteFormatter.KBYTES, 2));
-							Logger.debug(this, "  Query Time: " + (getTimer()-con.lastQueryStart) + " ms");
+							Logger.debug(this, "  Query Size: " + ByteFormatter.format(Connection.getInstance(connInstanceID).tx, ByteFormatter.KBYTES, 2));
+							Logger.debug(this, "  Total TX:   " + ByteFormatter.format(Connection.getInstance(connInstanceID).totalTX, ByteFormatter.KBYTES, 2));
+							Logger.debug(this, "  Query Time: " + (getTimer()-Connection.getInstance(connInstanceID).lastQueryStart) + " ms");
 							
 							unregister();
 							token.dispatchEvent(evt);
@@ -96,6 +98,7 @@ package com.maclema.mysql
 						
 						if ( !readHeader )
 						{
+							Logger.info(this, "Reading Column Data...");
 							rs = new ResultSet(token);
 							readHeader = true;
 							
@@ -104,7 +107,7 @@ package com.maclema.mysql
 						}
 						else if ( !readFields )
 						{
-							var field:Field = new Field(packet, con.connectionCharSet);
+							var field:Field = new Field(packet, Connection.getInstance(connInstanceID).connectionCharSet);
 							rs.addColumn(field);
 						
 							working = false;

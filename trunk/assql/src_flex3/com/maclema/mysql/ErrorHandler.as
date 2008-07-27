@@ -1,11 +1,12 @@
 package com.maclema.mysql
 {
-	import flash.events.IEventDispatcher;
 	import com.maclema.mysql.events.MySqlErrorEvent;
+	
+	import flash.events.IEventDispatcher;
 	
 	internal class ErrorHandler
 	{
-		public function ErrorHandler( packet:Packet, dispatchOn:IEventDispatcher )
+		public function ErrorHandler( packet:ProxiedPacket, dispatchOn:IEventDispatcher )
 		{
 			var id:int = packet.readShort();
             packet.readByte(); //# marker
