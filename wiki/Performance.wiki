@@ -1,3 +1,4 @@
+#labels Featured
 Here are some sample queries to give an idea of the performance. All queries were ran connecting to a local mysql server.
 
 *Updated: July 27 2008. Tests ran against revision 130*
