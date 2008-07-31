@@ -19,9 +19,19 @@ package com.maclema.mysql
     [Event(name="response", type="com.maclema.mysql.events.MySqlEvent")]
     
     /**
-    * Dispatche when a data manipulation query successfully executes
+    * Dispatched when a data manipulation query successfully executes
     **/
     [Event(name="result", type="com.maclema.mysql.events.MySqlEvent")]
+    
+    /**
+	 * Dispatched when stored procedure output parameters are available
+	 **/
+    [Event(name="params", type="com.maclema.mysql.events.MySqlEvent")]
+    
+    /**
+    * Dispatched when a StreamingQueryHandler recieves more rows.
+    **/
+    [Event(name="rowdata", type="com.maclema.mysql.events.MySqlEvent")]
     
     /**
     * This class provieds a place to set additional token-level data for MySql queries. It also allows an IResponder to be attached

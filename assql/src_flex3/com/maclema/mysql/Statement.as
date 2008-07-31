@@ -20,6 +20,9 @@ package com.maclema.mysql
         private var outputParams:Object;
         private var hasOutputParams:Boolean = false;
         
+        public var streamResults:Boolean = false;
+        public var streamingInterval:int = 1000;
+        
         /**
         * Constructs a new Statement object. Should never be called directly, rather, use Connection.createStatement();
         **/
@@ -130,11 +133,11 @@ package com.maclema.mysql
         	if ( this.sql.indexOf("?") != -1 ) {
         		Logger.info(this, "executing a statement with parameters");
         		var binq:BinaryQuery = addParametersToSql();
-        		con.executeBinaryQuery(token, binq);
+        		con.executeBinaryQuery(this, token, binq);
         	}
         	else {
         		Logger.info(this, "executing a regular statement");
-          		con.executeQuery(token, sql);
+          		con.executeQuery(this, token, sql);
          	}
          	
          	return token;
@@ -206,7 +209,7 @@ package com.maclema.mysql
         			
         			if ( hasOutputParams ) {
         				Logger.debug(this, "Waiting For Call Output Parameters");
-        				con.executeQuery(callParamsToken, getSelectParamsSql());
+        				con.executeQuery(null, callParamsToken, getSelectParamsSql());
     				}
     				else {
     					dispatchCallToken(callResultSet, callResponse, callParams, publicToken);
@@ -233,7 +236,7 @@ package com.maclema.mysql
         				
         				if ( hasOutputParams ) {
         					Logger.debug(this, "Waiting For Call Output Parameters");
-        					con.executeQuery(callParamsToken, getSelectParamsSql());
+        					con.executeQuery(null, callParamsToken, getSelectParamsSql());
         				}
         				else {
         					dispatchCallToken(callResultSet, callResponse, callParams, publicToken);
@@ -246,86 +249,9 @@ package com.maclema.mysql
         	));
         	
         	Logger.debug(this, "Executing Call (" + this.sql + ")");
-        	con.executeQuery(callToken, sql);
-        	
-        	/*var callToken:MySqlToken = new MySqlToken();
-        	callToken.addResponder(new Responder(
-        		function(callData:Object):void {
-        			/* If the stored procedure results a ResultSet, it will then also
-        			   return a response as well, watch for the response and also
-        			   dispatch it. *
-        			if ( callData is ResultSet ) {
-        				var callResponseToken:MySqlToken = new MySqlToken();
-        				con.setDataHandler(new QueryHandler(con.instanceID, callResponseToken));
-        				callResponseToken.addResponder(new Responder(
-        					function(callResponseData:Object):void {
-        						var revt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
-        						revt.affectedRows = callResponseData.affectedRows;
-        						revt.insertID = callResponseData.insertID;
-        						publicToken.dispatchEvent(revt);
-        						
-        						if ( hasOutputParams ) {
-        							getOutputParams(callData, publicToken);
-        						}
-        						else {
-        							var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
-        							evt.resultSet = callData;
-        							publicToken.dispatchEvent(evt);
-        						}
-        					},
-        					function(info:Object):void {
-        						ErrorHandler.handleError(info.id, info.msg, publicToken);
-        					}
-        				));
-        			}
-        			else {
-        				if ( hasOutputParams ) {
-							getOutputParams(callData, publicToken);
-						}
-						else {
-							var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
-							evt.affectedRows = callData.affectedRows;
-        					evt.insertID = callData.insertID;
-							publicToken.dispatchEvent(evt);
-						}
-        			}
-        		},
-        		function(info:Object):void {
-        			ErrorHandler.handleError(info.id, info.msg, publicToken);
-        		}
-        	));
-        	
-     		con.executeQuery(callToken, this.sql);*/
+        	con.executeQuery(this, callToken, sql);
         	
         	return publicToken;
-        }
-        
-        private function getOutputParams(callData:Object, publicToken:MySqlToken):void {
-        	var paramsToken:MySqlToken = new MySqlToken();
-        	con.executeQuery(paramsToken, getSelectParamsSql());
-        	paramsToken.addResponder(new Responder(
-        		function(paramsData:Object):void {
-        			ResultSet(paramsData).next();
-					for ( var param:String in outputParams ) {
-						outputParams[param] = ResultSet(paramsData).getString(param);
-					}
-					
-					var evt:MySqlEvent;
-					if ( callData is ResultSet ) {
-						evt = new MySqlEvent(MySqlEvent.RESULT);
-						evt.resultSet = ResultSet(callData);
-					}
-					else {
-						evt = new MySqlEvent(MySqlEvent.RESPONSE);
-						evt.affectedRows = callData.affectedRows;
-						evt.insertID = callData.insertID;
-					}
-					publicToken.dispatchEvent(evt);
-        		},
-        		function(info:Object):void {
-        			ErrorHandler.handleError(info.id, info.msg, publicToken);
-        		}
-        	));
         }
         
         private function getSelectParamsSql():String {
@@ -379,7 +305,7 @@ package com.maclema.mysql
         	var token:MySqlToken = new MySqlToken();
         	
         	query.position = 0;
-        	con.executeBinaryQuery(token, query);
+        	con.executeBinaryQuery(this, token, query);
         	
         	return token;
         }
