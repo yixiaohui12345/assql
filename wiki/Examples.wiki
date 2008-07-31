@@ -297,6 +297,8 @@ import com.maclema.mysql.ResultSet;
 import mx.controls.Alert;
 import mx.rpc.AsyncResponder;
 import com.maclema.mysql.MySqlToken;
+import com.maclema.mysql.MySqlResponse;
+import com.maclema.mysql.MySqlOutputParams;
 import com.maclema.util.ResultsUtil;
 
 //The MySql Connection
