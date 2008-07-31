@@ -211,10 +211,10 @@ package com.maclema.mysql
         	var token:MySqlToken = new MySqlToken();
         	
         	if ( dataHandler != null ) {
-        		poolCommand(doChangeDatabaseTo, token, whatDb);
+        		poolCommand(doChangeDatabaseTo, null, token, whatDb);
         	}
         	else {
-	        	doChangeDatabaseTo(token, whatDb);
+	        	doChangeDatabaseTo(null, token, whatDb);
          	}
             
             return token;
@@ -267,19 +267,25 @@ package com.maclema.mysql
          * Used by Statement to execute a query or update sql statement. 
          * @private
          **/
-        internal function executeQuery(token:MySqlToken, sql:String):void
+        internal function executeQuery(st:Statement, token:MySqlToken, sql:String):void
         {
         	Logger.info(this, "Execute Query (" + sql + ")");
         	
         	if ( dataHandler != null ) {
-        		poolCommand(executeQuery, token, sql);
+        		poolCommand(executeQuery, st, token, sql);
         	}
         	else {
 	        	_busy = true;
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	            setDataHandler(new QueryHandler(instanceID, token));
+	        	
+	        	var handler:DataHandler = 
+	        		(st != null && st.streamResults ) ? 
+	        			new StreamingQueryHandler(instanceID, token, st.streamingInterval) : 
+	        			new QueryHandler(instanceID, token);
+	        			
+	            setDataHandler(handler);
 	            sendCommand(Mysql.COM_QUERY, sql);
 	    	}
         }
@@ -288,19 +294,25 @@ package com.maclema.mysql
         * Executes a binary query object as a sql statement.
         * @private
         **/
-        internal function executeBinaryQuery(token:MySqlToken, query:BinaryQuery):void
+        internal function executeBinaryQuery(st:Statement, token:MySqlToken, query:BinaryQuery):void
         {
         	Logger.info(this, "Execute Binary Query");
         	
         	if ( dataHandler != null ) {
-        		poolCommand(executeBinaryQuery, token, query);
+        		poolCommand(executeBinaryQuery, st, token, query);
         	}
         	else {
 	        	_busy = true;
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
 	        	_queryStart = getTimer();
-	        	setDataHandler(new QueryHandler(instanceID, token));
+	        	
+	        	var handler:DataHandler = 
+	        		(st != null && st.streamResults ) ? 
+	        			new StreamingQueryHandler(instanceID, token, st.streamingInterval) : 
+	        			new QueryHandler(instanceID, token);
+	        	
+	        	setDataHandler(handler);
 	        	sendBinaryCommand(Mysql.COM_QUERY, query);
         	}
         }
@@ -513,13 +525,13 @@ package com.maclema.mysql
         * method(token:MySqlToken, data:*):void
         * @private
         **/
-        private function poolCommand(method:Function, arg1:*, arg2:*, inject:Boolean=false):void {
+        private function poolCommand(method:Function, arg1:*, arg2:*, arg3:*, inject:Boolean=false):void {
         	Logger.info(this, "Pooling Query");
         	if ( !inject ) {
-        		commandPool.push({method: method, arg1: arg1, arg2: arg2});
+        		commandPool.push({method: method, arg1: arg1, arg2: arg2, arg3: arg3});
         	}
         	else {
-        		commandPool.splice(0, 0, {method: method, arg1: arg1, arg2: arg2});
+        		commandPool.splice(0, 0, {method: method, arg1: arg1, arg2: arg2, arg3: arg3});
         	}
         }
         
@@ -535,8 +547,9 @@ package com.maclema.mysql
         		var method:Function = obj.method;
         		var arg1:* = obj.arg1;
         		var arg2:* = obj.arg2;
+        		var arg3:* = obj.arg3;
         		
-        		method(arg1, arg2);
+        		method(arg1, arg2, arg3);
         	}
         }
         
@@ -575,7 +588,7 @@ package com.maclema.mysql
         * command pooling.
         * @private
         **/
-        private function doChangeDatabaseTo(token:MySqlToken, whatDb:String):void
+        private function doChangeDatabaseTo(st:Statement, token:MySqlToken, whatDb:String):void
         {	
         	setDataHandler(new CommandHandler(instanceID, token));
         	
