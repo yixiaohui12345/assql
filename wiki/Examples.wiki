@@ -14,6 +14,8 @@
 
 [Examples#Stored_Procedure_Example Stored Procedure Example] *(Will be in Beta 2.7)*
 
+[Examples#Streaming_Results Streaming Results] *(Will be in Beta 2.7)*
+
 
 === MySqlService Example ===
 
@@ -329,6 +331,65 @@ private function handleConnected(e:Event):void {
 				//get the output parameter.
 				var lastUpdated:String = data.getParam("@LastUpdated");
 			}
+		},
+		
+		function(info:Object, token:Object):void {
+			Alert.show("Error: " + info);
+		},
+		
+		token
+	));
+}
+}}}
+
+=== Streaming Results ===
+
+This is an example of streaming a very large ResultSet.
+
+{{{
+import com.maclema.mysql.Statement;
+import com.maclema.mysql.Connection;
+import com.maclema.mysql.ResultSet;
+import mx.controls.Alert;
+import mx.rpc.AsyncResponder;
+import com.maclema.mysql.MySqlToken;
+import com.maclema.mysql.MySqlResponse;
+import com.maclema.mysql.MySqlOutputParams;
+import com.maclema.util.ResultsUtil;
+
+//The MySql Connection
+private var con:Connection;
+
+private function onCreationComplete():void {
+	con = new Connection("localhost", 3306, "root", "", "assql-test");
+	con.addEventListener(Event.CONNECT, handleConnected);
+	con.connect();
+}
+
+private var totalRows:int = 0;
+private var rowsAvailable:int = 0;
+
+private function handleConnected(e:Event):void {
+	var st:Statement = con.createStatement();
+	st.streamResults = true;
+
+	var token:MySqlToken = st.executeQuery();
+
+	token.addEventListener(MySqlEvent.COLUMNDATA, function(e:MySqlEvent):void {
+		//setup our datagrid
+		grid.columns = ResultsUtil.getDataGridColumns(e.resultSet);
+		grid.dataProvider = new ArrayCollection();
+	});
+
+	token.addEventListener(MySqlEvent.ROWDATA, function(e:MySqlEvent):void {
+		rowsAvailable = e.rowsAvailable;
+		//update a progress bar
+		pb.setProgress(rowsAvailable, totalRows);
+	});
+
+	token.addResponder(new AsyncResponder(
+		function(data:Object, token:Object):void {
+			//query complete!
 		},
 		
 		function(info:Object, token:Object):void {
