@@ -17,6 +17,7 @@ package com.maclema.mysql
 			
 			if ( rs.size() % streamingInterval == 0 ) {
 				var evt:MySqlEvent = new MySqlEvent(MySqlEvent.ROWDATA);
+				evt.resultSet = rs;
 				evt.rowsAvailable = rs.size();
 				token.dispatchEvent(evt);
 			} 
@@ -25,8 +26,17 @@ package com.maclema.mysql
 			handleNextPacket();
 		}
 		
+		override protected function handleResultSetFieldsEofPacket(packet:ProxiedPacket):void {
+			super.handleResultSetFieldsEofPacket(packet);
+			
+			var evt:MySqlEvent = new MySqlEvent(MySqlEvent.COLUMNDATA);
+			evt.resultSet = rs;
+			token.dispatchEvent(evt);
+		}
+		
 		override protected function handleResultSetRowsEofPacket(packet:ProxiedPacket):void {
 			var evt:MySqlEvent = new MySqlEvent(MySqlEvent.ROWDATA);
+			evt.resultSet = rs;
 			evt.rowsAvailable = rs.size();
 			token.dispatchEvent(evt);
 				

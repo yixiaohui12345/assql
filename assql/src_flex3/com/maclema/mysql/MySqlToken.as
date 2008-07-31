@@ -34,6 +34,11 @@ package com.maclema.mysql
     [Event(name="rowdata", type="com.maclema.mysql.events.MySqlEvent")]
     
     /**
+    * Dispatched when a StreamingQueryHandler recieves column data
+    **/
+    [Event(name="columndata", type="com.maclema.mysql.events.MySqlEvent")]
+    
+    /**
     * This class provieds a place to set additional token-level data for MySql queries. It also allows an IResponder to be attached
     * for an individual call.
     **/
