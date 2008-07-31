@@ -12,7 +12,7 @@
 
 [Examples#Selecting_Binary_Data_Example Selecting Binary Data Example]
 
-[Examples#Stored_Procedure_Example Stored Procedure Example (Will be in Beta 2.7)]
+[Examples#Stored_Procedure_Example Stored Procedure Example] *(Will be in Beta 2.7)*
 
 
 === MySqlService Example ===
@@ -320,7 +320,7 @@ private function handleConnected(e:Event):void {
 			if ( data is ResultSet ) {
 				//handle the results returned.
 			}
-			else is ( data is MySqlResponse ) {
+			else if ( data is MySqlResponse ) {
 				//check the affectedRows of the procedure
 			}
 			else if ( data is MySqlOutputParams ) {
