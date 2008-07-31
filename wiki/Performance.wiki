@@ -3,6 +3,22 @@ Here are some sample queries to give an idea of the performance. All queries wer
 *Updated: July 27 2008. Tests ran against revision 130*
 
 I ran all these queries on a MacBook Pro, 2.4GHz Core 2, 4GB Ram, 7200rpm Drive.
+
+All queries ran against the following table selecting all columns.
+
+CREATE TABLE `employees` (
+  `employeeID` int(11) NOT NULL auto_increment,
+  `username` varchar(255) character set latin1 default NULL,
+  `enabled` tinyint(1) default NULL,
+  `hourlyWage` decimal(8,2) default NULL,
+  `startDate` date default NULL,
+  `shiftStartTime` time default NULL,
+  `photo` longblob,
+  `createDate` datetime default NULL,
+  `modifyDate` timestamp NOT NULL default '0000-00-00 00:00:00' on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`employeeID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 {{{
 [DEBUG] com.maclema.mysql::QueryHandler            : Mysql Result
 [DEBUG] com.maclema.mysql::QueryHandler            :   Rows:       10
