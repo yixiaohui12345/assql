@@ -3,7 +3,7 @@ package com.maclema.mysql
 	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
 	
-	public class ProxiedBuffer extends ProxiedByteArray
+	internal class ProxiedBuffer extends ProxiedByteArray
 	{
 		public function ProxiedBuffer(dmgr:DataManager, oset:int, len:int) {
 			super(dmgr, oset, len);
