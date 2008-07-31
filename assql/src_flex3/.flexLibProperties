@@ -10,6 +10,7 @@
 <classEntry path="com.maclema.mysql.MySqlToken"/>
 <classEntry path="com.adobe.utils.IntUtil"/>
 <classEntry path="com.maclema.mysql.Buffer"/>
+<classEntry path="com.maclema.mysql.MySqlResponse"/>
 <classEntry path="com.maclema.mysql.ServerInformation"/>
 <classEntry path="com.maclema.mysql.ProxiedBuffer"/>
 <classEntry path="com.maclema.mysql.HandshakeHandler"/>
@@ -21,6 +22,7 @@
 <classEntry path="com.maclema.mysql.ProxiedByteArray"/>
 <classEntry path="com.maclema.mysql.MySqlService"/>
 <classEntry path="com.maclema.mysql.DataManager"/>
+<classEntry path="com.maclema.mysql.MySqlOutputParams"/>
 <classEntry path="com.maclema.mysql.CommandHandler"/>
 <classEntry path="com.maclema.mysql.DataHandler"/>
 <classEntry path="com.maclema.mysql.mxml.MySqlService"/>

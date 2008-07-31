@@ -90,5 +90,9 @@ package com.maclema.mysql
         	
         	dispatchEvent(new Event("unregister"));
         }
+        
+        protected function get remainingPackets():int {
+        	return packets.length;
+        }
 	}
 }

@@ -58,7 +58,7 @@ package com.maclema.mysql
 		}*/
 		
 		//this instanceID;
-		private var instanceID:int = -1;
+		internal var instanceID:int = -1;
 		
 		//the actual socket
 		internal var sock:Socket;
@@ -444,7 +444,7 @@ package com.maclema.mysql
 	                    cfpPosition = (cfpPosition+4) + len;
 	                    
 	                   	dataHandler.pushPacket( pack );
-	                   	
+
 	                   	cfpAvail = mgr.buffer.length-cfpPosition;
 	           		}
 	           		else {
@@ -475,7 +475,7 @@ package com.maclema.mysql
 		 * commands properly somewhere so throw an error.
 		 * @private
 		 **/
-		private function setDataHandler(handler:DataHandler):void
+		internal function setDataHandler(handler:DataHandler, data:String=null):void
 		{
 			if ( dataHandler != null ) {
 				throw new Error("Concurrency Error");
@@ -513,9 +513,14 @@ package com.maclema.mysql
         * method(token:MySqlToken, data:*):void
         * @private
         **/
-        private function poolCommand(method:Function, token:MySqlToken, data:*):void {
+        private function poolCommand(method:Function, arg1:*, arg2:*, inject:Boolean=false):void {
         	Logger.info(this, "Pooling Query");
-        	commandPool.push({method: method, token: token, data: data});
+        	if ( !inject ) {
+        		commandPool.push({method: method, arg1: arg1, arg2: arg2});
+        	}
+        	else {
+        		commandPool.splice(0, 0, {method: method, arg1: arg1, arg2: arg2});
+        	}
         }
         
         /**
@@ -528,10 +533,10 @@ package com.maclema.mysql
         		
         		var obj:Object = commandPool.shift();
         		var method:Function = obj.method;
-        		var token:MySqlToken = obj.token;
-        		var data:* = obj.data;
+        		var arg1:* = obj.arg1;
+        		var arg2:* = obj.arg2;
         		
-        		method(token, data);
+        		method(arg1, arg2);
         	}
         }
         

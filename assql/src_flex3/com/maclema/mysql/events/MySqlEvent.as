@@ -1,7 +1,9 @@
 package com.maclema.mysql.events
 {
-	import flash.events.Event;
+	import com.maclema.mysql.MySqlOutputParams;
 	import com.maclema.mysql.ResultSet;
+	
+	import flash.events.Event;
 	
 	/**
 	 * MySql Events are dispatched on successful sql queries or commands to the database. If the command sent results
@@ -12,6 +14,7 @@ package com.maclema.mysql.events
 	{	
 		public static const RESPONSE:String = "response";
 		public static const RESULT:String = "result";
+		public static const PARAMS:String = "params";
 		
 		/**
 		 * The number of affected rows for a RESPONSE event.
@@ -27,6 +30,11 @@ package com.maclema.mysql.events
 		 * The ResultSet for a RESULT event
 		 **/
 		public var resultSet:ResultSet;
+		
+		/**
+		 * The returned output parameters
+		 **/
+		public var params:MySqlOutputParams;
 		
 		/**
 		 * Constructs a new MySqlEvent object.
