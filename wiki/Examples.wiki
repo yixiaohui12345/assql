@@ -12,7 +12,7 @@
 
 [Examples#Selecting_Binary_Data_Example Selecting Binary Data Example]
 
-[Examples#Stored_Procedure_Example Stored Procedure Example (Beta 2.7)]
+[Examples#Stored_Procedure_Example Stored Procedure Example (*Will be in Beta 2.7*)]
 
 
 === MySqlService Example ===
