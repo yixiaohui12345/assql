@@ -16,6 +16,7 @@ package com.maclema.mysql.events
 		public static const RESULT:String = "result";
 		public static const PARAMS:String = "params";
 		public static const ROWDATA:String = "rowdata";
+		public static const COLUMNDATA:String = "columndata";
 		
 		/**
 		 * The number of affected rows for a RESPONSE event.

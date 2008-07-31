@@ -65,8 +65,6 @@ package com.maclema.mysql
 		protected function handleResultSetRowsEofPacket(packet:ProxiedPacket):void {
 			Logger.info(this, "Initializating ResultSet...");
 				
-			rs.initialize(Connection.getInstance(connInstanceID).connectionCharSet);
-			
 			var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
 			evt.resultSet = rs;
 			
@@ -82,6 +80,9 @@ package com.maclema.mysql
 		
 		protected function handleResultSetFieldsEofPacket(packet:ProxiedPacket):void {
 			Logger.info(this, "Reading Row Data...");
+			
+			rs.initialize(Connection.getInstance(connInstanceID).connectionCharSet);
+			
 			readFields = true;
 			working = false;
 			handleNextPacket();

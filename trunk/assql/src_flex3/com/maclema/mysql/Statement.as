@@ -20,8 +20,17 @@ package com.maclema.mysql
         private var outputParams:Object;
         private var hasOutputParams:Boolean = false;
         
+        /**
+        * Indicates if streaming should be used when reading results.
+        **/
         public var streamResults:Boolean = false;
-        public var streamingInterval:int = 1000;
+        
+        /**
+        * If streaming is being used, determines the numbers of rows read between MySqlEvent.ROWDATA events. The
+        * default is 5000 and should usually not be set lower as performance will degrade. Usually at 5000, the events
+        * will be dispatched every 300-500 ms.
+        **/
+        public var streamingInterval:int = 5000;
         
         /**
         * Constructs a new Statement object. Should never be called directly, rather, use Connection.createStatement();
