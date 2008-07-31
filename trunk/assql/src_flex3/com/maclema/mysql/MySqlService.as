@@ -71,7 +71,7 @@ package com.maclema.mysql
 		/**
 		 * The character set to use for the connection
 		 **/
-		public var charSet:String = "utf-8";
+		public var charSet:String = "utf8";
 		
 		/**
 		 * The responder to use for the mysql service
