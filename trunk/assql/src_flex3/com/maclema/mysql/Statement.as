@@ -104,10 +104,6 @@ package com.maclema.mysql
         	hasOutputParams = true;
         }
         
-        public function getString(param:String):String {
-        	return outputParams[param];
-        }
-        
         /**
          * Executes the specified sql statement. The statement can be provided using either the sql property
          * or as the first parameter of this method. You may also specify a IResponder object as the second parameter.
@@ -122,12 +118,12 @@ package com.maclema.mysql
         	
         	var token:MySqlToken = new MySqlToken();
         	
-        	if ( hasOutputParams ) {
-        		return executeQueryWithOutParams(sqlString);
-        	}
-        	
         	if ( sqlString != null ) {
         		this.sql = StringUtil.trim(sqlString);
+        	}
+        	
+        	if ( this.sql.indexOf("call") == 0 ) {
+        		return executeCall();
         	}
         	
         	//parameters
@@ -144,64 +140,192 @@ package com.maclema.mysql
          	return token;
         }
         
-        private function executeQueryWithOutParams(sqlString:String=null):MySqlToken {
-        	Logger.info(this, "executeQueryWithOutParams");
-        	
-        	var publicToken:MySqlToken = new MySqlToken();
-        	var internalToken:MySqlToken = new MySqlToken();
-        	
-        	if ( sqlString != null ) {
-        		this.sql = StringUtil.trim(sqlString);
+        private function dispatchCallToken(callResultSet:ResultSet, callResponse:MySqlResponse, callParams:MySqlOutputParams, publicToken:MySqlToken):void {
+        	if ( callResultSet != null ) {
+        		Logger.debug(this, "Dispatching Call ResultSet");
+        		
+        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
+        		evt.resultSet = callResultSet;
+        		publicToken.dispatchEvent(evt);
         	}
         	
-        	//watch our internal token, when we get our results, grab our output parameters.
-        	internalToken.addResponder(new Responder(
-        		function(internalTokenData:Object):void {
-        			var st_params:Statement = con.createStatement();
-        			var token_params:MySqlToken = new MySqlToken();
-        			con.executeQuery(token_params, getSelectParamsSql());
-        			token_params.addResponder(new Responder(
-        				function(paramsData:Object):void {
-        					if ( paramsData is ResultSet ) {
-	        					ResultSet(paramsData).next();
-	        					for ( var param:String in outputParams ) {
-	        						outputParams[param] = ResultSet(paramsData).getString(param);
-	        					}
-        					}
-        					
-        					var evt:MySqlEvent;
-        					if ( internalTokenData is ResultSet ) {
-        						evt = new MySqlEvent(MySqlEvent.RESULT);
-        						evt.resultSet = ResultSet(internalTokenData);
-        					}
-        					else {
-        						evt = new MySqlEvent(MySqlEvent.RESPONSE);
-        						evt.affectedRows = internalTokenData.affectedRows;
-        						evt.insertID = internalTokenData.insertID;
-        					}
-        					publicToken.dispatchEvent(evt);
-        				},
-        				function(info:Object):void {
-        					ErrorHandler.handleError(info.id, info.msg, publicToken);
-        				}
-        			));
+        	if ( callResponse != null ) {
+        		Logger.debug(this, "Dispatching Call Response");
+        		
+        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
+        		evt.affectedRows = callResponse.affectedRows;
+        		evt.insertID = callResponse.insertID;
+        		publicToken.dispatchEvent(evt);
+        	}
+        	
+        	if ( callParams != null ) {
+        		Logger.debug(this, "Dispatching Call Parameters");
+        		
+        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.PARAMS);
+        		evt.params = callParams;
+        		publicToken.dispatchEvent(evt);
+        	}
+        }
+        
+        private function executeCall():MySqlToken {
+        	var publicToken:MySqlToken = new MySqlToken();
+        	
+        	var callResultSet:ResultSet;
+        	var callResponse:MySqlResponse;
+        	var callParams:MySqlOutputParams;
+        	
+        	//handles getting call output parameters if any are defined
+        	var callParamsToken:MySqlToken = new MySqlToken();
+        	callParamsToken.addResponder(new Responder(
+        		function(data:Object):void {
+        			callParams = new MySqlOutputParams();
+        			
+        			ResultSet(data).next();
+					for ( var param:String in outputParams ) {
+						trace("Param '" + param + "': " + ResultSet(data).getString(param));
+						callParams[param] = ResultSet(data).getString(param);
+					}
+					
+					Logger.debug(this, "Got Output Parameters");
+					dispatchCallToken(callResultSet, callResponse, callParams, publicToken);
         		},
         		function(info:Object):void {
         			ErrorHandler.handleError(info.id, info.msg, publicToken);
         		}
         	));
-        	//parameters
-        	if ( this.sql.indexOf("?") != -1 ) {
-        		Logger.info(this, "executing a statement with parameters");
-        		var binq:BinaryQuery = addParametersToSql();
-        		con.executeBinaryQuery(internalToken, binq);
-        	}
-        	else {
-        		Logger.info(this, "executing a regular statement");
-          		con.executeQuery(internalToken, sql);
-         	}
-         	
-         	return publicToken;
+        	
+        	//handles getting the response object if the procedure returns a resultset.
+        	var callResponseToken:MySqlToken = new MySqlToken();
+        	callResponseToken.addResponder(new Responder(
+        		function(data:Object):void {
+        			callResponse = new MySqlResponse();
+        			callResponse.affectedRows = data.affectedRows;
+        			callResponse.insertID = data.insertID;
+        			
+        			Logger.debug(this, "Got Response.");
+        			
+        			if ( hasOutputParams ) {
+        				Logger.debug(this, "Waiting For Call Output Parameters");
+        				con.executeQuery(callParamsToken, getSelectParamsSql());
+    				}
+    				else {
+    					dispatchCallToken(callResultSet, callResponse, callParams, publicToken);
+    				}
+        		},
+        		function(info:Object):void {
+        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        		}
+        	));
+        	
+        	//handles the first procedure response
+        	var callToken:MySqlToken = new MySqlToken();
+        	callToken.addResponder(new Responder(
+        		function(data:Object):void {
+        			if ( data is ResultSet ) {
+        				Logger.debug(this, "Call Returned a ResultSet, Waiting for Response too.");
+        				callResultSet = ResultSet(data);
+        				con.setDataHandler(new QueryHandler(con.instanceID, callResponseToken));
+        			}
+        			else {
+        				callResponse = new MySqlResponse();
+        				callResponse.affectedRows = data.affectedRows;
+        				callResponse.insertID = data.insertID;
+        				
+        				if ( hasOutputParams ) {
+        					Logger.debug(this, "Waiting For Call Output Parameters");
+        					con.executeQuery(callParamsToken, getSelectParamsSql());
+        				}
+        				else {
+        					dispatchCallToken(callResultSet, callResponse, callParams, publicToken);
+        				}
+        			}
+        		},
+        		function(info:Object):void {
+        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        		}
+        	));
+        	
+        	Logger.debug(this, "Executing Call (" + this.sql + ")");
+        	con.executeQuery(callToken, sql);
+        	
+        	/*var callToken:MySqlToken = new MySqlToken();
+        	callToken.addResponder(new Responder(
+        		function(callData:Object):void {
+        			/* If the stored procedure results a ResultSet, it will then also
+        			   return a response as well, watch for the response and also
+        			   dispatch it. *
+        			if ( callData is ResultSet ) {
+        				var callResponseToken:MySqlToken = new MySqlToken();
+        				con.setDataHandler(new QueryHandler(con.instanceID, callResponseToken));
+        				callResponseToken.addResponder(new Responder(
+        					function(callResponseData:Object):void {
+        						var revt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
+        						revt.affectedRows = callResponseData.affectedRows;
+        						revt.insertID = callResponseData.insertID;
+        						publicToken.dispatchEvent(revt);
+        						
+        						if ( hasOutputParams ) {
+        							getOutputParams(callData, publicToken);
+        						}
+        						else {
+        							var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
+        							evt.resultSet = callData;
+        							publicToken.dispatchEvent(evt);
+        						}
+        					},
+        					function(info:Object):void {
+        						ErrorHandler.handleError(info.id, info.msg, publicToken);
+        					}
+        				));
+        			}
+        			else {
+        				if ( hasOutputParams ) {
+							getOutputParams(callData, publicToken);
+						}
+						else {
+							var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
+							evt.affectedRows = callData.affectedRows;
+        					evt.insertID = callData.insertID;
+							publicToken.dispatchEvent(evt);
+						}
+        			}
+        		},
+        		function(info:Object):void {
+        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        		}
+        	));
+        	
+     		con.executeQuery(callToken, this.sql);*/
+        	
+        	return publicToken;
+        }
+        
+        private function getOutputParams(callData:Object, publicToken:MySqlToken):void {
+        	var paramsToken:MySqlToken = new MySqlToken();
+        	con.executeQuery(paramsToken, getSelectParamsSql());
+        	paramsToken.addResponder(new Responder(
+        		function(paramsData:Object):void {
+        			ResultSet(paramsData).next();
+					for ( var param:String in outputParams ) {
+						outputParams[param] = ResultSet(paramsData).getString(param);
+					}
+					
+					var evt:MySqlEvent;
+					if ( callData is ResultSet ) {
+						evt = new MySqlEvent(MySqlEvent.RESULT);
+						evt.resultSet = ResultSet(callData);
+					}
+					else {
+						evt = new MySqlEvent(MySqlEvent.RESPONSE);
+						evt.affectedRows = callData.affectedRows;
+						evt.insertID = callData.insertID;
+					}
+					publicToken.dispatchEvent(evt);
+        		},
+        		function(info:Object):void {
+        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        		}
+        	));
         }
         
         private function getSelectParamsSql():String {

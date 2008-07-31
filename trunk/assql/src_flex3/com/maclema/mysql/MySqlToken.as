@@ -44,6 +44,7 @@ package com.maclema.mysql
 		{
 			this.addEventListener(MySqlEvent.RESPONSE, handleResponse);
             this.addEventListener(MySqlEvent.RESULT, handleResponse);
+            this.addEventListener(MySqlEvent.PARAMS, handleResponse);
             this.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError);
 		}
 		
@@ -60,11 +61,13 @@ package com.maclema.mysql
 	        	if ( e.type == MySqlEvent.RESULT ) {
 	        		data = e.resultSet;
 	        	}
-	        	else {
-	        		data = {
-	        			affectedRows: e.affectedRows,
-	        			insertID: e.insertID
-	        		}
+	        	else if ( e.type == MySqlEvent.RESPONSE ) {
+	        		data = new MySqlResponse();
+	        		data.affectedRows = e.affectedRows;
+	        		data.insertID = e.insertID;
+	        	}
+	        	else if ( e.type == MySqlEvent.PARAMS ) {
+	        		data = e.params;
 	        	}
 	        	
 	        	Logger.info(this, "Dispatching Result/Response Responders");
