@@ -3,7 +3,7 @@ package com.maclema.mysql
 	import flash.utils.ByteArray;
 	import flash.utils.IDataInput;
 	
-	public class ProxiedByteArray implements IDataInput
+	internal class ProxiedByteArray implements IDataInput
 	{
 		protected var mgr:DataManager;
 		private var offset:int;

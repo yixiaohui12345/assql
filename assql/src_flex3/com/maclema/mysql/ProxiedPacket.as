@@ -1,6 +1,6 @@
 package com.maclema.mysql
 {
-	public class ProxiedPacket extends ProxiedBuffer
+	internal class ProxiedPacket extends ProxiedBuffer
 	{
 		private static const maxAllowedPacket:int = 1024 * 1024 * 1024; //1GB
         public static const maxThreeBytes:int = (256 * 256 * 256) - 1; //16MB
