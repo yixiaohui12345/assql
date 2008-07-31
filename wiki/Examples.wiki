@@ -366,14 +366,14 @@ private function onCreationComplete():void {
 	con.connect();
 }
 
-private var totalRows:int = 0;
+private var totalRows:int = 200000;
 private var rowsAvailable:int = 0;
 
 private function handleConnected(e:Event):void {
 	var st:Statement = con.createStatement();
 	st.streamResults = true;
 
-	var token:MySqlToken = st.executeQuery();
+	var token:MySqlToken = st.executeQuery("SELECT * FROM employees LIMIT 200000");
 
 	token.addEventListener(MySqlEvent.COLUMNDATA, function(e:MySqlEvent):void {
 		//setup our datagrid
