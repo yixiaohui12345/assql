@@ -15,5 +15,9 @@ package com.maclema.mysql
             
             dispatchOn.dispatchEvent(new MySqlErrorEvent(msg, id));
 		}
+		
+		public static function handleError(id:int, msg:String, dispatchOn:IEventDispatcher):void {
+			dispatchOn.dispatchEvent(new MySqlErrorEvent(msg, id));
+		}
 	}
 }

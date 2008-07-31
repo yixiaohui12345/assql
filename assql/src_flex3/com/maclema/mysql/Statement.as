@@ -1,10 +1,12 @@
 package com.maclema.mysql
 {
     import com.maclema.logging.Logger;
+    import com.maclema.mysql.events.MySqlEvent;
     
     import flash.utils.ByteArray;
     
     import mx.formatters.DateFormatter;
+    import mx.rpc.Responder;
     import mx.utils.StringUtil;
     
     /**
@@ -15,6 +17,8 @@ package com.maclema.mysql
         private var con:Connection;
         private var _sql:String = null;
         private var params:Array;
+        private var outputParams:Object;
+        private var hasOutputParams:Boolean = false;
         
         /**
         * Constructs a new Statement object. Should never be called directly, rather, use Connection.createStatement();
@@ -23,6 +27,7 @@ package com.maclema.mysql
         {
             this.con = con;
             this.params = new Array();
+            this.outputParams = {};
         }
         
         
@@ -94,6 +99,15 @@ package com.maclema.mysql
         	params[index] = value;
         }
         
+        public function registerOutputParam(param:String):void {
+        	outputParams[param] = null;
+        	hasOutputParams = true;
+        }
+        
+        public function getString(param:String):String {
+        	return outputParams[param];
+        }
+        
         /**
          * Executes the specified sql statement. The statement can be provided using either the sql property
          * or as the first parameter of this method. You may also specify a IResponder object as the second parameter.
@@ -107,6 +121,10 @@ package com.maclema.mysql
         	Logger.info(this, "executeQuery");
         	
         	var token:MySqlToken = new MySqlToken();
+        	
+        	if ( hasOutputParams ) {
+        		return executeQueryWithOutParams(sqlString);
+        	}
         	
         	if ( sqlString != null ) {
         		this.sql = StringUtil.trim(sqlString);
@@ -124,6 +142,75 @@ package com.maclema.mysql
          	}
          	
          	return token;
+        }
+        
+        private function executeQueryWithOutParams(sqlString:String=null):MySqlToken {
+        	Logger.info(this, "executeQueryWithOutParams");
+        	
+        	var publicToken:MySqlToken = new MySqlToken();
+        	var internalToken:MySqlToken = new MySqlToken();
+        	
+        	if ( sqlString != null ) {
+        		this.sql = StringUtil.trim(sqlString);
+        	}
+        	
+        	//watch our internal token, when we get our results, grab our output parameters.
+        	internalToken.addResponder(new Responder(
+        		function(internalTokenData:Object):void {
+        			var st_params:Statement = con.createStatement();
+        			var token_params:MySqlToken = new MySqlToken();
+        			con.executeQuery(token_params, getSelectParamsSql());
+        			token_params.addResponder(new Responder(
+        				function(paramsData:Object):void {
+        					if ( paramsData is ResultSet ) {
+	        					ResultSet(paramsData).next();
+	        					for ( var param:String in outputParams ) {
+	        						outputParams[param] = ResultSet(paramsData).getString(param);
+	        					}
+        					}
+        					
+        					var evt:MySqlEvent;
+        					if ( internalTokenData is ResultSet ) {
+        						evt = new MySqlEvent(MySqlEvent.RESULT);
+        						evt.resultSet = ResultSet(internalTokenData);
+        					}
+        					else {
+        						evt = new MySqlEvent(MySqlEvent.RESPONSE);
+        						evt.affectedRows = internalTokenData.affectedRows;
+        						evt.insertID = internalTokenData.insertID;
+        					}
+        					publicToken.dispatchEvent(evt);
+        				},
+        				function(info:Object):void {
+        					ErrorHandler.handleError(info.id, info.msg, publicToken);
+        				}
+        			));
+        		},
+        		function(info:Object):void {
+        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        		}
+        	));
+        	//parameters
+        	if ( this.sql.indexOf("?") != -1 ) {
+        		Logger.info(this, "executing a statement with parameters");
+        		var binq:BinaryQuery = addParametersToSql();
+        		con.executeBinaryQuery(internalToken, binq);
+        	}
+        	else {
+        		Logger.info(this, "executing a regular statement");
+          		con.executeQuery(internalToken, sql);
+         	}
+         	
+         	return publicToken;
+        }
+        
+        private function getSelectParamsSql():String {
+        	var sql:String = "SELECT ";
+        	for ( var param:String in outputParams ) {
+        		sql += param + ",";
+        	}
+        	sql = sql.substr(0, sql.length-1);
+        	return sql;
         }
         
         private function addParametersToSql():BinaryQuery {
