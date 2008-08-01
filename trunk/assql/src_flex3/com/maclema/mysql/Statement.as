@@ -28,7 +28,7 @@ package com.maclema.mysql
         /**
         * If streaming is being used, determines the numbers of rows read between MySqlEvent.ROWDATA events. The
         * default is 5000 and should usually not be set lower as performance will degrade. Usually at 5000, the events
-        * will be dispatched every 300-500 ms.
+        * will be dispatched every 100-300 ms.
         **/
         public var streamingInterval:int = 5000;
         
@@ -225,7 +225,7 @@ package com.maclema.mysql
     				}
         		},
         		function(info:Object):void {
-        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        			ErrorHandler.handleError(0, String(info), publicToken);
         		}
         	));
         	
@@ -253,7 +253,7 @@ package com.maclema.mysql
         			}
         		},
         		function(info:Object):void {
-        			ErrorHandler.handleError(info.id, info.msg, publicToken);
+        			ErrorHandler.handleError(0, String(info), publicToken);
         		}
         	));
         	
