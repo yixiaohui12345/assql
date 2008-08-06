@@ -113,12 +113,5 @@ package com.maclema.mysql
         	
         	return xored;
         }
-        
-        public static function getTodayDateString():String {
-        	var df:DateFormatter = new DateFormatter();
-            df.formatString = "YYYY/MM/DD";
-            var dt:Date = new Date();
-            return df.format(dt);
-        }
     }
 }

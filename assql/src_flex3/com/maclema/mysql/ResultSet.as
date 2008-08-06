@@ -21,8 +21,6 @@ package com.maclema.mysql
         private var map:Object;
         private var charSet:String = "";
         
-        private var todayDateString:String;
-        
         /**
         * Constructs a new ResultSet object
         **/
@@ -31,9 +29,6 @@ package com.maclema.mysql
         	this._token = token;
             this.columns = new Array();
             this.rows = new Array();   
-            
-            //for getTime optimization
-            todayDateString = Util.getTodayDateString()
         }
         
         internal function initialize(charSet:String):void {
@@ -200,8 +195,12 @@ package com.maclema.mysql
             if ( timeString == null ) {
             	return null;
             }
-			
-			return new Date(Date.parse(todayDateString + " " + timeString));
+            
+            var hour:int = int(timeString.substr(0,2));
+    		var minute:int = int(timeString.substr(3,2));
+    		var second:int = int(timeString.substr(5,2));
+    		
+    		return new Date(1970, 1, 1, hour, minute, second);
         }
         
         /**
@@ -222,16 +221,24 @@ package com.maclema.mysql
             if ( dateString == null ) {
             	return null;
             }
-        
-            var mainParts:Array = dateString.split(" ");
-            var dateParts:Array = mainParts[0].split("-");
-            
-            //check for 0000-00-00 dates
-            if ( Number(dateParts[0])+Number(dateParts[1])+Number(dateParts[2]) == 0 ) {
-            	return null;
-            }
-            
-            return new Date(Date.parse(dateParts.join("/")+(mainParts[1]?" "+mainParts[1]:" ")));
+        	
+        	var year:int = int(dateString.substr(0,4));
+        	var month:int = int(dateString.substr(5,2));
+        	var day:int = int(dateString.substr(8,2));
+        	
+        	if ( year == 0 && month == 0 && day == 0 ) {
+        		return null;
+        	}
+        	
+        	if ( dateString.length == 10 ) {
+        		return new Date(year, month, day);
+        	}
+        	
+    		var hour:int = int(dateString.substr(11,2));
+    		var minute:int = int(dateString.substr(14,2));
+    		var second:int = int(dateString.substr(17,2));
+    		
+    		return new Date(year, month, day, hour, minute, second);
         }
         
         /**
@@ -290,7 +297,7 @@ package com.maclema.mysql
 					var obj:Object = new Object();
 					
 					columns.forEach(function(c:Field, index:int, arr:Array):void {
-						obj[c.getName()] = getCastedValue(c, dateTimesAsStrings);
+						castAndSetValue(obj, c, dateTimesAsStrings);
 					});
 					
 					getRowsCache[index] = obj;
@@ -309,28 +316,28 @@ package com.maclema.mysql
 		    return new ArrayCollection(arr);
 		}
         
-        private function getCastedValue(field:Field, dateTimesAsStrings:Boolean):*
+        private function castAndSetValue(obj:Object, field:Field, dateTimesAsStrings:Boolean):void
 		{
 			switch (field.getAsType())
 			{
 				case Mysql.AS3_TYPE_NUMBER:
-					return getNumber(field.getName());
+					obj[field.getName()] = getNumber(field.getName()); return;
+					
+				case Mysql.AS3_TYPE_STRING:
+					obj[field.getName()] = getString(field.getName()); return;
 					
 				case Mysql.AS3_TYPE_DATE:
 					if ( dateTimesAsStrings ) { break; }
-					return getDate(field.getName());
+					obj[field.getName()] = getDate(field.getName()); return;
 					
 				case Mysql.AS3_TYPE_TIME:
 					if ( dateTimesAsStrings ) { break; }
-					return getTime(field.getName());
+					obj[field.getName()] = getTime(field.getName()); return;
 				
-				case Mysql.AS3_TYPE_STRING:
-					return getString(field.getName());
-					
 				case Mysql.AS3_TYPE_BYTEARRAY:
-					return getBinary(field.getName());
+					obj[field.getName()] = getBinary(field.getName()); return;
 			}
-			return getString(field.getName());
+			obj[field.getName()] = getString(field.getName()); return;
 		}
         
         /**
@@ -362,12 +369,12 @@ package com.maclema.mysql
         		columns[i] = null;
         	}
         	
-			System.gc();
+			System.gc();System.gc();
 			        	
         	rows = new Array();
         	columns = new Array();
         	
-        	System.gc();
+        	System.gc();System.gc();
         }
     }
 }
