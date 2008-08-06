@@ -195,12 +195,8 @@ package com.maclema.mysql
             if ( timeString == null ) {
             	return null;
             }
-            
-            var hour:int = int(timeString.substr(0,2));
-    		var minute:int = int(timeString.substr(3,2));
-    		var second:int = int(timeString.substr(5,2));
-    		
-    		return new Date(1970, 1, 1, hour, minute, second);
+        	
+        	return new Date(Date.parse( "1970/01/01 " + timeString ));
         }
         
         /**
@@ -219,26 +215,26 @@ package com.maclema.mysql
             var dateString:String = getString(column);
             
             if ( dateString == null ) {
-            	return null;
-            }
-        	
-        	var year:int = int(dateString.substr(0,4));
-        	var month:int = int(dateString.substr(5,2));
-        	var day:int = int(dateString.substr(8,2));
-        	
-        	if ( year == 0 && month == 0 && day == 0 ) {
-        		return null;
-        	}
-        	
-        	if ( dateString.length == 10 ) {
-        		return new Date(year, month, day);
-        	}
-        	
-    		var hour:int = int(dateString.substr(11,2));
-    		var minute:int = int(dateString.substr(14,2));
-    		var second:int = int(dateString.substr(17,2));
-    		
-    		return new Date(year, month, day, hour, minute, second);
+		    	return null;
+		    }
+			
+			var year:int = int(dateString.substr(0,4));
+			var month:int = int(dateString.substr(5,2))-1;
+			var day:int = int(dateString.substr(8,2));
+			
+			if ( year == 0 && month == 0 && day == 0 ) {
+				return null;
+			}
+			
+			if ( dateString.length == 10 ) {
+				return new Date(year, month, day);
+			}
+			
+			var hour:int = int(dateString.substr(11,2));
+			var minute:int = int(dateString.substr(14,2));
+			var second:int = int(dateString.substr(17,2));
+			
+			return new Date(year, month, day, hour, minute, second);
         }
         
         /**
