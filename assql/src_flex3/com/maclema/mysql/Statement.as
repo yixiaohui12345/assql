@@ -272,8 +272,8 @@ package com.maclema.mysql
         	return sql;
         }
         
-        private function addParametersToSql():BinaryQuery {
-        	var parts:Array = this.sql.split("?");
+        private function addParametersToSql():BinaryQuery {        	
+        	var parts:Array = Util.splitIgnoreQuotedDelim(this.sql, "?");
     		var binq:BinaryQuery = new BinaryQuery(con.connectionCharSet);
     		for ( var i:int = 0; i<parts.length; i++ ) {
     			binq.append(parts[i]);
@@ -281,24 +281,29 @@ package com.maclema.mysql
     			if ( params[i+1] ) {
     				var value:* = params[i+1];
     				
-    				binq.append("'");
-    				if ( value is String ) {
-    					binq.append(value, true);
-    				}
-    				else if ( value is int || value is Number ) {
-    					binq.append(String(value));
-    				}
-    				else if ( value is Date ) {
-    					binq.append(String((value as Date).getTime()));
-    				}
-    				else if ( value is ByteArray ) {
-    					binq.appendBinary(ByteArray(value));
+    				if ( value == null ) {
+    					binq.append("NULL");
     				}
     				else {
-    					Logger.fatal(this, "Unknown parameter objject for parameter index " + i);
-    					throw new Error("Unknown Parameter Object For Parameter Index " + i);
+	    				binq.append("'");
+	    				if ( value is String ) {
+	    					binq.append(value, true);
+	    				}
+	    				else if ( value is int || value is Number ) {
+	    					binq.append(String(value));
+	    				}
+	    				else if ( value is Date ) {
+	    					binq.append(String((value as Date).getTime()));
+	    				}
+	    				else if ( value is ByteArray ) {
+	    					binq.appendBinary(ByteArray(value));
+	    				}
+	    				else {
+	    					Logger.fatal(this, "Unknown parameter obect for parameter index " + i);
+	    					throw new Error("Unknown Parameter Object For Parameter Index " + i);
+	    				}
+	    				binq.append("'");
     				}
-    				binq.append("'");
     			}
     		}
     		return binq;
