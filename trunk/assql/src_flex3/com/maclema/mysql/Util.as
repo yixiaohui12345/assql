@@ -4,8 +4,6 @@ package com.maclema.mysql
     
     import flash.utils.ByteArray;
     
-    import mx.formatters.DateFormatter;
-    
     internal class Util
     {
     	/**
@@ -112,6 +110,48 @@ package com.maclema.mysql
         	xored.position = 0;
         	
         	return xored;
+        }
+        
+        public static function splitIgnoreQuotedDelim(text:String, delim:String):Array {
+        	var parts:Array = new Array();
+        	var inQuotes:Boolean = false;
+        	var quoteID:String = "";
+        	
+        	for ( var i:int=text.length-1; i>=0; i-- ) {
+        		if ( isQuote(text.charAt(i)) ) {
+        			if ( !inQuotes ) {
+        				inQuotes = true;
+        				quoteID = text.charAt(i);
+        			}
+        			else {
+        				if ( text.charAt(i) == quoteID ) {
+        					if ( text.charAt(i-1) != "\\" ) {
+        						inQuotes = false;
+        					}
+        				}
+        			}
+        		}
+        		
+        		if ( !inQuotes ) {
+	        		if ( text.charAt(i) == delim ) {
+	        			var part:String = text.substr(i+1);
+	        			text = text.substr(0, i);
+	        			if ( parts.length > 0 || (parts.length == 0 && part != "") ) {
+	        				parts.splice(0, 0, part);
+	        			}
+	        		}
+        		}
+        		
+        		if ( i == 0 && text.length > 0 ) {
+        			parts.splice(0, 0, text);
+        		}
+        	}
+        	
+        	return parts;
+        }
+        
+        private static function isQuote(char:String):Boolean {
+        	return (char == '"' || char == "'");
         }
     }
 }
