@@ -231,6 +231,12 @@ package com.maclema.mysql
         	
         	//handles the first procedure response
         	var callToken:MySqlToken = new MySqlToken();
+        	callToken.addEventListener(MySqlEvent.ROWDATA, function(e:MySqlEvent):void {
+        		publicToken.dispatchEvent(e.copy());
+        	});
+        	callToken.addEventListener(MySqlEvent.COLUMNDATA, function(e:MySqlEvent):void {
+        		publicToken.dispatchEvent(e.copy());
+        	});
         	callToken.addResponder(new Responder(
         		function(data:Object):void {
         			if ( data is ResultSet ) {
