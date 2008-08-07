@@ -50,5 +50,15 @@ package com.maclema.mysql.events
 		{
 			super(type);
 		}
+		
+		public function copy():MySqlEvent {
+			var evt:MySqlEvent = new MySqlEvent(type);
+			evt.affectedRows = affectedRows;
+			evt.insertID = insertID;
+			evt.resultSet = resultSet;
+			evt.params = params;
+			evt.rowsAvailable = rowsAvailable;
+			return evt;
+		}
 	}
 }
