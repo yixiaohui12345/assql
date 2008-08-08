@@ -113,6 +113,24 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
+<a class="signatureLink" href="#event:columndata">columndata</a>
+</div>
+</td><td class="summaryTableDescription summaryTableCol">
+    Dispatched when a StreamingQueryHandler recieves column data
+    </td><td class="summaryTableOwnerCol">MySqlToken</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#event:params">params</a>
+</div>
+</td><td class="summaryTableDescription summaryTableCol">
+  Dispatched when stored procedure output parameters are available
+  </td><td class="summaryTableOwnerCol">MySqlToken</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
 <a class="signatureLink" href="#event:response">response</a>
 </div>
 </td><td class="summaryTableDescription summaryTableCol">
@@ -125,8 +143,16 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <a class="signatureLink" href="#event:result">result</a>
 </div>
 </td><td class="summaryTableDescription summaryTableCol">
-    Dispatche when a data manipulation query successfully executes
+    Dispatched when a data manipulation query successfully executes
     </td><td class="summaryTableOwnerCol">MySqlToken</td>
+</tr>
+<tr class="">
+<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
+<div class="summarySignature">
+<a class="signatureLink" href="#event:rowdata">rowdata</a>
+</div>
+</td><td class="summaryTableDescription summaryTableCol">
+    Dispatched when a StreamingQueryHandler recieves more rows.</td><td class="summaryTableOwnerCol">MySqlToken</td>
 </tr>
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
@@ -219,10 +245,34 @@ showHideInherited();
 </table>
 </div>
 <div class="detailSectionHeader">Event detail</div>
+<a name="event:columndata"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">columndata</td><td class="detailHeaderType">event&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
+<br>
+<p></p><p>
+    Dispatched when a StreamingQueryHandler recieves column data
+    </p></div>
+<a name="event:params"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">params</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
+<br>
+<p></p><p>
+  Dispatched when stored procedure output parameters are available
+  </p></div>
 <a name="event:response"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">response</td><td class="detailHeaderType">event&nbsp;</td>
+<td class="detailHeaderName">response</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
 </tr>
 </table>
 <div class="detailBody">
@@ -241,7 +291,19 @@ showHideInherited();
 <span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
 <br>
 <p></p><p>
-    Dispatche when a data manipulation query successfully executes
+    Dispatched when a data manipulation query successfully executes
+    </p></div>
+<a name="event:rowdata"></a>
+<table cellspacing="0" cellpadding="0" class="detailHeader">
+<tr>
+<td class="detailHeaderName">rowdata</td><td class="detailHeaderType">event&nbsp;</td><td class="detailHeaderRule">&nbsp;</td>
+</tr>
+</table>
+<div class="detailBody">
+<span class="label">Event object type: </span><a href="events/MySqlEvent.html"><code>com.maclema.mysql.events.MySqlEvent</code></a>
+<br>
+<p></p><p>
+    Dispatched when a StreamingQueryHandler recieves more rows.
     </p></div>
 <a name="event:sqlError"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
