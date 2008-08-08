@@ -4,7 +4,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../style.css" type="text/css" media="screen">
 <link rel="stylesheet" href="../../../print.css" type="text/css" media="print">
-<meta content="ResultSet,com.maclema.mysql.ResultSet,numColumns,token,addColumn,addRow,dispose,first,getBinary,getBoolean,getColumns,getDate,getInt,getNumber,getRows,getString,getTime,initialize,last,next,previous,size" name="keywords">
+<meta content="ResultSet,com.maclema.mysql.ResultSet,numColumns,token,dispose,first,getBinary,getBoolean,getColumns,getDate,getInt,getNumber,getRows,getString,getTime,last,next,previous,size" name="keywords">
 <title>com.maclema.mysql.ResultSet</title>
 </head>
 <body>
@@ -84,22 +84,10 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
 <tr class="">
 <td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
 <div class="summarySignature">
-<a class="signatureLink" href="#addColumn()">addColumn</a>(field:<a href="Field.html">Field</a>):void</div>
-<div class="summaryTableDescription"></div>
-</td><td class="summaryTableOwnerCol">ResultSet</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#addRow()">addRow</a>(data:ProxiedPacket):void</div>
-<div class="summaryTableDescription"></div>
-</td><td class="summaryTableOwnerCol">ResultSet</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
 <a class="signatureLink" href="#dispose()">dispose</a>():void</div>
-<div class="summaryTableDescription"></div>
+<div class="summaryTableDescription">
+        Cleans up resources held by this result set
+        </div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -187,13 +175,6 @@ if (!isEclipse() || window.name != ECLIPSE_FRAME_NAME) {titleBar_setSubTitle("Cl
         Returns a Date object, where yyyy-mm-dd is always the current date, but
         the time values are HH:mm:ss from the column
         </div>
-</td><td class="summaryTableOwnerCol">ResultSet</td>
-</tr>
-<tr class="">
-<td class="summaryTablePaddingCol">&nbsp;</td><td class="summaryTableInheritanceCol">&nbsp;</td><td class="summaryTableSignatureCol">
-<div class="summarySignature">
-<a class="signatureLink" href="#initialize()">initialize</a>(charSet:String):void</div>
-<div class="summaryTableDescription"></div>
 </td><td class="summaryTableOwnerCol">ResultSet</td>
 </tr>
 <tr class="">
@@ -288,43 +269,16 @@ showHideInherited();
 </div>
 <a name="methodDetail"></a>
 <div class="detailSectionHeader">Method detail</div>
-<a name="addColumn()"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">addColumn</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public function addColumn(field:<a href="Field.html">Field</a>):void</code><span class="label">Parameters</span>
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td width="20px"></td><td><code><span class="label">field</span>:<a href="Field.html">Field</a></code></td>
-</tr>
-</table>
-</div>
-<a name="addRow()"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">addRow</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public function addRow(data:ProxiedPacket):void</code><span class="label">Parameters</span>
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td width="20px"></td><td><code><span class="label">data</span>:ProxiedPacket</code></td>
-</tr>
-</table>
-</div>
 <a name="dispose()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
-<td class="detailHeaderName">dispose</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
+<td class="detailHeaderName">dispose</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td>
 </tr>
 </table>
 <div class="detailBody">
-<code>public function dispose():void</code>
-</div>
+<code>public function dispose():void</code><p>
+        Cleans up resources held by this result set
+        </p></div>
 <a name="first()"></a>
 <table cellspacing="0" cellpadding="0" class="detailHeader">
 <tr>
@@ -552,20 +506,6 @@ showHideInherited();
 <table border="0" cellspacing="0" cellpadding="0">
 <tr>
 <td width="20"></td><td><code>Date</code></td>
-</tr>
-</table>
-</div>
-<a name="initialize()"></a>
-<table cellspacing="0" cellpadding="0" class="detailHeader">
-<tr>
-<td class="detailHeaderName">initialize</td><td class="detailHeaderParens">()</td><td class="detailHeaderType">method</td><td class="detailHeaderRule">&nbsp;</td>
-</tr>
-</table>
-<div class="detailBody">
-<code>public function initialize(charSet:String):void</code><span class="label">Parameters</span>
-<table border="0" cellspacing="0" cellpadding="0">
-<tr>
-<td width="20px"></td><td><code><span class="label">charSet</span>:String</code></td>
 </tr>
 </table>
 </div>

@@ -49,6 +49,9 @@ package com.maclema.mysql
 		//connection instances.
 		private static var instances:Array = new Array();
 		
+		/**
+		 * @private
+		 **/
 		internal static function getInstance(instanceID:int):Connection {
 			return Connection(instances[instanceID]);
 		}
@@ -58,9 +61,15 @@ package com.maclema.mysql
 		}*/
 		
 		//this instanceID;
+		/**
+		 * @private
+		 **/
 		internal var instanceID:int = -1;
 		
 		//the actual socket
+		/**
+		 * @private
+		 **/
 		internal var sock:Socket;
 		
 		//connection information
@@ -78,6 +87,9 @@ package com.maclema.mysql
 		//the current data reader
 		private var dataHandler:DataHandler;
 		
+		/**
+		 * @private
+		 **/
 		internal var clientParam:Number = 0;
 		
 		//the server information
@@ -331,6 +343,9 @@ package com.maclema.mysql
             sendCommand(Mysql.COM_INIT_DB, whatDb);
         }
         
+        /**
+		 * @private
+		 **/
         internal function initConnection():void {
         	var mysqlCharSet:String = connectionCharSet;
         	connectionCharSet = CharSets.as3CharSetFromMysqlCharSet(connectionCharSet);
@@ -354,6 +369,9 @@ package com.maclema.mysql
         	));
         }
         
+        /**
+		 * @private
+		 **/
         internal function getSocket():Socket {
         	return sock;
         }
