@@ -31,6 +31,9 @@ package com.maclema.mysql
             this.rows = new Array();   
         }
         
+        /**
+		 * @private
+		 **/
         internal function initialize(charSet:String):void {
         	charSet = charSet;
         	
@@ -43,10 +46,16 @@ package com.maclema.mysql
             }
         }
         
+        /**
+		 * @private
+		 **/
         internal function addColumn(field:Field):void {
         	this.columns[this.columns.length] = field;
         }
         
+        /**
+		 * @private
+		 **/
         internal function addRow(data:ProxiedPacket):void {
         	this.rows[this.rows.length] = [data, null, null, false];
         }
@@ -351,8 +360,13 @@ package com.maclema.mysql
         	return rows.length;
         }
         
+        /**
+        * Cleans up resources held by this result set
+        **/
         public function dispose():void {
-        	for ( var i:int=0; i<rows.length; i++ ) {
+        	var i:int;
+        	
+        	for ( i=0; i<rows.length; i++ ) {
         		delete rows[i][0];
         		delete rows[i][1];
         		delete rows[i][2];
@@ -360,9 +374,13 @@ package com.maclema.mysql
         		rows[i] = null;
         	}
         	
-        	for ( var i:int=0; i<columns.length; i++ ) {
+        	for ( i=0; i<columns.length; i++ ) {
         		delete columns[i];
         		columns[i] = null;
+        	}
+        	
+        	for ( i=0; i<getRowsCache.length; i++ ) {
+        		delete getRowsCache[i];
         	}
         	
 			System.gc();System.gc();

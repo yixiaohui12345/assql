@@ -111,6 +111,9 @@ package com.maclema.mysql
         	params[index] = value;
         }
         
+        /**
+        * Register an output parameter that will be returned from a stored procedure
+        **/
         public function registerOutputParam(param:String):void {
         	outputParams[param] = null;
         	hasOutputParams = true;
@@ -153,10 +156,12 @@ package com.maclema.mysql
         }
         
         private function dispatchCallToken(callResultSet:ResultSet, callResponse:MySqlResponse, callParams:MySqlOutputParams, publicToken:MySqlToken):void {
+        	var evt:MySqlEvent;
+        	
         	if ( callResultSet != null ) {
         		Logger.debug(this, "Dispatching Call ResultSet");
         		
-        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESULT);
+        		evt = new MySqlEvent(MySqlEvent.RESULT);
         		evt.resultSet = callResultSet;
         		publicToken.dispatchEvent(evt);
         	}
@@ -164,7 +169,7 @@ package com.maclema.mysql
         	if ( callResponse != null ) {
         		Logger.debug(this, "Dispatching Call Response");
         		
-        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.RESPONSE);
+        		evt = new MySqlEvent(MySqlEvent.RESPONSE);
         		evt.affectedRows = callResponse.affectedRows;
         		evt.insertID = callResponse.insertID;
         		publicToken.dispatchEvent(evt);
@@ -173,7 +178,7 @@ package com.maclema.mysql
         	if ( callParams != null ) {
         		Logger.debug(this, "Dispatching Call Parameters");
         		
-        		var evt:MySqlEvent = new MySqlEvent(MySqlEvent.PARAMS);
+        		evt = new MySqlEvent(MySqlEvent.PARAMS);
         		evt.params = callParams;
         		publicToken.dispatchEvent(evt);
         	}

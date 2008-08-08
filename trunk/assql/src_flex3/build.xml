@@ -104,7 +104,7 @@ email: fgdevelopment@flashgen.com
 		whichever one you need to use depending on your version of Flex Builder.
 		##############################################################################################	
 	-->
-	<property name="ASDocs.dir" location="/Applications/Adobe Flex Builder 3 - Release/Adobe Flex Builder 3/sdks/3.0.0"/>
+	<property name="ASDocs.dir" location="/Applications/Adobe Flex Builder 3/sdks/3.0.0"/>
 
 	<!--
 		##############################################################################################	
