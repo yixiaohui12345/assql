@@ -125,37 +125,37 @@ package com.maclema.mysql
             return false;
         }
         
-        /**
-         * Moves the pointer to the first row
-         **/
-        public function first():Boolean
-        {
-            if ( rows.length == 0 )
-            {
-                index = -1;
-                return false;
-            }
-            
-            index = 0;
-            initRow(index);
-            return true;
-        }
-        
-        /**
-         * Moves the pointer to the last row.
-         **/
-        public function last():Boolean
-        {
-            if ( rows.length == 0 )
-            {
-                index = -1;
-                return false;
-            }
-            
-            index = rows.length-1;
-            initRow(index);
-            return true;
-        }
+		/**
+		 * Moves the pointer to the first row
+		 **/
+		public function first():Boolean
+		{
+		    if ( rows.length == 0 )
+		    {
+		        index = -1;
+		        return false;
+		    }
+		    
+		    index = 0;
+		    initRow(index);
+		    return true;
+		}
+		
+		/**
+		 * Moves the pointer to the last row.
+		 **/
+		public function last():Boolean
+		{
+		    if ( rows.length == 0 )
+		    {
+		        index = -1;
+		        return false;
+		    }
+		    
+		    index = rows.length-1;
+		    initRow(index);
+		    return true;
+		}
         
         /**
          * Returns a String value from the specified column. You may specify
