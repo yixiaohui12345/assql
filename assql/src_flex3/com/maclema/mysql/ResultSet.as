@@ -133,11 +133,11 @@ package com.maclema.mysql
             if ( rows.length == 0 )
             {
                 index = -1;
-                initRow(index);
                 return false;
             }
             
             index = 0;
+            initRow(index);
             return true;
         }
         
@@ -149,11 +149,11 @@ package com.maclema.mysql
             if ( rows.length == 0 )
             {
                 index = -1;
-                initRow(index);
                 return false;
             }
             
             index = rows.length-1;
+            initRow(index);
             return true;
         }
         
