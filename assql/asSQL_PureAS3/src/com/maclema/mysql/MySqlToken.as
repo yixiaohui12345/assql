@@ -99,7 +99,7 @@ package com.maclema.mysql
 	        	Logger.info(this, "Dispatching Fault Responders");
 	        	
 	        	for ( var i:int=0; i<responders.length; i++ ) {
-	        		var responder = responders[i];
+	        		var responder:* = responders[i];
 	        		responder.fault(data);
 	        	}
         	}
