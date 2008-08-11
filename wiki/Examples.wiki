@@ -24,32 +24,39 @@ This example is using MySqlService and DataGrid. The data grid's columns propert
 {{{
 <?xml version="1.0" encoding="utf-8"?>
 <mx:WindowedApplication 
-	xmlns:mx="http://www.adobe.com/2006/mxml" 
-	xmlns:assql="com.maclema.mysql.mxml.*" 
-	layout="absolute">
+        xmlns:mx="http://www.adobe.com/2006/mxml" 
+        xmlns:assql="com.maclema.mysql.mxml.*" 
+        layout="absolute">
+        
+        <mx:Script>
+        <![CDATA[
+			import mx.controls.Alert;
+			import com.maclema.mysql.events.MySqlErrorEvent;
+	        import com.maclema.util.ResultsUtil;
 	
-	<mx:Script>
-	<![CDATA[
-		import com.maclema.util.ResultsUtil;
-
-		private function handleConnected(e:Event):void {
-			service.send("SELECT * FROM employees");
-		}
-	]]>
-	</mx:Script>
-	
-	<assql:MySqlService id="service"
-		hostname="localhost" 
-		username="root"
-		password=""
-		database="assql-test"
-		autoConnect="true"
-		connect="handleConnected(event)" />
-		
-	<mx:DataGrid id="grid" left="10" right="10" top="10" bottom="10"
-		dataProvider="{service.lastResult}"
-		columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" />
-		
+	        private function handleConnected(e:Event):void {
+	        	service.send("SELECT * FROM employees2 LIMIT 10");
+	        }
+	        
+	        private function handleError(e:MySqlErrorEvent):void {
+	        	Alert.show(e.text);
+	        }
+        ]]>
+        </mx:Script>
+        
+        <assql:MySqlService id="service"
+                hostname="localhost" 
+                username="root"
+                password=""
+                database="assql-test"
+                autoConnect="true"
+                connect="handleConnected(event)" 
+                sqlError="handleError(event)" />
+                
+        <mx:DataGrid id="grid" left="10" right="10" top="10" bottom="10"
+                dataProvider="{service.lastResult}"
+                columns="{ResultsUtil.getDataGridColumns(service.lastResultSet)}" />
+                
 </mx:WindowedApplication>
 }}}
 
