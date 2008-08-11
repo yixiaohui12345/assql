@@ -32,6 +32,8 @@ package com.maclema.mysql.mxml
 		 **/
 		public function MySqlService()
 		{
+			super();
+			
 			addEventListener(MySqlErrorEvent.SQL_ERROR, removeBusyCursor);
 			addEventListener(MySqlEvent.RESULT, removeBusyCursor);
 			addEventListener(MySqlEvent.RESPONSE, removeBusyCursor);
@@ -88,7 +90,7 @@ package com.maclema.mysql.mxml
 			return token;
 		}
 		
-		private function removeBusyCursor(e:MySqlEvent=null):void {
+		private function removeBusyCursor(e:*=null):void {
 			CursorManager.removeBusyCursor();
 		}
 	}

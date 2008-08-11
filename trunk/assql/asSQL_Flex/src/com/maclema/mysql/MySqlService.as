@@ -7,8 +7,8 @@ package com.maclema.mysql
 	import flash.events.EventDispatcher;
 	
 	import mx.collections.ArrayCollection;
-	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
+	import mx.rpc.Responder;
 	
 	/**
 	 * Dispatched when an SQL error occurs.
@@ -174,7 +174,11 @@ package com.maclema.mysql
 		}
 		
 		private function handleConnectError(e:MySqlErrorEvent):void {
-			dispatchEvent(e);
+			var evt:MySqlErrorEvent = new MySqlErrorEvent(MySqlErrorEvent.SQL_ERROR);
+			evt.id = e.id;
+			evt.msg = e.msg;
+			evt.text = e.text;
+			dispatchEvent(evt);
 		}
 		
 		/**
@@ -187,18 +191,20 @@ package com.maclema.mysql
 			if ( queryObject is String ) {
 				st = con.createStatement();
 				token = st.executeQuery(String(queryObject));
-				token.addResponder(new AsyncResponder(handleResult, handleError, token));
+				token.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError2);
+				token.addResponder(new Responder(handleResult, handleError));
 			}
 			else if ( queryObject is Statement ) {
 				st = Statement(queryObject);
 				token = st.executeBinaryQuery(BinaryQuery(queryObject));
-				token.addResponder(new AsyncResponder(handleResult, handleError, token));
+				token.addEventListener(MySqlErrorEvent.SQL_ERROR, handleError2);
+				token.addResponder(new Responder(handleResult, handleError));
 			}
 			
 			return token;
 		}
 		
-		private function handleResult(data:Object, token:Object=null):void {
+		private function handleResult(data:Object):void {
 			if ( data is ResultSet ) {
 				_lastResultSet = ResultSet(data);
 				_lastResult = _lastResultSet.getRows() as ArrayCollection;
@@ -215,10 +221,18 @@ package com.maclema.mysql
 			}
 		}
 		
-		private function handleError(info:Object, token:Object=null):void {
+		private function handleError(info:Object):void {
 			if ( responder != null ) {
 				responder.fault(info);
 			}
+		}
+		
+		private function handleError2(e:MySqlErrorEvent):void {
+			var evt:MySqlErrorEvent = new MySqlErrorEvent(MySqlErrorEvent.SQL_ERROR);
+			evt.id = e.id;
+			evt.msg = e.msg;
+			evt.text = e.text;
+			dispatchEvent(evt);
 		}
 	}
 }
