@@ -5,8 +5,6 @@ package com.maclema.mysql
     
     import flash.utils.ByteArray;
     
-    import mx.utils.StringUtil;
-    
     /**
     * The Statement class allows you to execute queries for the MySql connection.
     **/
@@ -45,7 +43,7 @@ package com.maclema.mysql
         * Set the sql string to execute
         **/
         public function set sql(value:String):void {
-        	this._sql = StringUtil.trim(value);
+        	this._sql = value;
         }
         
         /**
@@ -142,7 +140,7 @@ package com.maclema.mysql
         	var token:MySqlToken = new MySqlToken();
         	
         	if ( sqlString != null ) {
-        		this.sql = StringUtil.trim(sqlString);
+        		this.sql = sqlString;
         	}
         	
         	if ( this.sql.indexOf("call") == 0 ) {
