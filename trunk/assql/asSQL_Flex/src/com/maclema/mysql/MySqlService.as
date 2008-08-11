@@ -215,7 +215,7 @@ package com.maclema.mysql
 			}
 		}
 		
-		private function handleError(info:Object):void {
+		private function handleError(info:Object, token:Object=null):void {
 			if ( responder != null ) {
 				responder.fault(info);
 			}
