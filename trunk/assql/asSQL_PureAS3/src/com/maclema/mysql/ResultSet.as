@@ -279,7 +279,7 @@ package com.maclema.mysql
          * The results of getRows are cached, so additional calls to getRows() will be a lot faster.
          **/
         private var getRowsCache:Array = new Array();
-		public function getRows(dateTimesAsStrings:Boolean=false, offset:int=0, len:int=0):Array
+		public function getRows(dateTimesAsStrings:Boolean=false, offset:int=0, len:int=0):*
 		{
 			Logger.debug(this, "Converting ResultSet to ArrayCollection...");
 			var st:Number = getTimer();
