@@ -79,6 +79,23 @@ package com.maclema.mysql
         	}
         }
         
+        public function set position(value:int):void {
+        	if ( value < 0 ) {
+        		throw new RangeError("Cannot set position less than 0");
+        	}
+        	else if ( value > size()-1 ) {
+        		throw new RangeError("Cannot set position greater then number of rows");
+        	}
+        	else {
+        		index = value;
+        		initRow(index); //dont forget to initialize the row.
+        	}
+        }
+        
+        public function get position():int {
+        	return index;
+        }
+        
         /**
         * Returns the token object that created this result set.
         **/
