@@ -351,59 +351,89 @@ private function handleConnected(e:Event):void {
 
 === Streaming Results ===
 
-This is an example of streaming a very large ResultSet.
+This is an example of streaming a very large ResultSet and updating a DataGrid every time we receive 500 new rows.
 
 {{{
-import com.maclema.mysql.Statement;
-import com.maclema.mysql.Connection;
-import com.maclema.mysql.ResultSet;
-import mx.controls.Alert;
-import mx.rpc.AsyncResponder;
-import com.maclema.mysql.MySqlToken;
-import com.maclema.mysql.MySqlResponse;
-import com.maclema.mysql.MySqlOutputParams;
-import com.maclema.util.ResultsUtil;
-
-//The MySql Connection
-private var con:Connection;
-
-private function onCreationComplete():void {
-	con = new Connection("localhost", 3306, "root", "", "assql-test");
-	con.addEventListener(Event.CONNECT, handleConnected);
-	con.connect();
-}
-
-private var totalRows:int = 200000;
-private var rowsAvailable:int = 0;
-
-private function handleConnected(e:Event):void {
-	var st:Statement = con.createStatement();
-	st.streamResults = true;
-
-	var token:MySqlToken = st.executeQuery("SELECT * FROM employees LIMIT 200000");
-
-	token.addEventListener(MySqlEvent.COLUMNDATA, function(e:MySqlEvent):void {
-		//setup our datagrid
-		grid.columns = ResultsUtil.getDataGridColumns(e.resultSet);
-		grid.dataProvider = new ArrayCollection();
-	});
-
-	token.addEventListener(MySqlEvent.ROWDATA, function(e:MySqlEvent):void {
-		rowsAvailable = e.rowsAvailable;
-		//update a progress bar
-		pb.setProgress(rowsAvailable, totalRows);
-	});
-
-	token.addResponder(new AsyncResponder(
-		function(data:Object, token:Object):void {
-			//query complete!
-		},
-		
-		function(info:Object, token:Object):void {
-			Alert.show("Error: " + info);
-		},
-		
-		token
-	));
-}
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication 
+        xmlns:mx="http://www.adobe.com/2006/mxml" 
+        xmlns:assql="com.maclema.mysql.mxml.*" 
+        layout="absolute" 
+        creationComplete="onCreationComplete()">
+        
+        <mx:Script>
+        <![CDATA[
+        	import mx.controls.Alert;
+        	import mx.rpc.AsyncResponder;
+        	import mx.collections.ArrayCollection;
+        	import com.maclema.mysql.ResultSet;
+        	import com.maclema.util.ResultsUtil;
+        	import com.maclema.mysql.events.MySqlEvent;
+        	import com.maclema.mysql.MySqlToken;
+        	import com.maclema.mysql.Statement;
+        	import com.maclema.mysql.Connection;
+        	
+        	private var con:Connection;
+        	
+			private function onCreationComplete():void {
+				con = new Connection("localhost", 3306, "root", "", "assql-test");
+				con.addEventListener(Event.CONNECT, handleConnected);
+				con.connect();	
+			}
+			
+			private function handleConnected(e:Event):void {
+				var st:Statement = con.createStatement();
+				
+				//turn on results streaming
+				st.streamResults = true;
+				
+				//dispatch new rows event every 500 new rows
+				st.streamingInterval = 500;
+				
+				//execute a query
+				var token:MySqlToken = st.executeQuery("SELECT * FROM employees");
+				
+				//listen for our result set columns
+				token.addEventListener(MySqlEvent.COLUMNDATA, function(e:MySqlEvent):void {
+					grid.columns = ResultsUtil.getDataGridColumns( e.resultSet );
+					grid.dataProvider = new ArrayCollection();
+				});
+				
+				//listen for new rows
+				token.addEventListener(MySqlEvent.ROWDATA, function(e:MySqlEvent):void {
+					addNewRows(e.resultSet);
+				});				
+				
+				//add a responder
+				token.addResponder(new AsyncResponder(
+					function(data:Object, token:Object):void {
+						//call add new rows again to ensure we have all the rows
+						addNewRows(ResultSet(data));
+					},
+					function(info:Object, token:Object):void {
+						Alert.show("Error: " + info);
+					},
+					token
+				));
+			}
+			
+			private function addNewRows(rs:ResultSet):void {
+				//get our data provider
+				var dp:ArrayCollection = grid.dataProvider as ArrayCollection;
+				
+				//get the collection of new rows
+				var newRows:ArrayCollection = rs.getRows(false, dp.length, (rs.size()-dp.length));
+				
+				//concat our current source, and our new rows source
+				dp.source = dp.source.concat( newRows.source );
+				
+				//refresh our data provider
+				dp.refresh();
+			}
+		]]>
+        </mx:Script>
+        
+        <mx:DataGrid id="grid" left="10" right="10" top="10" bottom="10" />
+                
+</mx:WindowedApplication>
 }}}
