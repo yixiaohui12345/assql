@@ -112,42 +112,108 @@ package com.maclema.mysql
         	return xored;
         }
         
-        public static function splitIgnoreQuotedDelim(text:String, delim:String):Array {
-        	var parts:Array = new Array();
+        public static function getSqlParameters(sql:String):Array {
+        	var params:Array = new Array();
         	var inQuotes:Boolean = false;
         	var quoteID:String = "";
         	
-        	for ( var i:int=text.length-1; i>=0; i-- ) {
-        		if ( isQuote(text.charAt(i)) ) {
+        	var paramCount:int = 0;
+        	var namesParamCount:int = 0;
+        	
+        	var param:SqlParam;
+        	
+        	var i:int = 0;
+        	while ( i < sql.length ) {
+        		var c:String = sql.charAt(i);
+				
+				//ignore parameter identifiers that reside inside quotes        		
+        		if ( isQuote(c) ) {
         			if ( !inQuotes ) {
         				inQuotes = true;
-        				quoteID = text.charAt(i);
+        				quoteID = c;
+        				
+        				i++;
+        				continue;
         			}
         			else {
-        				if ( text.charAt(i) == quoteID ) {
-        					if ( text.charAt(i-1) != "\\" ) {
+        				if ( c == quoteID ) {
+        					if ( i > 1 && sql.charAt(i-1) != "\\" ) {
         						inQuotes = false;
+        						
+        						i++;
+        						continue;
         					}
         				}
         			}
         		}
         		
+        		//watch for params
         		if ( !inQuotes ) {
-	        		if ( text.charAt(i) == delim ) {
-	        			var part:String = text.substr(i+1);
-	        			text = text.substr(0, i);
-	        			if ( parts.length > 0 || (parts.length == 0 && part != "") ) {
-	        				parts.splice(0, 0, part);
-	        			}
-	        		}
+        			if ( c == "?" ) {
+        				paramCount++;
+        				
+        				param = new SqlParam();
+        				param.startIndex = i;
+        				param.length = 1;
+        				param.paramIndex = paramCount;
+        				params.push(param);
+        				
+        				i++;
+        				continue;
+        			}
+        			else if ( c == ":" ) {
+						namesParamCount++;
+						
+						//get our param name
+						var n:int = i+1;
+						while ( isAlphaNumeric(sql.charAt(n)) && n < sql.length ) {
+							n++;
+						}
+						
+						if ( n > i+1 ) {
+							param = new SqlParam();
+							param.startIndex = i;
+							param.paramName = sql.substring(i+1, n);
+							param.length = n-i;
+							params.push(param);
+							
+							i = n;
+							continue;
+						}
+        			}
         		}
         		
-        		if ( i == 0 && text.length > 0 ) {
-        			parts.splice(0, 0, text);
-        		}
+        		i++;
+        	}
+        	
+        	return params;
+        }
+        
+        public static function getSqlPartsForParams(sql:String, params:Array):Array {
+        	var parts:Array = new Array();
+        	
+        	var pos:int = 0;
+        	var part:String = "";
+        	
+        	for ( var i:int=0; i<params.length; i++ ) {
+        		var p:SqlParam = params[i];
+        		part = sql.substring(pos, p.startIndex);
+        		parts.push(part);
+        		pos = p.startIndex + p.length;
+        	}
+        	
+        	part = sql.substring(pos);
+        	if ( part != "" ) {
+        		parts.push(part);
         	}
         	
         	return parts;
+        }
+        
+        private static function isAlphaNumeric(c:String):Boolean {
+        	c = c.toLocaleLowerCase();
+        	var alphaNumeric:String = "0123456789abcdefghijklmnopqrstuvwxyz";
+        	return (alphaNumeric.indexOf(c) != -1);
         }
         
         private static function isQuote(char:String):Boolean {
