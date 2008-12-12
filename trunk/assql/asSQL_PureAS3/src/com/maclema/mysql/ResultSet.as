@@ -189,7 +189,13 @@ package com.maclema.mysql
         	}
         	
         	rowData.position = colStarts[colIndex];
-        	var out:String = rowData.readMultiByte(colLengths[colIndex], charSet);
+        	var out:String = "";
+        	if ( charSet == "utf8" ) {
+        		out = rowData.readMultiByte(colLengths[colIndex], charSet);
+        	}
+        	else {
+        		out = rowData.readUTFBytes(colLengths[colIndex]);
+        	}
         	
         	return out;
         }
