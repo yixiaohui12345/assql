@@ -298,7 +298,7 @@ package com.maclema.mysql
         private var getRowsCache:Array = new Array();
 		public function getRows(dateTimesAsStrings:Boolean=false, offset:int=0, len:int=0):*
 		{
-			Logger.debug(this, "Converting ResultSet to ArrayCollection...");
+			Logger.debug(this, "Converting ResultSet to Array...");
 			var st:Number = getTimer();
 			
 			var oldIndex:int = index;

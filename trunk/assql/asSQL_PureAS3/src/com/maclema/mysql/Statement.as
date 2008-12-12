@@ -54,6 +54,19 @@ package com.maclema.mysql
         }
         
         /**
+        * Sets a named parameter. Named parameters are identified in sql using :paramName. Valid parameter
+        * names only contain alpha-numeric characters.
+        **/
+        public function setNamedParameter(name:String, value:*):void {
+			if ( name.indexOf(":") == 0 ) {
+        		name = name.substr(1);
+        	}
+        	
+        	Logger.info(this, "setNamedParameter('" + name + "', " + value + ")");
+        	params[name] = value;
+        }
+        
+        /**
         * Set a String parameter
         **/
         public function setString(index:int, value:String):void {
@@ -148,7 +161,7 @@ package com.maclema.mysql
         	}
         	
         	//parameters
-        	if ( this.sql.indexOf("?") != -1 ) {
+        	if ( this.sql.indexOf("?") != -1 || this.sql.indexOf(":") ) {    		
         		Logger.info(this, "executing a statement with parameters");
         		var binq:BinaryQuery = addParametersToSql();
         		con.executeBinaryQuery(this, token, binq);
@@ -288,41 +301,54 @@ package com.maclema.mysql
         	return sql;
         }
         
-        private function addParametersToSql():BinaryQuery {        	
-        	var parts:Array = Util.splitIgnoreQuotedDelim(this.sql, "?");
-    		var binq:BinaryQuery = new BinaryQuery(con.connectionCharSet);
-    		for ( var i:int = 0; i<parts.length; i++ ) {
-    			binq.append(parts[i]);
+        private function addParametersToSql():BinaryQuery {  
+        	var sqlParams:Array = Util.getSqlParameters(this.sql);
+        	var sqlParts:Array = Util.getSqlPartsForParams(this.sql, sqlParams);
+	    	var binq:BinaryQuery = new BinaryQuery(con.connectionCharSet);
+
+	    	var numberedParamIndex:int = 0;
+	    	
+    		for ( var i:int = 0; i<sqlParts.length; i++ ) {
+    			var param:SqlParam = sqlParams[i];
     			
-    			if ( params[i+1] ) {
-    				var value:* = params[i+1];
-    				
-    				if ( value == null ) {
-    					binq.append("NULL");
+    			binq.append(sqlParts[i]);
+    			
+    			if ( param ) {
+    				if ( param.paramName == "" ) {
+    					addValueToQuery(binq, params[++numberedParamIndex]);
     				}
     				else {
-	    				binq.append("'");
-	    				if ( value is String ) {
-	    					binq.append(value, true);
-	    				}
-	    				else if ( value is int || value is Number ) {
-	    					binq.append(String(value));
-	    				}
-	    				else if ( value is Date ) {
-	    					binq.append(String((value as Date).getTime()));
-	    				}
-	    				else if ( value is ByteArray ) {
-	    					binq.appendBinary(ByteArray(value));
-	    				}
-	    				else {
-	    					Logger.fatal(this, "Unknown parameter obect for parameter index " + i);
-	    					throw new Error("Unknown Parameter Object For Parameter Index " + i);
-	    				}
-	    				binq.append("'");
+    					addValueToQuery(binq, params[param.paramName]);
     				}
     			}
     		}
     		return binq;
+        }
+        
+        private function addValueToQuery(binq:BinaryQuery, value:*):void {
+        	if ( value == null ) {
+				binq.append("NULL");
+			}
+			else {
+				binq.append("'");
+				if ( value is String ) {
+					binq.append(value, true);
+				}
+				else if ( value is int || value is Number ) {
+					binq.append(String(value));
+				}
+				else if ( value is Date ) {
+					binq.append(String((value as Date).getTime()));
+				}
+				else if ( value is ByteArray ) {
+					binq.appendBinary(ByteArray(value));
+				}
+				else {
+					Logger.fatal(this, "Unknown parameter obect");
+					throw new Error("Unknown parameter obect");
+				}
+				binq.append("'");
+			}
         }
         
         /**
