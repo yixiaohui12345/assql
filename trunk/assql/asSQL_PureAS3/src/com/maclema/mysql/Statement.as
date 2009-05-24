@@ -156,7 +156,7 @@ package com.maclema.mysql
         		this.sql = sqlString;
         	}
         	
-        	if ( this.sql.indexOf("call") == 0 ) {
+        	if ( this.sql.toLocaleLowerCase().indexOf("call") == 0 ) {
         		return executeCall();
         	}
         	

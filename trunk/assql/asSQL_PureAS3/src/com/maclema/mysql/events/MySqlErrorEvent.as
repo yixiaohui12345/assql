@@ -31,5 +31,10 @@ package com.maclema.mysql.events
             this.id = id;
             this.text = "SQL Error #" + id + ": " + msg;
         }
+		// Issue 71 from Pablo Torres
+		override public function clone():Event {
+			return new MySqlErrorEvent(msg, id);
+		}
+
     }
 }
