@@ -60,5 +60,16 @@ package com.maclema.mysql.events
 			evt.rowsAvailable = rowsAvailable;
 			return evt;
 		}
+		// Moock - Essential Actionscript 3 p 226.
+		// "Note that every custom Event subclass must override both clone() and toString(), providing versions of those methods
+		//  that account for any custom variables in the subclass.
+		override public function clone():Event
+		{
+			return copy();
+		}
+		override public function toString():String
+		{
+			return formatToString("MySqlEvent", "type", "bubbles", "cancelable", "eventPhase",  "affectedRows", "insertID", "resultSet", "params", "rowsAvailable");
+		}
 	}
 }

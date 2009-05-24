@@ -8,7 +8,7 @@ package com.maclema.mysql
     import flash.utils.getTimer;
     
     /**
-    * The ResultSet class represents a data set retuends by MySql for a query.
+    * The ResultSet class represents a data set returned by MySql for a query.
     **/
     public class ResultSet
     {        
@@ -34,7 +34,7 @@ package com.maclema.mysql
 		 * @private
 		 **/
         internal function initialize(charSet:String):void {
-        	charSet = charSet;
+        	this.charSet = charSet;
         	
             map = new Object();
             for ( var i:int=0; i<columns.length; i++ )

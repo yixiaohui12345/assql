@@ -33,11 +33,6 @@ package com.maclema.mysql.mxml
 		public function MySqlService()
 		{
 			super();
-			
-			addEventListener(MySqlErrorEvent.SQL_ERROR, removeBusyCursor);
-			addEventListener(MySqlEvent.RESULT, removeBusyCursor);
-			addEventListener(MySqlEvent.RESPONSE, removeBusyCursor);
-			addEventListener(Event.CLOSE, removeBusyCursor);
 		}
 		
 		/**
@@ -85,6 +80,10 @@ package com.maclema.mysql.mxml
 			
 			if ( showBusyCursor ) {
 				CursorManager.setBusyCursor();
+				token.addEventListener(MySqlErrorEvent.SQL_ERROR,removeBusyCursor);
+				token.addEventListener(MySqlEvent.RESULT, removeBusyCursor);
+				token.addEventListener(MySqlEvent.RESPONSE, removeBusyCursor);
+				token.addEventListener(Event.CLOSE, removeBusyCursor);
 			}
 			
 			return token;
