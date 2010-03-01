@@ -288,6 +288,7 @@ package com.maclema.mysql
         	else {
 				if ( isStoredProcedure ) {
 					_executingStoredProcedure = true;
+					Logger.debug(this, "Stored Procedure Call Starting");
 				}
 				
 	        	_busy = true;
@@ -306,6 +307,7 @@ package com.maclema.mysql
         }
 		
 		internal function storedProcedureComplete():void {
+			Logger.debug(this, "Stored Procedure Call Complete");
 			_executingStoredProcedure = false;
 			checkPool();
 		}
