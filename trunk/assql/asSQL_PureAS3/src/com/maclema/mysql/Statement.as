@@ -177,8 +177,6 @@ package com.maclema.mysql
         private function dispatchCallToken(callResultSet:ResultSet, callResponse:MySqlResponse, callParams:MySqlOutputParams, publicToken:MySqlToken):void {
         	var evt:MySqlEvent;
 			
-			trace("dispatch call tokens");
-        	
         	if ( callResultSet != null ) {
         		Logger.debug(this, "Dispatching Call ResultSet");
         		
