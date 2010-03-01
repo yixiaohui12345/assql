@@ -176,6 +176,8 @@ package com.maclema.mysql
         
         private function dispatchCallToken(callResultSet:ResultSet, callResponse:MySqlResponse, callParams:MySqlOutputParams, publicToken:MySqlToken):void {
         	var evt:MySqlEvent;
+			
+			trace("dispatch call tokens");
         	
         	if ( callResultSet != null ) {
         		Logger.debug(this, "Dispatching Call ResultSet");
@@ -201,6 +203,8 @@ package com.maclema.mysql
         		evt.params = callParams;
         		publicToken.dispatchEvent(evt);
         	}
+			
+			con.storedProcedureComplete();
         }
         
         private function executeCall():MySqlToken {
@@ -287,7 +291,7 @@ package com.maclema.mysql
         	});
         	
         	Logger.debug(this, "Executing Call (" + this.sql + ")");
-        	con.executeQuery(this, callToken, sql);
+        	con.executeQuery(this, callToken, sql, true);
         	
         	return publicToken;
         }

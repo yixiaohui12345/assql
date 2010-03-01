@@ -104,6 +104,8 @@ package com.maclema.mysql
 		private var _busy:Boolean = false;
 		private var commandPool:Array;
 		
+		private var _executingStoredProcedure:Boolean = false;
+		
 		private var mgr:DataManager;
 		
 		/**
@@ -276,14 +278,18 @@ package com.maclema.mysql
          * Used by Statement to execute a query or update sql statement. 
          * @private
          **/
-        internal function executeQuery(st:Statement, token:MySqlToken, sql:String):void
+        internal function executeQuery(st:Statement, token:MySqlToken, sql:String, isStoredProcedure:Boolean=false):void
         {
         	Logger.info(this, "Execute Query (" + sql + ")");
-        	
+			
         	if ( dataHandler != null ) {
-        		poolCommand(executeQuery, st, token, sql);
+        		poolCommand(executeQuery, st, token, sql, false, isStoredProcedure);
         	}
         	else {
+				if ( isStoredProcedure ) {
+					_executingStoredProcedure = true;
+				}
+				
 	        	_busy = true;
 	        	dispatchEvent(new Event("busyChanged"));
 	        	_tx = 0;
@@ -298,6 +304,11 @@ package com.maclema.mysql
 	            sendCommand(Mysql.COM_QUERY, sql);
 	    	}
         }
+		
+		internal function storedProcedureComplete():void {
+			_executingStoredProcedure = false;
+			checkPool();
+		}
         
         /**
         * Executes a binary query object as a sql statement.
@@ -539,13 +550,13 @@ package com.maclema.mysql
         * method(token:MySqlToken, data:*):void
         * @private
         **/
-        private function poolCommand(method:Function, arg1:*, arg2:*, arg3:*, inject:Boolean=false):void {
+        private function poolCommand(method:Function, arg1:*, arg2:*, arg3:*, inject:Boolean=false, isStoredProcedure:Boolean=false):void {
         	Logger.info(this, "Pooling Query");
         	if ( !inject ) {
-        		commandPool.push({method: method, arg1: arg1, arg2: arg2, arg3: arg3});
+        		commandPool.push({method: method, arg1: arg1, arg2: arg2, arg3: arg3, isStoredProcedure: isStoredProcedure});
         	}
         	else {
-        		commandPool.splice(0, 0, {method: method, arg1: arg1, arg2: arg2, arg3: arg3});
+        		commandPool.splice(0, 0, {method: method, arg1: arg1, arg2: arg2, arg3: arg3, isStoredProcedure: isStoredProcedure});
         	}
         }
         
@@ -554,17 +565,25 @@ package com.maclema.mysql
         * @private
         **/
         private function checkPool():void {
-        	if ( commandPool.length > 0 ) {
-        		Logger.info(this, "Executing Pooled Query");
-        		
-        		var obj:Object = commandPool.shift();
-        		var method:Function = obj.method;
-        		var arg1:* = obj.arg1;
-        		var arg2:* = obj.arg2;
-        		var arg3:* = obj.arg3;
-        		
-        		method(arg1, arg2, arg3);
-        	}
+			if ( !_executingStoredProcedure ) {
+	        	if ( commandPool.length > 0 ) {
+	        		Logger.info(this, "Executing Pooled Query");
+	        		
+	        		var obj:Object = commandPool.shift();
+	        		var method:Function = obj.method;
+	        		var arg1:* = obj.arg1;
+	        		var arg2:* = obj.arg2;
+	        		var arg3:* = obj.arg3;
+	        		var isStoredProcedure:Boolean = obj.isStoredProcedure;
+				
+					if ( isStoredProcedure && method == executeQuery ) {
+						method(arg1, arg2, arg3, isStoredProcedure);
+					}
+					else {
+	        			method(arg1, arg2, arg3);
+					}
+	        	}
+			}
         }
         
         /**
